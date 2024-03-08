@@ -40,12 +40,13 @@ npm install
 6. To start the backend-side type this command:
 
 ```bash
+npm start
 ```
 
 ## Installation on Client Side
 
 
-1. Navigate to the `client` directory:
+1. From another terminal, navigate to the `client` directory:
 
 ```bash
 cd client
