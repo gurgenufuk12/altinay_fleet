@@ -4,6 +4,7 @@ const app = express();
 require("dotenv").config();
 const bodyParser = require("body-parser");
 const morgan = require("morgan");
+const cors = require("cors");
 const cookieParser = require("cookie-parser");
 
 //IMPORT ROUTES
@@ -21,6 +22,7 @@ mongoose
 app.use(morgan("dev"));
 app.use(bodyParser.json());
 app.use(cookieParser());
+app.use(cors());
 
 //ROUTES MIDDLEWARE
 app.use("/api", userRoutes);
