@@ -9,6 +9,7 @@ const cookieParser = require("cookie-parser");
 
 //IMPORT ROUTES
 const userRoutes = require("./routes/user");
+const adminRoutes = require("./routes/admin");
 
 const url = process.env.MONGO_URI;
 const port = process.env.PORT || 8000;
@@ -26,6 +27,7 @@ app.use(cors());
 
 //ROUTES MIDDLEWARE
 app.use("/api", userRoutes);
+app.use("/admin", adminRoutes);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
