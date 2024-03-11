@@ -1,9 +1,11 @@
 import React from "react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-const SignIn = () => {
+const SignIn = ({ onLogin }) => {
+  const navigate = useNavigate();
   const [values, setValues] = useState({
     username: "",
     password: "",
@@ -22,11 +24,12 @@ const SignIn = () => {
         username,
         password,
       });
-      
+
       if (signUser) {
         setValues({ ...values, username: "", password: "" });
         toast.success("Sign in successfully, redirecting to home page...");
-        window.location.href = "/";
+        onLogin();
+        navigate("/");
       }
     } catch (error) {
       
@@ -78,7 +81,7 @@ const SignIn = () => {
           </form>
           <div className="text-sm text-center text-gray-600">
             Already have an account ?{" "}
-            <a href="#" className="text-indigo-500 hover:text-indigo-700">
+            <a href="/signup" className="text-indigo-500 hover:text-indigo-700">
               Sign Up
             </a>
           </div>
