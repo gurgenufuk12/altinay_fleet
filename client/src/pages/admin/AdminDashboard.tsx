@@ -59,45 +59,72 @@ const AdminDashboard = () => {
       console.log(error);
     }
   };
-
+  const deleteUser = async (username: string) => {
+    try {
+      const res = await axios.delete(`/admin/deleteUser/${username}`);
+      const updatedUsers = adminUsers.filter(
+        (user) => user.username !== username
+      );
+      setAdminUsers(updatedUsers);
+      toast.success("User deleted successfully");
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-4">Admin Dashboard</h1>
-      <div className="grid grid-cols-2 gap-4">
-        {adminUsers.map((user, index) => (
-          <div
-            key={index}
-            className="bg-gray-200 p-4 rounded border border-gray-400"
-          >
-            <div className="flex flex-row gap-2">
-              <p className="font-semibold">Username:</p>
-              <p>{user.username}</p>
-            </div>
-            <div className="flex flex-row gap-2">
-              <p className="font-semibold">User Role:</p>
-              <p>{user.user_Role}</p>
-            </div>
-            <div className="flex flex-row">
-              <div className="flex flex-row gap-2 mt-2">
-                <label htmlFor={`role_${user.username}`}>Change Role:</label>
-                <select
-                  id={`role_${user.username}`}
-                  value={selectedRoles[user.username]}
-                  onChange={(event) => handleRoleChange(event, user.username)}
-                >
-                  <option value="admin">Admin</option>
-                  <option value="user">User</option>
-                </select>
-              </div>
-              <button
-                onClick={() => saveUserRoleChanges(user.username)}
-                className="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+      <div className="overflow-x-auto">
+        <table className="table-auto w-full border-collapse border border-gray-400">
+          <thead className="bg-gray-200">
+            <tr>
+              <th className="px-4 py-2 border border-gray-400">Username</th>
+              <th className="px-4 py-2 border border-gray-400">User Role</th>
+              <th className="px-4 py-2 border border-gray-400">Change Role</th>
+              <th className="px-4 py-2 border border-gray-400">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {adminUsers.map((user, index) => (
+              <tr
+                key={index}
+                className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}
               >
-                Save
-              </button>
-            </div>
-          </div>
-        ))}
+                <td className="px-4 py-2 border border-gray-400">
+                  {user.username}
+                </td>
+                <td className="px-4 py-2 border border-gray-400">
+                  {user.user_Role}
+                </td>
+                <td className="px-4 py-2 border border-gray-400">
+                  <select
+                    id={`role_${user.username}`}
+                    value={selectedRoles[user.username]}
+                    onChange={(event) => handleRoleChange(event, user.username)}
+                    className="block w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="admin">Admin</option>
+                    <option value="user">User</option>
+                  </select>
+                </td>
+                <td className="px-4 py-2 border border-gray-400">
+                  <button
+                    onClick={() => saveUserRoleChanges(user.username)}
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2"
+                  >
+                    Save
+                  </button>
+                  <button
+                    onClick={() => deleteUser(user.username)}
+                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );

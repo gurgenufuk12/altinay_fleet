@@ -92,3 +92,16 @@ exports.changeUserRole = async (req, res, next) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+exports.deleteUser = async (req, res, next) => {
+  const { username } = req.params;
+  try {
+    const user = await User.findOneAndDelete({ username: username });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.status(200).json({ deletedUser: user });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
