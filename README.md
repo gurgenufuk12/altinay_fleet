@@ -5,18 +5,18 @@ Welcome to the Altınay Fleet project! This repository contains the code for man
 
 ## Installation on Server Side
 
-1. Install MongoDB to your system. You can use this tutorial: [https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-ubuntu/#std-label-install-mdb-community-ubuntu
+1. Install MongoDB to your system. You can use [this
 ](https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-ubuntu/#std-label-install-mdb-community-ubuntu
-)
+) tutorial.
 
 ```bash
 sudo systemctl start mongod
 mongosh
 ```
-2. Install mongodb-compass to your system. You can use this tutorial:[https://www.mongodb.com/docs/compass/current/install/](https://www.mongodb.com/docs/compass/current/install/)Start compass with this command:
+2. Install MongoDB Compass to your system. You can use [this](https://www.mongodb.com/docs/compass/current/install/) tutorial. Start compass with this command:
 
 ```bash
-mongo-compass
+mongodb-compass
 ```
 
 3. Name your database in mongo-compass : 
