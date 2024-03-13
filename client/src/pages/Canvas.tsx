@@ -70,7 +70,15 @@ const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
       console.log(error);
     }
   };
-
+  const convertCoordinates = (x: string, y: string) => {
+    const temp_X = parseFloat(x);
+    const temp_Y = parseFloat(y);
+    const X = temp_Y * -1;
+    const Y = temp_X;
+    const canvasX = ((-1 * X + 13) / 26) * width;
+    const canvasY = ((-1 * Y + 13) / 26) * height;
+    return { x: canvasX, y: canvasY };
+  };
   React.useEffect(() => {
     const canvas = canvasRef.current;
     if (canvas) {
@@ -78,12 +86,10 @@ const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
       if (ctx) {
         ctx.clearRect(0, 0, width, height);
         robots.forEach((robot) => {
-          var temp_X = parseFloat(robot.Pose.Position.x);
-          var temp_Y = parseFloat(robot.Pose.Position.y);
-          var x = temp_Y * -1;
-          var y = temp_X;
-          x = ((-1 * x + 13) / 26) * width;
-          y = ((-1 * y + 13) / 26) * height;
+          const { x, y } = convertCoordinates(
+            robot.Pose.Position.x,
+            robot.Pose.Position.y
+          );
           ctx.beginPath();
           ctx.arc(x, y, 10, 0, 2 * Math.PI);
           ctx.fillStyle = "red";
