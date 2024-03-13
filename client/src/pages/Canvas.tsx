@@ -54,6 +54,10 @@ interface CanvasProps {
 const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [robots, setRobots] = React.useState<Robot[]>([]);
+  const [clickedPosition, setClickedPosition] = React.useState<{
+    x: number;
+    y: number;
+  } | null>(null);
 
   React.useEffect(() => {
     const intervalId = setInterval(() => {
@@ -79,6 +83,26 @@ const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
     const canvasY = ((-1 * Y + 13) / 26) * height;
     return { x: canvasX, y: canvasY };
   };
+  const reverseCoordinates = (x: number, y: number) => {
+    const temp_X = (x / width) * 26 - 13;
+    const temp_Y = (y / height) * 26 - 13;
+    const X = temp_Y * -1;
+    const Y = temp_X;
+    return { x: X, y: Y };
+  };
+
+  const handleCanvasClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
+    if (canvasRef.current) {
+      const canvas = canvasRef.current;
+      const rect = canvas.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+        const { x: X_Target, y: Y_Target } = reverseCoordinates(x, y);
+        console.log(X_Target, Y_Target);// values that will be goe to the database
+        setClickedPosition({ x, y });// the values will be seen in canvas
+    }
+  };
+  
   React.useEffect(() => {
     const canvas = canvasRef.current;
     if (canvas) {
@@ -98,9 +122,22 @@ const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
           ctx.fillText(robot.robotName, x - 10, y - 20);
           ctx.textAlign = "start";
         });
+        if (clickedPosition) {
+          ctx.beginPath();
+          ctx.arc(
+            clickedPosition.x,
+            clickedPosition.y,
+            10,
+            0,
+            2 * Math.PI
+          );
+          ctx.fillStyle = "green";
+          ctx.fill();
+          ctx.stroke();
+        }
       }
     }
-  }, [robots, width, height]);
+  }, [robots, width, height, clickedPosition]);
 
   return (
     <canvas
@@ -108,6 +145,7 @@ const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
       width={width}
       height={height}
       className="border-2 border-black"
+      onClick={handleCanvasClick}
     />
   );
 };
