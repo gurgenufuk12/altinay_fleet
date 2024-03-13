@@ -98,7 +98,7 @@ const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
       const x = event.clientX - rect.left;
       const y = event.clientY - rect.top;
         const { x: X_Target, y: Y_Target } = reverseCoordinates(x, y);
-        console.log(X_Target, Y_Target);// values that will be goe to the database
+        console.log(X_Target, Y_Target);// values that will be gone to the database
         setClickedPosition({ x, y });// the values will be seen in canvas
     }
   };
