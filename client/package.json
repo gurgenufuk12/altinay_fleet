@@ -41,5 +41,10 @@
   "devDependencies": {
     "tailwindcss": "^3.4.1"
   },
+  "jest": {
+    "collectCoverageFrom": [
+      "src/**/*.{js,jsx,ts,tsx}"
+    ]
+  },
   "proxy": "http://localhost:8000"
 }
