@@ -1,7 +1,7 @@
 import React from "react";
 import axios from "axios";
 import { useRef } from "react";
-import { useEffect } from "react";
+import { toast } from "react-toastify";
 
 interface Robot {
   Pose: {
@@ -54,9 +54,24 @@ interface CanvasProps {
 const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [robots, setRobots] = React.useState<Robot[]>([]);
-  const [clickedPosition, setClickedPosition] = React.useState<{
+  const [arrowStart, setArrowStart] = React.useState<{
     x: number;
     y: number;
+  } | null>(null);
+  const [arrowEnd, setArrowEnd] = React.useState<{
+    x: number;
+    y: number;
+  } | null>(null);
+  const [targetPosition, setTargetPosition] = React.useState<{
+    x: number;
+    y: number;
+    z: 0;
+  } | null>(null);
+  const [targetOrientation, setTargetOrientation] = React.useState<{
+    x: number;
+    y: number;
+    z: number;
+    w: number;
   } | null>(null);
 
   React.useEffect(() => {
@@ -74,13 +89,11 @@ const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
       console.log(error);
     }
   };
-  const convertCoordinates = (x: string, y: string) => {
-    const temp_X = parseFloat(x);
-    const temp_Y = parseFloat(y);
-    const X = temp_Y * -1;
-    const Y = temp_X;
-    const canvasX = ((-1 * X + 13) / 26) * width;
-    const canvasY = ((-1 * Y + 13) / 26) * height;
+
+  const convertCoordinates = (x: number, y: number) => {
+    const canvasX = ((x / +1 + 13) / 26) * width;
+    const canvasY = ((y / -1 + 13) / 26) * height;
+
     return { x: canvasX, y: canvasY };
   };
   const reverseCoordinates = (x: number, y: number) => {
@@ -91,18 +104,160 @@ const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
     return { x: X, y: Y };
   };
 
-  const handleCanvasClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
-    if (canvasRef.current) {
-      const canvas = canvasRef.current;
+  const handleCanvasMouseDown = (
+    event: React.MouseEvent<HTMLCanvasElement>
+  ) => {
+    const canvas = canvasRef.current;
+    if (canvas) {
       const rect = canvas.getBoundingClientRect();
       const x = event.clientX - rect.left;
       const y = event.clientY - rect.top;
-        const { x: X_Target, y: Y_Target } = reverseCoordinates(x, y);
-        console.log(X_Target, Y_Target);// values that will be gone to the database
-        setClickedPosition({ x, y });// the values will be seen in canvas
+
+      setArrowStart({ x: x, y: y });
+      setArrowEnd({ x: x, y: y }); // Start and end are the same initially
     }
   };
-  
+
+  const handleCanvasMouseMove = (
+    event: React.MouseEvent<HTMLCanvasElement>
+  ) => {
+    if (arrowStart) {
+      const canvas = canvasRef.current;
+      if (canvas) {
+        const rect = canvas.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        setArrowEnd({ x: x, y: y });
+      }
+    }
+  };
+  const calculateAngle = (
+    point1: { x: number; y: number },
+    point2: { x: number; y: number }
+  ): number => {
+    const deltaY = point2.y - point1.y;
+    const deltaX = point2.x - point1.x;
+    return (Math.atan2(deltaY, deltaX) * 180) / Math.PI;
+  };
+  const calculateOrientation = (
+    angle: number
+  ): { x: number; y: number; z: number; w: number } => {
+    const halfAngle = angle / 2;
+    const sinHalfAngle = Math.sin((halfAngle * Math.PI) / 180);
+    const cosHalfAngle = Math.cos((halfAngle * Math.PI) / 180);
+
+    const x = 0;
+    const y = 0;
+    const z = sinHalfAngle;
+    const w = cosHalfAngle;
+
+    return { x, y, z, w };
+  };
+  const calculateRotationAngle = (orientation: {
+    x: string;
+    y: string;
+    z: string;
+    w: string;
+  }): number => {
+    const { x, y, z, w } = orientation;
+
+    const qx = parseFloat(x);
+    const qy = parseFloat(y);
+    const qz = parseFloat(z);
+    const qw = parseFloat(w);
+
+    const sinYaw = 2 * (qx * qy + qz * qw);
+    const cosYaw = 1 - 2 * (qx * qx + qz * qz);
+    let yaw = Math.PI - Math.atan2(sinYaw, cosYaw);
+
+    const yawDegrees = 180 + (yaw * 180) / Math.PI;
+
+    return yawDegrees;
+  };
+  const drawRobotArrow = (
+    ctx: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    angle: number
+  ) => {
+    const arrowLength = 20; // Length of the arrow
+    const arrowWidth = 30; // Width of the arrow
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(
+      x + arrowLength * Math.cos((angle - 90) * (Math.PI / 180)),
+      y + arrowLength * Math.sin((angle - 90) * (Math.PI / 180))
+    );
+    ctx.lineTo(
+      x + arrowWidth * Math.cos(angle * (Math.PI / 180)),
+      y + arrowWidth * Math.sin(angle * (Math.PI / 180))
+    );
+    ctx.lineTo(
+      x + arrowLength * Math.cos((angle + 90) * (Math.PI / 180)),
+      y + arrowLength * Math.sin((angle + 90) * (Math.PI / 180))
+    );
+    ctx.closePath();
+    ctx.fillStyle = "blue";
+    ctx.fill();
+  };
+  const handleCanvasMouseUp = async () => {
+    if (arrowStart && arrowEnd) {
+      const { x: robotXStart, y: robotYStart } = reverseCoordinates(
+        arrowStart.x,
+        arrowStart.y
+      );
+      const { x: robotXEnd, y: robotYEnd } = reverseCoordinates(
+        arrowEnd.x,
+        arrowEnd.y
+      );
+
+      setTargetPosition({
+        x: robotXStart,
+        y: robotYStart,
+        z: 0,
+      });
+
+      const angle = calculateAngle(arrowStart, arrowEnd);
+
+      const taskOrientation = calculateOrientation(angle);
+
+      setTargetOrientation({
+        x: taskOrientation.x,
+        y: taskOrientation.y,
+        z: taskOrientation.z,
+        w: taskOrientation.w,
+      });
+    }
+
+    setArrowStart(null);
+    setArrowEnd(null);
+  };
+
+  const giveTaskToRobot = async () => {
+    if (targetPosition && targetOrientation) {
+      const res = await axios
+        .post("/robots/addTarget", {
+          taskName: "Move",
+          taskCode: "1",
+          taskPriority: "1",
+          taskPercentage: "0",
+          robotName: "robot1",
+          lineerVelocity: "0",
+          angularVelocity: "0",
+          targetPosition: targetPosition,
+          targetOrientation: targetOrientation,
+          targetExecuted: false,
+        })
+        .then((res) => {
+          console.log(res);
+          toast.success("Task is given to robot successfully");
+        })
+        .catch((error) => {
+          toast.error(error.response.data.message);
+        });
+    }
+  };
+
   React.useEffect(() => {
     const canvas = canvasRef.current;
     if (canvas) {
@@ -111,9 +266,14 @@ const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
         ctx.clearRect(0, 0, width, height);
         robots.forEach((robot) => {
           const { x, y } = convertCoordinates(
-            robot.Pose.Position.x,
-            robot.Pose.Position.y
+            parseFloat(robot.Pose.Position.x),
+            parseFloat(robot.Pose.Position.y)
           );
+
+          const orientationAngle = calculateRotationAngle(
+            robot.Pose.Orientation
+          );
+          drawRobotArrow(ctx, x, y, orientationAngle);
           ctx.beginPath();
           ctx.arc(x, y, 10, 0, 2 * Math.PI);
           ctx.fillStyle = "red";
@@ -122,31 +282,55 @@ const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
           ctx.fillText(robot.robotName, x - 10, y - 20);
           ctx.textAlign = "start";
         });
-        if (clickedPosition) {
-          ctx.beginPath();
-          ctx.arc(
-            clickedPosition.x,
-            clickedPosition.y,
-            10,
-            0,
-            2 * Math.PI
+        if (arrowStart && arrowEnd) {
+          const angle = Math.atan2(
+            arrowEnd.y - arrowStart.y,
+            arrowEnd.x - arrowStart.x
           );
-          ctx.fillStyle = "green";
-          ctx.fill();
+          ctx.beginPath();
+          ctx.moveTo(arrowStart.x, arrowStart.y);
+          ctx.lineTo(arrowEnd.x, arrowEnd.y);
+          ctx.lineTo(
+            arrowEnd.x - 10 * Math.cos(angle - Math.PI / 6),
+            arrowEnd.y - 10 * Math.sin(angle - Math.PI / 6)
+          );
+          ctx.moveTo(arrowEnd.x, arrowEnd.y);
+          ctx.lineTo(
+            arrowEnd.x - 10 * Math.cos(angle + Math.PI / 6),
+            arrowEnd.y - 10 * Math.sin(angle + Math.PI / 6)
+          );
+
+          ctx.strokeStyle = "green";
+          ctx.lineWidth = 2;
           ctx.stroke();
         }
       }
     }
-  }, [robots, width, height, clickedPosition]);
+  }, [robots, width, height, arrowStart, arrowEnd]);
 
   return (
-    <canvas
-      ref={canvasRef}
-      width={width}
-      height={height}
-      className="border-2 border-black"
-      onClick={handleCanvasClick}
-    />
+    <>
+      <canvas
+        ref={canvasRef}
+        width={width}
+        height={height}
+        className="border-2 border-black"
+        onMouseDown={handleCanvasMouseDown}
+        onMouseMove={handleCanvasMouseMove}
+        onMouseUp={handleCanvasMouseUp}
+        style={{
+          backgroundImage: "url(https://i.hizliresim.com/dhimtef.jpg)",
+        }}
+      />
+      <div>
+        <button
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          onClick={giveTaskToRobot}
+        >
+          Move
+        </button>
+      </div>
+    </>
   );
 };
 
