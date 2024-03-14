@@ -51,7 +51,7 @@ interface CanvasProps {
   height: number;
 }
 
-const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
+const Map: React.FC<CanvasProps> = ({ width, height }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [robots, setRobots] = React.useState<Robot[]>([]);
   const [arrowStart, setArrowStart] = React.useState<{
@@ -334,4 +334,4 @@ const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
   );
 };
 
-export default Canvas;
+export default Map;
