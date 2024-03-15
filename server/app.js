@@ -11,6 +11,7 @@ const cookieParser = require("cookie-parser");
 const userRoutes = require("./routes/user");
 const adminRoutes = require("./routes/admin");
 const robotsRoutes = require("./routes/robots");
+const tasksRoutes = require("./routes/tasks");
 
 const url = process.env.MONGO_URI;
 const port = process.env.PORT || 8000;
@@ -30,6 +31,7 @@ app.use(cors());
 app.use("/api", userRoutes);
 app.use("/admin", adminRoutes);
 app.use("/robots", robotsRoutes);
+app.use("/tasks", tasksRoutes);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
