@@ -45,7 +45,23 @@ interface Robot {
   };
   robotName: string;
 }
-
+interface Task {
+  // robotName: string;
+  Target: {
+    Position: {
+      x: string;
+      y: string;
+      z: string;
+    };
+    Orientation: {
+      x: string;
+      y: string;
+      z: string;
+      w: string;
+    };
+    targetExecuted: boolean;
+  };
+}
 interface CanvasProps {
   width: number;
   height: number;
@@ -54,6 +70,7 @@ interface CanvasProps {
 const Map: React.FC<CanvasProps> = ({ width, height }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [robots, setRobots] = React.useState<Robot[]>([]);
+  const [tasks, setTasks] = React.useState<Task[]>([]);
   const [arrowStart, setArrowStart] = React.useState<{
     x: number;
     y: number;
@@ -227,12 +244,33 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
         z: taskOrientation.z,
         w: taskOrientation.w,
       });
+      setTasks([
+        ...tasks,
+        {
+          Target: {
+            Position: {
+              x: robotXStart.toString(),
+              y: robotYStart.toString(),
+              z: "0",
+            },
+            Orientation: {
+              x: taskOrientation.x.toString(),
+              y: taskOrientation.y.toString(),
+              z: taskOrientation.z.toString(),
+              w: taskOrientation.w.toString(),
+            },
+            targetExecuted: false,
+          },
+        },
+      ]);
     }
 
     setArrowStart(null);
     setArrowEnd(null);
   };
-
+  const showTasks = () => {
+    console.log(tasks);
+  };
   const giveTaskToRobot = async () => {
     if (targetPosition && targetOrientation) {
       const res = await axios
@@ -324,41 +362,44 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
   }, [robots, width, height, arrowStart, arrowEnd]);
 
   return (
-    <div className="flex flex-col items-center ">
-      <canvas
-        ref={canvasRef}
-        width={width}
-        height={height}
-        className="border-2 border-black ml-20"
-        onMouseDown={handleCanvasMouseDown}
-        onMouseMove={handleCanvasMouseMove}
-        onMouseUp={handleCanvasMouseUp}
-        style={{
-          backgroundImage: "url(https://i.hizliresim.com/dhimtef.jpg)",
-        }}
-      />
-      <div className="flex flex-row mt-10 gap-10">
+    <div className="flex flex-row items-center ">
+      <div>
+        <canvas
+          ref={canvasRef}
+          width={width}
+          height={height}
+          className="border-2 border-black"
+          onMouseDown={handleCanvasMouseDown}
+          onMouseMove={handleCanvasMouseMove}
+          onMouseUp={handleCanvasMouseUp}
+          style={{
+            backgroundImage: "url(https://i.hizliresim.com/dhimtef.jpg)",
+          }}
+        />
         <button
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-40 h-14"
           onClick={giveTaskToRobot}
         >
           Give Task
         </button>
-        {targetPosition && (
-          <div>
-            <h1>Target Position</h1>
-            <p>X: {targetPosition.x}</p>
-            <p>Y: {targetPosition.y}</p>
-            <p>Z: {targetPosition.z}</p>
-
-            <h1>Target Orientation</h1>
-            <p>X: {targetOrientation?.x}</p>
-            <p>Y: {targetOrientation?.y}</p>
-            <p>Z: {targetOrientation?.z}</p>
-            <p>W: {targetOrientation?.w}</p>
-          </div>
-        )}
+        <button
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-40 h-14"
+          onClick={showTasks}
+        >
+          Show Tasks
+        </button>
       </div>
+      {tasks.map((task, index) => (
+        <div key={index}>
+          <h1>Target Position</h1>
+          <p>X: {task.Target.Position.x}</p>
+          <p>Y: {task.Target.Position.y}</p>
+
+          <h1>Target Orientation</h1>
+          <p>Z: {task.Target.Orientation.z}</p>
+          <p>W: {task.Target.Orientation.w}</p>
+        </div>
+      ))}
     </div>
   );
 };
