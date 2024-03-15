@@ -255,6 +255,21 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
         .catch((error) => {
           toast.error(error.response.data.message);
         });
+      const res2 = await axios
+        .post("/tasks/addTasks", {
+          taskName: "Move",
+          taskCode: "1",
+          taskPriority: "1",
+          taskPercentage: "0",
+          robotName: "robot1",
+          targetPosition: targetPosition,
+          targetOrientation: targetOrientation,
+          targetExecuted: false,
+        })
+        .then((res) => {})
+        .catch((error) => {
+          toast.error(error.response.data.message);
+        });
     }
   };
 
@@ -309,12 +324,12 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
   }, [robots, width, height, arrowStart, arrowEnd]);
 
   return (
-    <>
+    <div className="flex flex-col items-center ">
       <canvas
         ref={canvasRef}
         width={width}
         height={height}
-        className="border-2 border-black"
+        className="border-2 border-black ml-20"
         onMouseDown={handleCanvasMouseDown}
         onMouseMove={handleCanvasMouseMove}
         onMouseUp={handleCanvasMouseUp}
@@ -322,15 +337,29 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
           backgroundImage: "url(https://i.hizliresim.com/dhimtef.jpg)",
         }}
       />
-      <div>
+      <div className="flex flex-row mt-10 gap-10">
         <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-40 h-14"
           onClick={giveTaskToRobot}
         >
-          Move
+          Give Task
         </button>
+        {targetPosition && (
+          <div>
+            <h1>Target Position</h1>
+            <p>X: {targetPosition.x}</p>
+            <p>Y: {targetPosition.y}</p>
+            <p>Z: {targetPosition.z}</p>
+
+            <h1>Target Orientation</h1>
+            <p>X: {targetOrientation?.x}</p>
+            <p>Y: {targetOrientation?.y}</p>
+            <p>Z: {targetOrientation?.z}</p>
+            <p>W: {targetOrientation?.w}</p>
+          </div>
+        )}
       </div>
-    </>
+    </div>
   );
 };
 
