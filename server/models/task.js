@@ -27,6 +27,7 @@ const tasksSchema = new mongoose.Schema({
   Task: taskSchema,
   robotName: String,
   userName: String,
+  taskStartTime: String,
 });
 
 module.exports = mongoose.model("Task", tasksSchema);

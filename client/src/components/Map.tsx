@@ -334,6 +334,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
           targetPosition: targetPosition,
           targetOrientation: targetOrientation,
           targetExecuted: false,
+          taskStartTime: new Date().toISOString(),
         })
         .then((res) => {})
         .catch((error) => {
@@ -420,6 +421,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
           Show Tasks
         </button>
       </div>
+      <div className="flex flex-col gap-3 pl-5">
       {tasks.map((task, index) => (
         <div key={index}>
           <h1>Target Position</h1>
@@ -431,6 +433,8 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
           <p>W: {task.Target.Orientation.w}</p>
         </div>
       ))}
+      </div>
+      
     </div>
   );
 };
