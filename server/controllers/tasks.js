@@ -18,6 +18,7 @@ exports.getTasks = async (req, res, next) => {
 exports.addTasks = async (req, res, next) => {
   try {
     const {
+      userName,
       taskName,
       taskCode,
       taskPriority,
@@ -40,6 +41,7 @@ exports.addTasks = async (req, res, next) => {
         targetExecuted: targetExecuted,
       },
       robotName: robotName,
+      userName: userName,
     });
     await task.save();
     res.status(200).json({
