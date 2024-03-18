@@ -26,6 +26,7 @@ const tasksSchema = new mongoose.Schema({
   Target: targetSchema,
   Task: taskSchema,
   robotName: String,
+  userName: String,
 });
 
 module.exports = mongoose.model("Task", tasksSchema);

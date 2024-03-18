@@ -1,5 +1,6 @@
 const User = require("../models/user");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 exports.signup = async (req, res, next) => {
   const { username } = req.body;
@@ -92,6 +93,28 @@ const generateToken = async (user, statusCode, res) => {
 exports.getUserById = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id);
+    if (!user)
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    res.status(200).json({
+      success: true,
+      data: user,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+exports.getUserByToken = async (req, res, next) => {
+  try {
+    const token = req.cookies.token;
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decodedToken.id);
     if (!user)
       return res.status(404).json({
         success: false,

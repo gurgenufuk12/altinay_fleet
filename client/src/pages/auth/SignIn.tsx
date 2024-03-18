@@ -13,11 +13,11 @@ const SignIn = ({ onLogin }: { onLogin: any }) => {
 
   const { username, password } = values;
 
-  const handleChange = (username:any) => (event:any) => {
+  const handleChange = (username: any) => (event: any) => {
     setValues({ ...values, [username]: event.target.value });
   };
 
-  const handleSubmit = async (event:any) => {
+  const handleSubmit = async (event: any) => {
     event.preventDefault();
     try {
       const signUser = await axios.post("/api/login", {
@@ -28,10 +28,8 @@ const SignIn = ({ onLogin }: { onLogin: any }) => {
       if (signUser) {
         setValues({ ...values, username: "", password: "" });
         toast.success("Sign in successfully, redirecting to home page...");
-        const userData = signUser.data;
-        // Store user data in localStorage
+        const userData = signUser.data.token;
         localStorage.setItem("userData", JSON.stringify(userData));
-        console.log("User data: ", userData);
         onLogin();
         navigate("/");
       }

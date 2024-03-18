@@ -72,6 +72,7 @@ interface CanvasProps {
 }
 
 const Map: React.FC<CanvasProps> = ({ width, height }) => {
+  const [token, setToken] = React.useState<string | null>("");
   const [user, setUser] = React.useState<User | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [robots, setRobots] = React.useState<Robot[]>([]);
@@ -140,6 +141,28 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
       setArrowEnd({ x: x, y: y }); // Start and end are the same initially
     }
   };
+  React.useEffect(() => {
+    const token = localStorage.getItem("userData");
+    if (token) {
+      setToken(token);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await axios.get("/api/getUserByToken", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setUser(res.data.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchUser();
+  }, [token]);
 
   const handleCanvasMouseMove = (
     event: React.MouseEvent<HTMLCanvasElement>
@@ -302,6 +325,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
         });
       const res2 = await axios
         .post("/tasks/addTasks", {
+          userName: user?.username,
           taskName: "Move",
           taskCode: "1",
           taskPriority: "1",
