@@ -23,7 +23,7 @@ const taskSchema = new mongoose.Schema({
 });
 
 const tasksSchema = new mongoose.Schema({
-  Target: targetSchema,
+  Targets: [targetSchema],
   Task: taskSchema,
   robotName: String,
   userName: String,

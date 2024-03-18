@@ -24,9 +24,7 @@ exports.addTasks = async (req, res, next) => {
       taskPriority,
       taskPercentage,
       robotName,
-      targetPosition,
-      targetOrientation,
-      targetExecuted,
+      targets,
       taskStartTime,
     } = req.body;
     const task = new Task({
@@ -36,11 +34,11 @@ exports.addTasks = async (req, res, next) => {
         taskPriority: taskPriority,
         taskPercentage: taskPercentage,
       },
-      Target: {
-        Position: targetPosition,
-        Orientation: targetOrientation,
-        targetExecuted: targetExecuted,
-      },
+      Targets: targets.map((target) => ({
+        Position: target.targetPosition,
+        Orientation: target.targetOrientation,
+        targetExecuted: target.targetExecuted,
+      })),
       robotName: robotName,
       userName: userName,
       taskStartTime: taskStartTime,

@@ -46,7 +46,6 @@ interface Robot {
   robotName: string;
 }
 interface Task {
-  // robotName: string;
   Target: {
     Position: {
       x: string;
@@ -112,7 +111,6 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
       console.log(error);
     }
   };
-
 
   const convertCoordinates = (x: number, y: number) => {
     const canvasX = ((x / +1 + 13) / 26) * width;
@@ -317,7 +315,6 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
           targetExecuted: false,
         })
         .then((res) => {
-          console.log(res);
           toast.success("Task is given to robot successfully");
         })
         .catch((error) => {
@@ -331,9 +328,13 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
           taskPriority: "1",
           taskPercentage: "0",
           robotName: "robot1",
-          targetPosition: targetPosition,
-          targetOrientation: targetOrientation,
-          targetExecuted: false,
+          targets: tasks.map((task, index) => {
+            return {
+              targetPosition: task.Target.Position,
+              targetOrientation: task.Target.Orientation,
+              targetExecuted: false,
+            };
+          }),
           taskStartTime: new Date().toISOString(),
         })
         .then((res) => {})
@@ -341,6 +342,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
           toast.error(error.response.data.message);
         });
     }
+    setTasks([]);
   };
 
   React.useEffect(() => {
@@ -422,19 +424,19 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
         </button>
       </div>
       <div className="flex flex-col gap-3 pl-5">
-      {tasks.map((task, index) => (
-        <div key={index}>
-          <h1>Target Position</h1>
-          <p>X: {task.Target.Position.x}</p>
-          <p>Y: {task.Target.Position.y}</p>
+        Task List:
+        {tasks.map((task, index) => (
+          <div key={index}>
+            <h1>Target Position</h1>
+            <p>X: {task.Target.Position.x}</p>
+            <p>Y: {task.Target.Position.y}</p>
 
-          <h1>Target Orientation</h1>
-          <p>Z: {task.Target.Orientation.z}</p>
-          <p>W: {task.Target.Orientation.w}</p>
-        </div>
-      ))}
+            <h1>Target Orientation</h1>
+            <p>Z: {task.Target.Orientation.z}</p>
+            <p>W: {task.Target.Orientation.w}</p>
+          </div>
+        ))}
       </div>
-      
     </div>
   );
 };
