@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-const SignIn = ({ onLogin }) => {
+const SignIn = ({ onLogin }: { onLogin: any }) => {
   const navigate = useNavigate();
   const [values, setValues] = useState({
     username: "",
@@ -13,11 +13,11 @@ const SignIn = ({ onLogin }) => {
 
   const { username, password } = values;
 
-  const handleChange = (username) => (event) => {
+  const handleChange = (username:any) => (event:any) => {
     setValues({ ...values, [username]: event.target.value });
   };
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event:any) => {
     event.preventDefault();
     try {
       const signUser = await axios.post("/api/login", {
@@ -28,11 +28,14 @@ const SignIn = ({ onLogin }) => {
       if (signUser) {
         setValues({ ...values, username: "", password: "" });
         toast.success("Sign in successfully, redirecting to home page...");
+        const userData = signUser.data;
+        // Store user data in localStorage
+        localStorage.setItem("userData", JSON.stringify(userData));
+        console.log("User data: ", userData);
         onLogin();
         navigate("/");
       }
-    } catch (error) {
-      
+    } catch (error: any) {
       toast.error(error.response.data.message);
     }
   };

@@ -11,11 +11,11 @@ const SignUp = () => {
 
   const { username, password } = values;
 
-  const handleChange = (username) => (event) => {
+  const handleChange = (username:any) => (event:any) => {
     setValues({ ...values, [username]: event.target.value });
   };
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event:any) => {
     event.preventDefault();
     try {
       const signUser = await axios.post("/api/signup", {
@@ -27,7 +27,7 @@ const SignUp = () => {
         setValues({ ...values, username: "", password: "" });
         toast.success("Sign up successfully, please sign in to continue");
       }
-    } catch (error) {
+    } catch (error:any) {
       console.log(error.response);
       toast.error(error.response.data.message);
     }

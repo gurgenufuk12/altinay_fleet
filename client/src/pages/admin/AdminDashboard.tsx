@@ -17,7 +17,7 @@ const AdminDashboard = () => {
     try {
       const res = await axios.get("/admin/getUsers");
       const initialSelectedRoles: { [key: string]: string } = {};
-      res.data.data.forEach((user) => {
+      res.data.data.forEach((user: any) => {
         initialSelectedRoles[user.username] = user.user_Role;
       });
       setSelectedRoles(initialSelectedRoles);

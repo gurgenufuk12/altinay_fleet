@@ -1,7 +1,7 @@
 import React from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import Sidebar from "../../components/SideBar.tsx";
+import Sidebar from "../../components/SideBar";
 interface Task {
   robotName: string;
   Target: {

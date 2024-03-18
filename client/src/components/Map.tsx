@@ -62,12 +62,17 @@ interface Task {
     targetExecuted: boolean;
   };
 }
+interface User {
+  id: string;
+  username: string;
+}
 interface CanvasProps {
   width: number;
   height: number;
 }
 
 const Map: React.FC<CanvasProps> = ({ width, height }) => {
+  const [user, setUser] = React.useState<User | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [robots, setRobots] = React.useState<Robot[]>([]);
   const [tasks, setTasks] = React.useState<Task[]>([]);
@@ -106,6 +111,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
       console.log(error);
     }
   };
+
 
   const convertCoordinates = (x: number, y: number) => {
     const canvasX = ((x / +1 + 13) / 26) * width;
@@ -244,6 +250,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
         z: taskOrientation.z,
         w: taskOrientation.w,
       });
+      // CHANGE MONDAY
       setTasks([
         ...tasks,
         {

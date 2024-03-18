@@ -6,11 +6,12 @@ import {
   Navigate,
 } from "react-router-dom";
 import "./App.css";
-import Home from "./pages/Home.tsx";
-import SignUp from "./pages/SignUp.tsx";
-import SignIn from "./pages/SignIn.tsx";
-import AdminLogin from "./pages/admin/AdminLogin.tsx";
-import AdminDashboard from "./pages/admin/AdminDashboard.tsx";
+import Dasboard from "./pages/Dasboard";
+import SignUp from "./pages/auth/SignUp";
+import SignIn from "./pages/auth/SignIn";
+import AdminLogin from "./pages/admin/AdminLogin";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import TaskTable from "./pages/tasks/taskTable";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -39,9 +40,10 @@ const App = () => {
         <Routes>
           <Route
             path="/"
-            element={isLoggedIn ? <Home /> : <Navigate to="/signin" />}
+            element={isLoggedIn ? <Dasboard /> : <Navigate to="/signin" />}
           />
           <Route path="/signup" element={<SignUp />} />
+          {/* <Route path="/" element={<Dasboard />} /> */}
           <Route path="/signin" element={<SignIn onLogin={handleLogin} />} />
           <Route
             path="/admin"
@@ -53,6 +55,7 @@ const App = () => {
               isAdminLoggedIn ? <AdminDashboard /> : <Navigate to="/admin" />
             }
           />
+          <Route path="/tasks" element={<TaskTable />} />
         </Routes>
       </Router>
     </>

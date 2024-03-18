@@ -4,7 +4,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
-const AdminLogin = ({ onLogin }) => {
+const AdminLogin = ({ onLogin }: { onLogin: any }) => {
   const navigate = useNavigate();
   const [values, setValues] = useState({
     username: "",
@@ -13,11 +13,11 @@ const AdminLogin = ({ onLogin }) => {
 
   const { username, password } = values;
 
-  const handleChange = (username) => (event) => {
+  const handleChange = (username:any) => (event:any) => {
     setValues({ ...values, [username]: event.target.value });
   };
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event:any) => {
     event.preventDefault();
     try {
       const signUser = await axios.post("/admin/adminLogin", {
@@ -35,7 +35,7 @@ const AdminLogin = ({ onLogin }) => {
       } else {
         toast.error("You are not an admin");
       }
-    } catch (error) {
+    } catch (error:any) {
       toast.error(error.response.data.message);
     }
   };
