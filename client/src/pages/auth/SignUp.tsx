@@ -11,11 +11,11 @@ const SignUp = () => {
 
   const { username, password } = values;
 
-  const handleChange = (username:any) => (event:any) => {
+  const handleChange = (username: any) => (event: any) => {
     setValues({ ...values, [username]: event.target.value });
   };
 
-  const handleSubmit = async (event:any) => {
+  const handleSubmit = async (event: any) => {
     event.preventDefault();
     try {
       const signUser = await axios.post("/api/signup", {
@@ -25,9 +25,12 @@ const SignUp = () => {
       console.log(signUser);
       if (signUser) {
         setValues({ ...values, username: "", password: "" });
-        toast.success("Sign up successfully, please sign in to continue");
+        toast.success("Sign up successfully, redirecting to sign in page...");
+        setInterval(() => {
+          window.location.href = "/signin";
+        }, 2000);
       }
-    } catch (error:any) {
+    } catch (error: any) {
       console.log(error.response);
       toast.error(error.response.data.message);
     }
@@ -57,7 +60,7 @@ const SignUp = () => {
                 Password
               </label>
               <input
-                type="text"
+                type="password"
                 id="password"
                 name="password"
                 value={password}
@@ -76,7 +79,7 @@ const SignUp = () => {
             </div>
           </form>
           <div className="text-sm text-center text-gray-600">
-            Already have an account  ?{" "}
+            Already have an account ?{" "}
             <a href="/signin" className="text-indigo-500 hover:text-indigo-700">
               Sign In
             </a>
