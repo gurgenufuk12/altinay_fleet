@@ -25,9 +25,7 @@ exports.addTarget = async (req, res, next) => {
       robotName,
       lineerVelocity,
       angularVelocity,
-      targetPosition,
-      targetOrientation,
-      targetExecuted,
+      targets,
     } = req.body;
     const robot = await Robot.findOne({ robotName: robotName });
     if (!robot) {
@@ -36,11 +34,11 @@ exports.addTarget = async (req, res, next) => {
         message: "Robot not found",
       });
     }
-    robot.Target = {
-      Position: targetPosition,
-      Orientation: targetOrientation,
-      targetExecuted: targetExecuted,
-    };
+    robot.Targets = targets.map((target) => ({
+      Position: target.targetPosition,
+      Orientation: target.targetOrientation,
+      targetExecuted: target.targetExecuted,
+    }));
     robot.Task = {
       taskName: taskName,
       taskCode: taskCode,

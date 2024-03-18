@@ -310,9 +310,13 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
           robotName: "robot1",
           lineerVelocity: "0",
           angularVelocity: "0",
-          targetPosition: targetPosition,
-          targetOrientation: targetOrientation,
-          targetExecuted: false,
+          targets: tasks.map((task, index) => {
+            return {
+              targetPosition: task.Target.Position,
+              targetOrientation: task.Target.Orientation,
+              targetExecuted: false,
+            };
+          }),
         })
         .then((res) => {
           toast.success("Task is given to robot successfully");
