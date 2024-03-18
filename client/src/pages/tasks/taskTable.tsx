@@ -6,6 +6,7 @@ import Sidebar from "../../components/SideBar";
 interface Task {
   robotName: string;
   userName: string;
+  taskStartTime: string;
   Targets: {
     Position: {
       x: string;
@@ -18,7 +19,7 @@ interface Task {
       z: string;
       w: string;
     };
-    targetExecuted: string;
+    targetExecuted: boolean;
   }[];
   Task: {
     taskCode: string;
@@ -46,7 +47,7 @@ const TaskTable: React.FC = () => {
   };
 
   return (
-    <div className="flex items-center justify-center mt-10 ">
+    <div className="flex items-center justify-center mt-10 ml-20  ">
       <Sidebar />
       <table className="table-auto">
         <thead>
@@ -57,6 +58,7 @@ const TaskTable: React.FC = () => {
             <th className="px-4 py-2">Task Name</th>
             <th className="px-4 py-2">Task Percentage</th>
             <th className="px-4 py-2">Task Priority</th>
+            <th className="px-4 py-2">Task Start Time</th>
             <th className="px-4 py-2">Task Details</th>
           </tr>
         </thead>
@@ -69,6 +71,7 @@ const TaskTable: React.FC = () => {
               <td className="border px-4 py-2">{task.Task.taskName}</td>
               <td className="border px-4 py-2">{task.Task.taskPercentage}</td>
               <td className="border px-4 py-2">{task.Task.taskPriority}</td>
+              <td className="border px-4 py-2">{task.taskStartTime}</td>
               <td className="border px-4 py-2">
                 {task.Targets &&
                   task.Targets.map((target, idx) => (
@@ -82,7 +85,10 @@ const TaskTable: React.FC = () => {
                         {target.Orientation.y}, {target.Orientation.z},{" "}
                         {target.Orientation.w}
                       </p>
-                      <p>Target Executed: {target.targetExecuted}</p>
+                      <p>
+                        Target Executed:
+                        {target.targetExecuted ? "Yes" : "No"}
+                      </p>
                     </div>
                   ))}
               </td>
