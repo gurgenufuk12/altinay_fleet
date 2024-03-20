@@ -79,6 +79,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
   const [robots, setRobots] = React.useState<Robot[]>([]);
   const [tasks, setTasks] = React.useState<Task[]>([]);
   const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(null);
+  const [taskName, setTaskName] = React.useState<string>("");
   const [arrowStart, setArrowStart] = React.useState<{
     x: number;
     y: number;
@@ -316,7 +317,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
         if (targetPosition && targetOrientation) {
           try {
             const res = await axios.post("/robots/addTarget", {
-              taskName: "Move",
+              taskName: taskName,
               taskCode: "1",
               taskPriority: "1",
               taskPercentage: "0",
@@ -333,7 +334,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
 
             const res2 = await axios.post("/tasks/addTasks", {
               userName: user?.username,
-              taskName: "Move",
+              taskName: taskName,
               taskCode: "1",
               taskPriority: "1",
               taskPercentage: "0",
@@ -424,6 +425,10 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
     setSelectedRobot(selectedRobot || null);
     toast.success("Robot selected successfully: " + robotName);
   };
+  const handleTaskName = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setTaskName(event.target.value);
+    toast.success("Task selected successfully: " + event.target.value);
+  };
 
   return (
     <div className="flex flex-row ml-96 justify-center mt-11">
@@ -441,6 +446,12 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
               {robot.robotName}
             </option>
           ))}
+        </select>
+        <select onChange={handleTaskName} value={taskName}>
+          <option value="">Select Task Name</option>
+          <option value="Patrol">Patrol</option>
+          <option value="Docking">Docking</option>
+          <option value="Lift">Lift</option>
         </select>
         <canvas
           ref={canvasRef}
