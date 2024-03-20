@@ -271,7 +271,6 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
         z: taskOrientation.z,
         w: taskOrientation.w,
       });
-      // CHANGE MONDAY
       setTasks([
         ...tasks,
         {
@@ -348,7 +347,10 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
     }
     setTasks([]);
   };
-
+  const clearTaskList = () => {
+    setTasks([]);
+    toast.success("Task list is cleared");
+  };
   React.useEffect(() => {
     const canvas = canvasRef.current;
     if (canvas) {
@@ -370,7 +372,12 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
           ctx.fillStyle = "red";
           ctx.fill();
           ctx.stroke();
-          ctx.fillText(robot.robotName, x - 10, y - 20);
+          ctx.fillText(robot.robotName, x - 10, y - 30);
+          ctx.fillText(
+            `Velocity ${robot.robotVelocity.lineerVelocity}m/s`,
+            x - 30,
+            y + 20
+          );
           ctx.textAlign = "start";
         });
         if (arrowStart && arrowEnd) {
@@ -422,9 +429,9 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
         </button>
         <button
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-40 h-14"
-          onClick={showTasks}
+          onClick={clearTaskList}
         >
-          Show Tasks
+          Clear Task List
         </button>
       </div>
       <div className="flex flex-col gap-3 pl-5">
