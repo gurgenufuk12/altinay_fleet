@@ -3,7 +3,8 @@ import axios from "axios";
 import { useRef } from "react";
 import { toast } from "react-toastify";
 import RobotInfo from "./RobotInfo";
-
+import Robot from "../assets/amr.png";
+import CanvasMap from "../assets/map.jpg";
 interface Robot {
   Pose: {
     Position: {
@@ -450,7 +451,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
           onMouseMove={handleCanvasMouseMove}
           onMouseUp={handleCanvasMouseUp}
           style={{
-            backgroundImage: "url(https://i.hizliresim.com/dhimtef.jpg)",
+            backgroundImage: `url(${CanvasMap})`,
           }}
         />
         <button
