@@ -2,6 +2,7 @@ import React from "react";
 import axios from "axios";
 import { useRef } from "react";
 import { toast } from "react-toastify";
+import RobotInfo from "./RobotInfo";
 
 interface Robot {
   Pose: {
@@ -422,7 +423,10 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
   };
 
   return (
-    <div className="flex flex-row items-center ">
+    <div className="flex flex-row ml-96 justify-center mt-11">
+      <div className="mr-10">
+        <RobotInfo selectedRobot={selectedRobot} />
+      </div>
       <div>
         <select
           onChange={handleRobotChange}
@@ -460,7 +464,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
           Clear Task List
         </button>
       </div>
-      <div className="flex flex-col gap-3 pl-5">
+      <div className="flex flex-col gap-3 pl-5 mt-6">
         Task List:
         {tasks.map((task, index) => (
           <div key={index}>

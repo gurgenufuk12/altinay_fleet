@@ -30,7 +30,7 @@ const Sidebar = () => {
     fetchUser();
   }, [token]);
   return (
-    <div className="fixed top-0 left-0 h-full w-60 bg-gray-800 text-white">
+    <div className="fixed top-0 left-0 h-full  bg-gray-800 text-white w-60">
       <div className="p-4">
         <h1 className="text-2xl font-bold">
           {user ? `Welcome, ${user.username}` : "Welcome"}

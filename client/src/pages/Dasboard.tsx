@@ -4,9 +4,9 @@ import TaskTable from "./tasks/taskTable";
 import Sidebar from "../components/SideBar";
 const Dasboard = () => {
   return (
-    <div className="flex items-center justify-center mt-10">
+    <div className="flex bg-orange-100 w-screen h-screen">
       <Sidebar />
-      <Map width={600} height={600} />
+      <Map width={600} height={600}  />
     </div>
   );
 };
