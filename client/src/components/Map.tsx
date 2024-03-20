@@ -125,8 +125,8 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
   const reverseCoordinates = (x: number, y: number) => {
     const temp_X = (x / width) * 26 - 13;
     const temp_Y = (y / height) * 26 - 13;
-    const X = temp_Y * -1;
-    const Y = temp_X;
+    const X = temp_X;
+    const Y = temp_Y * -1;
     return { x: X, y: Y };
   };
 
