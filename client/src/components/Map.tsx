@@ -76,6 +76,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [robots, setRobots] = React.useState<Robot[]>([]);
   const [tasks, setTasks] = React.useState<Task[]>([]);
+  const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(null);
   const [arrowStart, setArrowStart] = React.useState<{
     x: number;
     y: number;
@@ -306,7 +307,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
           taskCode: "1",
           taskPriority: "1",
           taskPercentage: "0",
-          robotName: "robot1",
+          robotName: selectedRobot?.robotName,
           lineerVelocity: "0",
           angularVelocity: "0",
           targets: tasks.map((task, index) => {
@@ -330,7 +331,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
           taskCode: "1",
           taskPriority: "1",
           taskPercentage: "0",
-          robotName: "robot1",
+          robotName: selectedRobot?.robotName,
           targets: tasks.map((task, index) => {
             return {
               targetPosition: task.Target.Position,
@@ -346,6 +347,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
         });
     }
     setTasks([]);
+    setSelectedRobot(null);
   };
   const clearTaskList = () => {
     setTasks([]);
@@ -412,10 +414,27 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
       }
     }
   }, [robots, width, height, arrowStart, arrowEnd]);
+  const handleRobotChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const robotName = event.target.value;
+    const selectedRobot = robots.find((robot) => robot.robotName === robotName);
+    setSelectedRobot(selectedRobot || null);
+    toast.success("Robot selected successfully: " + robotName);
+  };
 
   return (
     <div className="flex flex-row items-center ">
       <div>
+        <select
+          onChange={handleRobotChange}
+          value={selectedRobot ? selectedRobot.robotName : ""}
+        >
+          <option value="">Select a robot</option>
+          {robots.map((robot) => (
+            <option key={robot.robotName} value={robot.robotName}>
+              {robot.robotName}
+            </option>
+          ))}
+        </select>
         <canvas
           ref={canvasRef}
           width={width}
