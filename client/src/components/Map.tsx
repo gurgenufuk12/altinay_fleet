@@ -301,60 +301,55 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
     console.log(tasks);
   };
   const giveTaskToRobot = async () => {
-    if (selectedRobot === null && tasks.length === 0) {
-      toast.error("Please select a robot and give a task");
-    } else if (selectedRobot !== null && tasks.length === 0) {
-      toast.error("Please give a task to the robot");
-    } else if (selectedRobot === null && tasks.length !== 0) {
-      toast.error("Please select a robot to give a task");
-    } else {
-      if (targetPosition && targetOrientation) {
-        const res = await axios
-          .post("/robots/addTarget", {
-            taskName: "Move",
-            taskCode: "1",
-            taskPriority: "1",
-            taskPercentage: "0",
-            robotName: selectedRobot?.robotName,
-            linearVelocity: "0",
-            angularVelocity: "0",
-            targets: tasks.map((task, index) => {
-              return {
+    switch (true) {
+      case selectedRobot === null && tasks.length === 0:
+        toast.error("Please select a robot and target position");
+        break;
+      case selectedRobot !== null && tasks.length === 0:
+        toast.error("Please give a task to the robot");
+        break;
+      case selectedRobot === null && tasks.length !== 0:
+        toast.error("Please select a robot to give a task");
+        break;
+      default:
+        if (targetPosition && targetOrientation) {
+          try {
+            const res = await axios.post("/robots/addTarget", {
+              taskName: "Move",
+              taskCode: "1",
+              taskPriority: "1",
+              taskPercentage: "0",
+              robotName: selectedRobot?.robotName,
+              linearVelocity: "0",
+              angularVelocity: "0",
+              targets: tasks.map((task, index) => ({
                 targetPosition: task.Target.Position,
                 targetOrientation: task.Target.Orientation,
                 targetExecuted: false,
-              };
-            }),
-          })
-          .then((res) => {
+              })),
+            });
             toast.success("Task is given to robot successfully");
-          })
-          .catch((error) => {
-            toast.error(error.response.data.message);
-          });
-        const res2 = await axios
-          .post("/tasks/addTasks", {
-            userName: user?.username,
-            taskName: "Move",
-            taskCode: "1",
-            taskPriority: "1",
-            taskPercentage: "0",
-            robotName: selectedRobot?.robotName,
-            targets: tasks.map((task, index) => {
-              return {
+
+            const res2 = await axios.post("/tasks/addTasks", {
+              userName: user?.username,
+              taskName: "Move",
+              taskCode: "1",
+              taskPriority: "1",
+              taskPercentage: "0",
+              robotName: selectedRobot?.robotName,
+              targets: tasks.map((task, index) => ({
                 targetPosition: task.Target.Position,
                 targetOrientation: task.Target.Orientation,
                 targetExecuted: false,
-              };
-            }),
-            taskStartTime: new Date().toISOString(),
-          })
-          .then((res) => {})
-          .catch((error) => {
+              })),
+              taskStartTime: new Date().toISOString(),
+            });
+          } catch (error: any) {
             toast.error(error.response.data.message);
-          });
-      }
-      setTasks([]);
+          }
+        }
+        setTasks([]);
+        break;
     }
   };
   const clearTaskList = () => {
