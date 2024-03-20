@@ -47,7 +47,7 @@ const TaskTable: React.FC = () => {
   };
 
   return (
-    <div className="flex items-center justify-center mt-10 ml-20  ">
+    <div className="flex items-center justify-center pl-10  bg-orange-100">
       <Sidebar />
       <table className="table-auto">
         <thead>
