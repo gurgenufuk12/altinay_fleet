@@ -351,6 +351,13 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
     setTasks([]);
     toast.success("Task list is cleared");
   };
+  const handleDeleteTask = (index: number) => {
+    const updatedTasks = [...tasks];
+    updatedTasks.splice(index, 1);
+    setTasks(updatedTasks);
+    toast.success("Task deleted successfully!");
+  };
+
   React.useEffect(() => {
     const canvas = canvasRef.current;
     if (canvas) {
@@ -445,6 +452,12 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
             <h1>Target Orientation</h1>
             <p>Z: {task.Target.Orientation.z}</p>
             <p>W: {task.Target.Orientation.w}</p>
+            <button
+              className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+              onClick={() => handleDeleteTask(index)}
+            >
+              Delete
+            </button>
           </div>
         ))}
       </div>
