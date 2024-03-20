@@ -1,4 +1,5 @@
 import React from "react";
+import axios from "axios";
 
 interface Robot {
   Pose: {
@@ -44,10 +45,31 @@ interface Robot {
 }
 
 interface RobotInfoProps {
-  selectedRobot: Robot | null; // Define the props interface for RobotInfo component
+  selectedRobot: Robot | null;
 }
 
 const RobotInfo: React.FC<RobotInfoProps> = ({ selectedRobot }) => {
+  const [activeRobot, setActiveRobot] = React.useState<Robot | null>(null);
+
+  const getRobotInfo = async () => {
+    try {
+      if (selectedRobot) {
+        const res = await axios.get(
+          `/robots/getRobotInfo/${selectedRobot.robotName}`
+        );
+        setActiveRobot(res.data.data);
+      }
+    } catch (error) {
+      console.error("Error fetching robot info:", error);
+    }
+  };
+
+  React.useEffect(() => {
+    const intervalId = setInterval(getRobotInfo, 500);
+
+    return () => clearInterval(intervalId);
+  }, [selectedRobot]);
+
   return (
     <div className="border-black border-2 h-[37.5rem] mt-6 w-[18.75rem] rounded-2xl p-4 flex flex-col">
       <h1 className="text-xl font-medium">Robot Information</h1>
@@ -56,22 +78,22 @@ const RobotInfo: React.FC<RobotInfoProps> = ({ selectedRobot }) => {
       </div>
       <div className="flex flex-col">
         <h1 className="text-m font-medium">
-          Robot Name: {selectedRobot?.robotName}
+          Robot Name: {activeRobot?.robotName}
         </h1>
         <h1 className="text-m font-medium">
-          Robot Status: {selectedRobot?.robotStatus}
+          Robot Status: {activeRobot?.robotStatus}
         </h1>
         <h1 className="text-m font-medium">
-          Robot Charge: {selectedRobot?.robotCharge}
+          Robot Charge: {activeRobot?.robotCharge}
         </h1>
         <h1 className="text-m font-medium">
-          Robot Velocity: {selectedRobot?.robotVelocity.linearVelocity}
+          Robot Velocity: {activeRobot?.robotVelocity.linearVelocity + " m/s"}
         </h1>
         <h1 className="text-m font-medium">
-          Task Name: {selectedRobot?.Task.taskName}
+          Task Name: {activeRobot?.Task.taskName}
         </h1>
         <h1 className="text-m font-medium">
-          Task Percentage: {selectedRobot?.Task.taskPercentage}
+          Task Percentage: {activeRobot?.Task.taskPercentage}
         </h1>
       </div>
     </div>
