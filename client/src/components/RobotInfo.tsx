@@ -1,5 +1,6 @@
 import React from "react";
 import axios from "axios";
+import Robot from "../assets/amr.png";
 
 interface Robot {
   Pose: {
@@ -71,10 +72,12 @@ const RobotInfo: React.FC<RobotInfoProps> = ({ selectedRobot }) => {
   }, [selectedRobot]);
 
   return (
-    <div className="border-black border-2 h-[37.5rem] mt-6 w-[18.75rem] rounded-2xl p-4 flex flex-col">
+    <div className="border-black border-2 h-[37.5rem] mt-6 w-[18.75rem] rounded-2xl p-4 flex flex-col gap-20">
       <h1 className="text-xl font-medium">Robot Information</h1>
       <div className="flex flex-col items-center">
-        <div className="flex bg-black m-7 w-10 h-10"></div>
+        <div className="flex m-7">
+          <img src={Robot} alt="robot" />
+        </div>
       </div>
       <div className="flex flex-col">
         <h1 className="text-m font-medium">
