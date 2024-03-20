@@ -23,7 +23,7 @@ exports.addTarget = async (req, res, next) => {
       taskPriority,
       taskPercentage,
       robotName,
-      lineerVelocity,
+      linearVelocity,
       angularVelocity,
       targets,
     } = req.body;
@@ -46,7 +46,7 @@ exports.addTarget = async (req, res, next) => {
       taskPercentage: taskPercentage,
     };
     robot.robotVelocity = {
-      lineerVelocity: lineerVelocity,
+      linearVelocity: linearVelocity,
       angularVelocity: angularVelocity,
     };
 
@@ -60,6 +60,31 @@ exports.addTarget = async (req, res, next) => {
     res.status(400).json({
       success: false,
       message: error.message,
+    });
+  }
+};
+exports.getCurrentRobotVelocity = async (req, res, next) => {
+  try {
+    const { robotName } = req.params;
+    const robot = await Robot.findOne({ robotName: robotName });
+
+    if (!robot) {
+      return res.status(404).json({
+        success: false,
+        message: "Robot not found",
+      });
+    }
+
+    const { robotVelocity } = robot;
+    res.status(200).json({
+      success: true,
+      data: robotVelocity,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
     });
   }
 };

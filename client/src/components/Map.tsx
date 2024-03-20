@@ -20,7 +20,7 @@ interface Robot {
   robotCharge: string;
   robotStatus: string;
   robotVelocity: {
-    lineerVelocity: string;
+    linearVelocity: string;
     angularVelocity: string;
   };
   Target: {
@@ -308,7 +308,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
           taskPriority: "1",
           taskPercentage: "0",
           robotName: selectedRobot?.robotName,
-          lineerVelocity: "0",
+          linearVelocity: "0",
           angularVelocity: "0",
           targets: tasks.map((task, index) => {
             return {
@@ -383,7 +383,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
           ctx.stroke();
           ctx.fillText(robot.robotName, x - 10, y - 30);
           ctx.fillText(
-            `Velocity ${robot.robotVelocity.lineerVelocity}m/s`,
+            `Velocity ${robot.robotVelocity.linearVelocity}m/s`,
             x - 30,
             y + 20
           );

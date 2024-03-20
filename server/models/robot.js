@@ -41,7 +41,7 @@ const robotSchema = new mongoose.Schema({
   robotCharge: String,
   robotStatus: String,
   robotVelocity: {
-    lineerVelocity: String,
+    linearVelocity: String,
     angularVelocity: String,
   },
   Targets: [targetSchema],
