@@ -64,10 +64,12 @@ const TaskTable: React.FC = () => {
     setFilter("");
   };
 
-  const filteredTasks = tasks.filter((task) => {
-    if (!filter) return true;
-    return task.Task.taskName === filter;
-  });
+  const filteredTasks = tasks
+    .filter((task) => {
+      if (!filter) return true;
+      return task.Task.taskName === filter;
+    })
+    .reverse();
 
   return (
     <div className="flex items-center justify-center pl-20 bg-orange-100">
