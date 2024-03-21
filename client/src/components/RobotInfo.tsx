@@ -1,6 +1,7 @@
 import React from "react";
 import axios from "axios";
 import Robot from "../assets/amr.png";
+import { toast } from "react-toastify";
 
 interface Robot {
   Pose: {
@@ -22,7 +23,7 @@ interface Robot {
     linearVelocity: string;
     angularVelocity: string;
   };
-  Target: {
+  Targets: {
     Position: {
       x: string;
       y: string;
@@ -35,7 +36,7 @@ interface Robot {
       w: string;
     };
     targetExecuted: boolean;
-  };
+  }[];
   Task: {
     taskCode: string;
     taskName: string;
@@ -51,6 +52,7 @@ interface RobotInfoProps {
 
 const RobotInfo: React.FC<RobotInfoProps> = ({ selectedRobot }) => {
   const [activeRobot, setActiveRobot] = React.useState<Robot | null>(null);
+  const [robotStatus, setRobotStatus] = React.useState<string>("");
 
   const getRobotInfo = async () => {
     try {
@@ -64,13 +66,39 @@ const RobotInfo: React.FC<RobotInfoProps> = ({ selectedRobot }) => {
       console.error("Error fetching robot info:", error);
     }
   };
+  React.useEffect(() => {
+    if (activeRobot) {
+      if (activeRobot.Targets.length > 0) {
+        const lastTarget = activeRobot.Targets[activeRobot.Targets.length - 1];
+        const newStatus = lastTarget.targetExecuted
+          ? "Idle"
+          : "Task In Progress";
+        setRobotStatus(newStatus);
+      }
+    }
+  }, [activeRobot]);
 
   React.useEffect(() => {
     const intervalId = setInterval(getRobotInfo, 500);
 
     return () => clearInterval(intervalId);
   }, [selectedRobot]);
+  React.useEffect(() => {
+    const updateRobotStatus = async () => {
+      if (activeRobot) {
+        try {
+          await axios.put(`/robots/updateRobotInfo/${activeRobot.robotName}`, {
+            robotStatus,
+          });
+        } catch (error) {
+          console.error("Error updating robot status:", error);
+        }
+      }
+    };
+    updateRobotStatus();
 
+    return () => {};
+  }, [robotStatus]);
   return (
     <div className="border-black border-2 h-[37.5rem] mt-6 w-[18.75rem] rounded-2xl p-4 flex flex-col gap-20">
       <h1 className="text-xl font-medium">Robot Information</h1>
