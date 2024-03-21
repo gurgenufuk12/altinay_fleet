@@ -185,7 +185,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
   ): number => {
     const deltaY = point2.y - point1.y;
     const deltaX = point2.x - point1.x;
-    return (Math.atan2(deltaY, deltaX) * 180) / Math.PI;
+    return (Math.atan2(deltaY, deltaX) * -180) / Math.PI;
   };
   const calculateOrientation = (
     angle: number
