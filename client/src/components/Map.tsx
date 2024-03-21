@@ -25,7 +25,7 @@ interface Robot {
     linearVelocity: string;
     angularVelocity: string;
   };
-  Target: {
+    Targets: {
     Position: {
       x: string;
       y: string;
@@ -38,7 +38,7 @@ interface Robot {
       w: string;
     };
     targetExecuted: boolean;
-  };
+  }[];
   Task: {
     taskCode: string;
     taskName: string;
