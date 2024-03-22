@@ -468,18 +468,21 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
             backgroundImage: `url(${CanvasMap})`,
           }}
         />
-        <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-40 h-14"
-          onClick={giveTaskToRobot}
-        >
-          Give Task
-        </button>
-        <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-40 h-14"
-          onClick={clearTaskList}
-        >
-          Clear Task List
-        </button>
+        <div className="flex justify-between">
+          <button
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-40 h-14"
+            onClick={giveTaskToRobot}
+          >
+            Give Task
+          </button>
+
+          <button
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-40 h-14"
+            onClick={clearTaskList}
+          >
+            Clear Task List
+          </button>
+        </div>
       </div>
       <div className="flex flex-col gap-3 pl-5 mt-6">
         Task List:
