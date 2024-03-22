@@ -99,7 +99,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
   const [taskCode, settaskCode] = React.useState<string>("");
   const [locationName, setLocationName] = React.useState<string>("");
   const [locations, setLocations] = React.useState<Location[]>([]);
-  const [isUserAdmin, setIsUserAdmin] = React.useState<boolean>(false);
+  const [isUserAdmin, setIsUserAdmin] = React.useState<boolean>(false);// DO NOT COMMIT JUST FOR PROD AS TRUE
   const [arrowStart, setArrowStart] = React.useState<{
     x: number;
     y: number;
@@ -136,27 +136,32 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
     }
   };
   const addLocation = async () => {
-    try {
-      const res = await axios.post("/locations/addLocation", {
-        locationName: locationName,
-        Target: {
-          Position: {
-            x: targetPosition?.x.toString() || "",
-            y: targetPosition?.y.toString() || "",
-            z: "0",
+    if (locationName.trim() === "") {
+      toast.error("Location name cannot be empty");
+      return;
+    } else {
+      try {
+        const res = await axios.post("/locations/addLocation", {
+          locationName: locationName,
+          Target: {
+            Position: {
+              x: targetPosition?.x.toString() || "",
+              y: targetPosition?.y.toString() || "",
+              z: "0",
+            },
+            Orientation: {
+              x: targetOrientation?.x.toString() || "",
+              y: targetOrientation?.y.toString() || "",
+              z: targetOrientation?.z.toString() || "",
+              w: targetOrientation?.w.toString() || "",
+            },
           },
-          Orientation: {
-            x: targetOrientation?.x.toString() || "",
-            y: targetOrientation?.y.toString() || "",
-            z: targetOrientation?.z.toString() || "",
-            w: targetOrientation?.w.toString() || "",
-          },
-        },
-      });
-      toast.success("Location added successfully");
-      setLocationName("");
-    } catch (error: any) {
-      toast.error(error.response.data.message);
+        });
+        toast.success("Location added successfully");
+        setLocationName("");
+      } catch (error: any) {
+        toast.error(error.response.data.message);
+      }
     }
   };
   const convertCoordinates = (x: number, y: number) => {
@@ -309,6 +314,22 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
     ctx.fillStyle = "blue";
     ctx.fill();
   };
+  const drawLocations = (ctx: CanvasRenderingContext2D) => {
+    locations.forEach((location) => {
+      const { x, y } = convertCoordinates(
+        parseFloat(location.Target.Position.x),
+        parseFloat(location.Target.Position.y)
+      );
+
+      ctx.beginPath();
+      ctx.arc(x, y, 5, 0, 2 * Math.PI);
+      ctx.fillStyle = "green";
+      ctx.font = "10px Arial";
+      ctx.fillText(location.locationName, x - 5, y - 10);
+      ctx.fill();
+      ctx.stroke();
+    });
+  };
   const handleCanvasMouseUp = async () => {
     if (arrowStart && arrowEnd) {
       const { x: robotXStart, y: robotYStart } = reverseCoordinates(
@@ -435,6 +456,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
       const ctx = canvas.getContext("2d");
       if (ctx) {
         ctx.clearRect(0, 0, width, height);
+        drawLocations(ctx);
         robots.forEach((robot) => {
           const { x, y } = convertCoordinates(
             parseFloat(robot.Pose.Position.x),
@@ -600,8 +622,21 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
                 </button>
                 {isUserAdmin && (
                   <button
-                    className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                    className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded disabled:opacity-0"
                     onClick={addLocation}
+                    disabled={locations.some(
+                      (location) =>
+                        location.Target.Position.x === task.Target.Position.x &&
+                        location.Target.Position.y === task.Target.Position.y &&
+                        location.Target.Orientation.x ===
+                          task.Target.Orientation.x &&
+                        location.Target.Orientation.y ===
+                          task.Target.Orientation.y &&
+                        location.Target.Orientation.z ===
+                          task.Target.Orientation.z &&
+                        location.Target.Orientation.w ===
+                          task.Target.Orientation.w
+                    )}
                   >
                     Add Location
                   </button>
