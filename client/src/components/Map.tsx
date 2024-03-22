@@ -79,7 +79,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
   const [robots, setRobots] = React.useState<Robot[]>([]);
   const [tasks, setTasks] = React.useState<Task[]>([]);
   const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(null);
-  const [taskName, setTaskName] = React.useState<string>("");
+  const [taskCode, settaskCode] = React.useState<string>("");
   const [arrowStart, setArrowStart] = React.useState<{
     x: number;
     y: number;
@@ -313,15 +313,15 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
       case selectedRobot === null && tasks.length !== 0:
         toast.error("Please select a robot to give a task");
         break;
-      case taskName.trim() === "":
-        toast.error("Task name cannot be empty");
+      case taskCode.trim() === "":
+        toast.error("Task code cannot be empty");
         break;
       default:
         if (targetPosition && targetOrientation) {
           try {
             const res = await axios.post("/robots/addTarget", {
-              taskName: taskName,
-              taskCode: "1",
+              taskName: "",
+              taskCode: taskCode,
               taskPriority: "1",
               taskPercentage: "0",
               robotName: selectedRobot?.robotName,
@@ -337,8 +337,8 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
 
             const res2 = await axios.post("/tasks/addTasks", {
               userName: user?.username,
-              taskName: taskName,
-              taskCode: "1",
+              taskName: "",
+              taskCode: taskCode,
               taskPriority: "1",
               taskPercentage: "0",
               robotName: selectedRobot?.robotName,
@@ -429,8 +429,8 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
     toast.success("Robot selected successfully: " + robotName);
   };
   const handleTaskName = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setTaskName(event.target.value);
-    toast.success("Task selected successfully: " + event.target.value);
+    settaskCode(event.target.value);
+    toast.success("Task code selected successfully: " + event.target.value);
   };
 
   return (
@@ -450,8 +450,8 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
             </option>
           ))}
         </select>
-        <select onChange={handleTaskName} value={taskName}>
-          <option value="">Select Task Name</option>
+        <select onChange={handleTaskName} value={taskCode}>
+          <option value="">Select Task Code</option>
           <option value="Patrol">Patrol</option>
           <option value="Docking">Docking</option>
           <option value="Lift">Lift</option>
