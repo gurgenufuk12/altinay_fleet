@@ -67,6 +67,22 @@ interface User {
   id: string;
   username: string;
 }
+interface Location {
+  locationName: string;
+  Target: {
+    Position: {
+      x: string;
+      y: string;
+      z: string;
+    };
+    Orientation: {
+      x: string;
+      y: string;
+      z: string;
+      w: string;
+    };
+  };
+}
 interface CanvasProps {
   width: number;
   height: number;
@@ -80,6 +96,8 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
   const [tasks, setTasks] = React.useState<Task[]>([]);
   const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(null);
   const [taskCode, settaskCode] = React.useState<string>("");
+  const [locationName, setLocationName] = React.useState<string>("");
+  const [locations, setLocations] = React.useState<Location[]>([]);
   const [arrowStart, setArrowStart] = React.useState<{
     x: number;
     y: number;
@@ -115,7 +133,30 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
       console.log(error);
     }
   };
-
+  const addLocation = async () => {
+    try {
+      const res = await axios.post("/locations/addLocation", {
+        locationName: locationName,
+        Target: {
+          Position: {
+            x: targetPosition?.x.toString() || "",
+            y: targetPosition?.y.toString() || "",
+            z: "0",
+          },
+          Orientation: {
+            x: targetOrientation?.x.toString() || "",
+            y: targetOrientation?.y.toString() || "",
+            z: targetOrientation?.z.toString() || "",
+            w: targetOrientation?.w.toString() || "",
+          },
+        },
+      });
+      toast.success("Location added successfully");
+      setLocationName("");
+    } catch (error: any) {
+      toast.error(error.response.data.message);
+    }
+  };
   const convertCoordinates = (x: number, y: number) => {
     const canvasX = ((x / +1 + 13) / 26) * width;
     const canvasY = ((y / -1 + 13) / 26) * height;
@@ -166,6 +207,20 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
     fetchUser();
   }, [token]);
 
+  const fetchLocations = async () => {
+    try {
+      const res = await axios.get("/locations/getLocations");
+      setLocations(res.data.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  React.useEffect(() => {
+    const intervalId = setInterval(() => {
+      fetchLocations();
+    }, 1000);
+    return () => clearInterval(intervalId);
+  }, []);
   const handleCanvasMouseMove = (
     event: React.MouseEvent<HTMLCanvasElement>
   ) => {
@@ -317,7 +372,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
         toast.error("Task code cannot be empty");
         break;
       default:
-        if (targetPosition && targetOrientation) {
+        if (tasks.length > 0 && selectedRobot !== null) {
           try {
             const res = await axios.post("/robots/addTarget", {
               taskName: "",
@@ -432,6 +487,40 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
     settaskCode(event.target.value);
     toast.success("Task code selected successfully: " + event.target.value);
   };
+  const handleLocationSelection = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const selectedLocationName = event.target.value;
+    if (selectedLocationName) {
+      const selectedLocation = locations.find(
+        (location) => location.locationName === selectedLocationName
+      );
+      if (selectedLocation) {
+        const { Position, Orientation } = selectedLocation.Target;
+        const newTask = {
+          Target: {
+            Position: {
+              x: Position.x,
+              y: Position.y,
+              z: "0",
+            },
+            Orientation: {
+              x: Orientation.x,
+              y: Orientation.y,
+              z: Orientation.z,
+              w: Orientation.w,
+            },
+            targetExecuted: false,
+          },
+        };
+        setTasks([...tasks, newTask]);
+        setLocationName("");
+        toast.success(
+          `Location "${selectedLocationName}" added to the task list successfully`
+        );
+      }
+    }
+  };
 
   return (
     <div className="flex flex-row ml-96 justify-center mt-11">
@@ -484,25 +573,62 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
           </button>
         </div>
       </div>
-      <div className="flex flex-col gap-3 pl-5 mt-6">
-        Task List:
-        {tasks.map((task, index) => (
-          <div key={index}>
-            <h1>Target Position</h1>
-            <p>X: {task.Target.Position.x}</p>
-            <p>Y: {task.Target.Position.y}</p>
+      <div className="gap-10 flex flex-row">
+        <div className="flex flex-col gap-3 pl-5 mt-6">
+          Task List:
+          {tasks.map((task, index) => (
+            <div key={index}>
+              <h1>Target Position</h1>
+              <p>X: {task.Target.Position.x}</p>
+              <p>Y: {task.Target.Position.y}</p>
 
-            <h1>Target Orientation</h1>
-            <p>Z: {task.Target.Orientation.z}</p>
-            <p>W: {task.Target.Orientation.w}</p>
-            <button
-              className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-              onClick={() => handleDeleteTask(index)}
-            >
-              Delete
-            </button>
+              <h1>Target Orientation</h1>
+              <p>Z: {task.Target.Orientation.z}</p>
+              <p>W: {task.Target.Orientation.w}</p>
+              <div className="flex gap-3">
+                <button
+                  className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                  onClick={() => handleDeleteTask(index)}
+                >
+                  Delete
+                </button>
+                <button
+                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                  onClick={addLocation}
+                >
+                  Add Location
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="flex flex-col gap-3 pl-5 mt-6">
+          <div className="flex flex-col">
+            <span>
+              Location:
+              <input
+                type="text"
+                placeholder="Name"
+                className="w-20"
+                value={locationName}
+                onChange={(e) => setLocationName(e.target.value)}
+              />
+            </span>
           </div>
-        ))}
+          <div>
+            <select onChange={handleLocationSelection} value={locationName}>
+              <option value="">Select Location</option>
+              {locations.map((location) => (
+                <option
+                  key={location.locationName}
+                  value={location.locationName}
+                >
+                  {location.locationName}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
       </div>
     </div>
   );
