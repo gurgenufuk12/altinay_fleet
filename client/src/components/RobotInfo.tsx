@@ -77,7 +77,16 @@ const RobotInfo: React.FC<RobotInfoProps> = ({ selectedRobot }) => {
       }
     }
   }, [activeRobot]);
-
+  React.useEffect(() => {
+    if (activeRobot) {
+      if (activeRobot.Targets.length > 0) {
+        const lastTarget = activeRobot.Targets[activeRobot.Targets.length - 1];
+        if (lastTarget.targetExecuted && robotStatus === "Task In Progress") {
+          toast.success("Task Completed :" + activeRobot.Task.taskName);
+        }
+      }
+    }
+  }, [activeRobot]);
   React.useEffect(() => {
     const intervalId = setInterval(getRobotInfo, 500);
 
