@@ -115,16 +115,20 @@ const RobotInfo: React.FC<RobotInfoProps> = ({ selectedRobot }) => {
           Robot Status: {activeRobot?.robotStatus}
         </h1>
         <h1 className="text-m font-medium">
-          Robot Charge: {activeRobot?.robotCharge}
+          Robot Charge: {activeRobot?.robotCharge + "%"}
         </h1>
         <h1 className="text-m font-medium">
           Robot Velocity: {activeRobot?.robotVelocity.linearVelocity + " m/s"}
         </h1>
         <h1 className="text-m font-medium">
-          Task Name: {activeRobot?.Task.taskName}
+          {robotStatus === "Idle"
+            ? ""
+            : "Task Name: " + activeRobot?.Task.taskName}
         </h1>
         <h1 className="text-m font-medium">
-          Task Percentage: {activeRobot?.Task.taskPercentage}
+          {robotStatus === "Task In Progress"
+            ? "Task Percentage: " + activeRobot?.Task.taskPercentage + "%"
+            : ""}
         </h1>
       </div>
     </div>
