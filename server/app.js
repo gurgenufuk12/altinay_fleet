@@ -12,6 +12,7 @@ const userRoutes = require("./routes/user");
 const adminRoutes = require("./routes/admin");
 const robotsRoutes = require("./routes/robots");
 const tasksRoutes = require("./routes/tasks");
+const locationsRoutes = require("./routes/locations");
 
 const url = process.env.MONGO_URI;
 const port = process.env.PORT || 8000;
@@ -32,6 +33,7 @@ app.use("/api", userRoutes);
 app.use("/admin", adminRoutes);
 app.use("/robots", robotsRoutes);
 app.use("/tasks", tasksRoutes);
+app.use("/locations", locationsRoutes);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
