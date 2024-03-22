@@ -66,6 +66,7 @@ interface Task {
 interface User {
   id: string;
   username: string;
+  user_Role: string;
 }
 interface Location {
   locationName: string;
@@ -98,6 +99,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
   const [taskCode, settaskCode] = React.useState<string>("");
   const [locationName, setLocationName] = React.useState<string>("");
   const [locations, setLocations] = React.useState<Location[]>([]);
+  const [isUserAdmin, setIsUserAdmin] = React.useState<boolean>(false);
   const [arrowStart, setArrowStart] = React.useState<{
     x: number;
     y: number;
@@ -170,7 +172,11 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
     const Y = temp_Y * -1;
     return { x: X, y: Y };
   };
-
+  React.useEffect(() => {
+    if (user && user.user_Role === "admin") {
+      setIsUserAdmin(true);
+    }
+  }, [user]);
   const handleCanvasMouseDown = (
     event: React.MouseEvent<HTMLCanvasElement>
   ) => {
@@ -592,12 +598,14 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
                 >
                   Delete
                 </button>
-                <button
-                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                  onClick={addLocation}
-                >
-                  Add Location
-                </button>
+                {isUserAdmin && (
+                  <button
+                    className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                    onClick={addLocation}
+                  >
+                    Add Location
+                  </button>
+                )}
               </div>
             </div>
           ))}
