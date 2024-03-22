@@ -25,7 +25,7 @@ interface Robot {
     linearVelocity: string;
     angularVelocity: string;
   };
-    Targets: {
+  Targets: {
     Position: {
       x: string;
       y: string;
@@ -312,6 +312,9 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
         break;
       case selectedRobot === null && tasks.length !== 0:
         toast.error("Please select a robot to give a task");
+        break;
+      case taskName.trim() === "":
+        toast.error("Task name cannot be empty");
         break;
       default:
         if (targetPosition && targetOrientation) {
