@@ -99,7 +99,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
   const [taskCode, settaskCode] = React.useState<string>("");
   const [locationName, setLocationName] = React.useState<string>("");
   const [locations, setLocations] = React.useState<Location[]>([]);
-  const [isUserAdmin, setIsUserAdmin] = React.useState<boolean>(false);// DO NOT COMMIT JUST FOR PROD AS TRUE
+  const [isUserAdmin, setIsUserAdmin] = React.useState<boolean>(false); // DO NOT COMMIT JUST FOR PROD AS TRUE
   const [arrowStart, setArrowStart] = React.useState<{
     x: number;
     y: number;
@@ -585,7 +585,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
             backgroundImage: `url(${CanvasMap})`,
           }}
         />
-        <div className="flex justify-between">
+        <div className="flex justify-between mt-2">
           <button
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-40 h-14"
             onClick={giveTaskToRobot}
@@ -647,16 +647,18 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
         </div>
         <div className="flex flex-col gap-3 pl-5 mt-6">
           <div className="flex flex-col">
-            <span>
-              Location:
-              <input
-                type="text"
-                placeholder="Name"
-                className="w-20"
-                value={locationName}
-                onChange={(e) => setLocationName(e.target.value)}
-              />
-            </span>
+            {isUserAdmin && (
+              <span>
+                Location:
+                <input
+                  type="text"
+                  placeholder="Name"
+                  className="w-20"
+                  value={locationName}
+                  onChange={(e) => setLocationName(e.target.value)}
+                />
+              </span>
+            )}
           </div>
           <div>
             <select onChange={handleLocationSelection} value={locationName}>
