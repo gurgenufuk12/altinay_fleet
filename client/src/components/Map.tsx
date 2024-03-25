@@ -99,7 +99,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
   const [taskCode, settaskCode] = React.useState<string>("");
   const [locationName, setLocationName] = React.useState<string>("");
   const [locations, setLocations] = React.useState<Location[]>([]);
-  const [isUserAdmin, setIsUserAdmin] = React.useState<boolean>(false); // DO NOT COMMIT JUST FOR PROD AS TRUE
+  const [isUserAdmin, setIsUserAdmin] = React.useState<boolean>(false); // DO NOT COMMIT JUST FOR DEV AS TRUE
   const [disableButtons, setDisableButtons] = React.useState<boolean[]>([]);
   const [arrowStart, setArrowStart] = React.useState<{
     x: number;
@@ -192,11 +192,6 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
     const Y = temp_Y * -1;
     return { x: X, y: Y };
   };
-  React.useEffect(() => {
-    if (user && user.user_Role === "admin") {
-      setIsUserAdmin(true);
-    }
-  }, [user]);
   const handleCanvasMouseDown = (
     event: React.MouseEvent<HTMLCanvasElement>
   ) => {
@@ -211,7 +206,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
     }
   };
   React.useEffect(() => {
-    const token = localStorage.getItem("userData");
+    const token = sessionStorage.getItem("userData");
     if (token) {
       setToken(token);
     }

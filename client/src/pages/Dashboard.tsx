@@ -8,7 +8,7 @@ const Dashboard = () => {
   const [token, setToken] = React.useState<string | null>("");
 
   React.useEffect(() => {
-    const token = localStorage.getItem("userData");
+    const token = sessionStorage.getItem("userData");
     if (token) {
       setToken(token);
     }

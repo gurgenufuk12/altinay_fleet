@@ -31,7 +31,7 @@ const SignIn = () => {
         setValues({ ...values, username: "", password: "" });
         toast.success("Sign in successfully, redirecting to home page...");
         const userData = signUser.data.token;
-        localStorage.setItem("userData", JSON.stringify(userData));
+        sessionStorage.setItem("userData", JSON.stringify(userData));
         handleLogin();
         navigate("/");
         console.log("Redirected to dashboard.");
