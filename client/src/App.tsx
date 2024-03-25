@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   BrowserRouter as Router,
   Route,
@@ -13,31 +13,34 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import TaskTable from "./pages/tasks/taskTable";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
 
 const App = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // State to track if user is logged in
-  const handleLogin = () => {
-    setIsLoggedIn(true);
-  };
+  const { isLoggedIn, setIsLoggedIn } = useAuth();
 
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-  };
-
+  // React.useEffect(() => {
+  //   // Check if authentication token exists in local storage
+  //   const token = localStorage.getItem("token");
+  //   if (token) {
+  //     // Set authentication state to indicate user is logged in
+  //     setIsLoggedIn(true);
+  //   }
+  // }, []);
+  
   return (
     <>
       <ToastContainer />
       <Router>
         <Routes>
-          {
+          {/* {
             <Route
               path="/"
               element={isLoggedIn ? <Dashboard /> : <Navigate to="/signin" />}
             />
-          }
+          } */}
           <Route path="/signup" element={<SignUp />} />
-          {/* <Route path="/" element={<Dashboard />} /> */}
-          <Route path="/signin" element={<SignIn onLogin={handleLogin} />} />
+          <Route path ="/" element={<Dashboard />} />
+          <Route path="/signin" element={<SignIn />} />
           <Route path="/adminPage" element={<AdminDashboard />} />
           <Route path="/tasks" element={<TaskTable />} />
         </Routes>

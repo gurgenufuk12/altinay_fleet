@@ -1,21 +1,18 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
+
 interface User {
   id: string;
   username: string;
   user_Role: string;
 }
-const Sidebar = () => {
-  const [token, setToken] = React.useState<string | null>("");
-  const [user, setUser] = React.useState<User | null>(null);
-  React.useEffect(() => {
-    const token = localStorage.getItem("userData");
-    if (token) {
-      setToken(token);
-    }
-  }, []);
+interface SidebarProps {
+  token: string | null;
+}
+const Sidebar: React.FC<SidebarProps> = ({ token }) => {
+  const [user, setUser] = useState<User | null>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const fetchUser = async () => {
       try {
         const res = await axios.get("/api/getUserByToken", {
@@ -28,18 +25,23 @@ const Sidebar = () => {
         console.log(error);
       }
     };
-    fetchUser();
+    if (token) {
+      fetchUser();
+    }
   }, [token]);
+  console.log(user);
+  console.log(token);
   return (
     <div className="fixed top-0 left-0 h-full  bg-gray-800 text-white w-60">
       <div className="p-4">
         <h1 className="text-2xl font-bold">
           {user ? `Welcome, ${user.username}` : "Welcome"}
         </h1>
+
         <ul>
           <li
             className="py-2 hover:bg-gray-700"
-            onMouseDown={() => {
+            onClick={() => {
               window.location.href = "/";
             }}
           >
@@ -47,22 +49,21 @@ const Sidebar = () => {
           </li>
           <li
             className="py-2 hover:bg-gray-700"
-            onMouseDown={() => {
+            onClick={() => {
               window.location.href = "/tasks";
             }}
           >
             Task History
           </li>
-          {user && user.user_Role === "admin" && (
-            <li
-              className="py-2 hover:bg-gray-700"
-              onMouseDown={() => {
-                window.location.href = "/adminPage";
-              }}
-            >
-              Admin Dashboard
-            </li>
-          )}
+
+          <li
+            className="py-2 hover:bg-gray-700"
+            onClick={() => {
+              window.location.href = "/adminPage";
+            }}
+          >
+            Admin Dashboard
+          </li>
         </ul>
       </div>
     </div>

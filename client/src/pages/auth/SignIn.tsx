@@ -3,9 +3,11 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useAuth } from "../../contexts/AuthContext";
 
-const SignIn = ({ onLogin }: { onLogin: any }) => {
+const SignIn = () => {
   const navigate = useNavigate();
+  const { handleLogin } = useAuth();
   const [values, setValues] = useState({
     username: "",
     password: "",
@@ -30,8 +32,9 @@ const SignIn = ({ onLogin }: { onLogin: any }) => {
         toast.success("Sign in successfully, redirecting to home page...");
         const userData = signUser.data.token;
         localStorage.setItem("userData", JSON.stringify(userData));
-        onLogin();
+        handleLogin();
         navigate("/");
+        console.log("Redirected to dashboard.");
       }
     } catch (error: any) {
       toast.error(error.response.data.message);
