@@ -100,6 +100,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
   const [locationName, setLocationName] = React.useState<string>("");
   const [locations, setLocations] = React.useState<Location[]>([]);
   const [isUserAdmin, setIsUserAdmin] = React.useState<boolean>(false); // DO NOT COMMIT JUST FOR PROD AS TRUE
+  const [disableButtons, setDisableButtons] = React.useState<boolean[]>([]);
   const [arrowStart, setArrowStart] = React.useState<{
     x: number;
     y: number;
@@ -126,6 +127,20 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
     }, 1000);
     return () => clearInterval(intervalId);
   }, []);
+  React.useEffect(() => {
+    const newDisableButtons = tasks.map((task) =>
+      locations.some(
+        (location) =>
+          task.Target.Position.x === location.Target.Position.x &&
+          task.Target.Position.y === location.Target.Position.y &&
+          task.Target.Orientation.x === location.Target.Orientation.x &&
+          task.Target.Orientation.y === location.Target.Orientation.y &&
+          task.Target.Orientation.z === location.Target.Orientation.z &&
+          task.Target.Orientation.w === location.Target.Orientation.w
+      )
+    );
+    setDisableButtons(newDisableButtons);
+  }, [tasks, locations]);
 
   const fetchRobots = async () => {
     try {
@@ -624,19 +639,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
                   <button
                     className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded disabled:opacity-0"
                     onClick={addLocation}
-                    disabled={locations.some(
-                      (location) =>
-                        location.Target.Position.x === task.Target.Position.x &&
-                        location.Target.Position.y === task.Target.Position.y &&
-                        location.Target.Orientation.x ===
-                          task.Target.Orientation.x &&
-                        location.Target.Orientation.y ===
-                          task.Target.Orientation.y &&
-                        location.Target.Orientation.z ===
-                          task.Target.Orientation.z &&
-                        location.Target.Orientation.w ===
-                          task.Target.Orientation.w
-                    )}
+                    disabled={disableButtons[index]}
                   >
                     Add Location
                   </button>
