@@ -3,6 +3,7 @@ import axios from "axios";
 import { useRef } from "react";
 import { toast } from "react-toastify";
 import RobotInfo from "./RobotInfo";
+import { useUserContext } from "../contexts/UserContext";
 import Robot from "../assets/amr.png";
 import CanvasMap from "../assets/map.jpg";
 interface Robot {
@@ -90,8 +91,7 @@ interface CanvasProps {
 }
 
 const Map: React.FC<CanvasProps> = ({ width, height }) => {
-  const [token, setToken] = React.useState<string | null>("");
-  const [user, setUser] = React.useState<User | null>(null);
+  const { user } = useUserContext();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [robots, setRobots] = React.useState<Robot[]>([]);
   const [tasks, setTasks] = React.useState<Task[]>([]);
@@ -120,7 +120,11 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
     z: number;
     w: number;
   } | null>(null);
-
+  React.useEffect(() => {
+    if (user && user.user_Role === "admin") {
+      setIsUserAdmin(true);
+    }
+  }, [user]);
   React.useEffect(() => {
     const intervalId = setInterval(() => {
       fetchRobots();
@@ -141,7 +145,6 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
     );
     setDisableButtons(newDisableButtons);
   }, [tasks, locations]);
-
   const fetchRobots = async () => {
     try {
       const res = await axios.get("/robots/getRobots");
@@ -205,28 +208,6 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
       setArrowEnd({ x: x, y: y }); // Start and end are the same initially
     }
   };
-  React.useEffect(() => {
-    const token = sessionStorage.getItem("userData");
-    if (token) {
-      setToken(token);
-    }
-  }, []);
-
-  React.useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await axios.get("/api/getUserByToken", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setUser(res.data.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchUser();
-  }, [token]);
 
   const fetchLocations = async () => {
     try {

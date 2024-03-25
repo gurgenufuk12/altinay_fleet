@@ -34,20 +34,12 @@ const TaskTable: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [filter, setFilter] = useState<string>("");
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
-  const [token, setToken] = useState<string | null>("");
 
-  useEffect(() => {
+  React.useEffect(() => {
     const intervalId = setInterval(() => {
       retrieveTasks();
     }, 500);
     return () => clearInterval(intervalId);
-  }, []);
-  useEffect(() => {
-    const token = localStorage.getItem("userData");
-    if (token) {
-      setToken(token);
-    }
-    retrieveTasks();
   }, []);
   const retrieveTasks = async () => {
     try {
@@ -80,7 +72,7 @@ const TaskTable: React.FC = () => {
 
   return (
     <div className="flex items-center justify-center pl-20 bg-orange-100">
-      <Sidebar token={token}/>
+      <Sidebar />
       <table className="table-auto">
         <thead>
           <tr>

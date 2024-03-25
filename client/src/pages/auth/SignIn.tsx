@@ -4,9 +4,11 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useAuth } from "../../contexts/AuthContext";
+import { useUserContext } from "../../contexts/UserContext";
 
 const SignIn = () => {
   const navigate = useNavigate();
+  const { setUser } = useUserContext();
   const { handleLogin } = useAuth();
   const [values, setValues] = useState({
     username: "",
@@ -32,9 +34,19 @@ const SignIn = () => {
         toast.success("Sign in successfully, redirecting to home page...");
         const userData = signUser.data.token;
         sessionStorage.setItem("userData", JSON.stringify(userData));
+        const token = signUser.data.token;
+        try {
+          const res = await axios.get("/api/getUserByToken", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          setUser(res.data.data);
+        } catch (error) {
+          console.log(error);
+        }
         handleLogin();
         navigate("/");
-        console.log("Redirected to dashboard.");
       }
     } catch (error: any) {
       toast.error(error.response.data.message);

@@ -98,8 +98,9 @@ const AdminDashboard = () => {
   };
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-4">Admin Dashboard</h1>
-      <div className="flex">
+      <SideBar />
+      <h1 className="text-3xl font-bold mb-4 ml-10">Admin Dashboard</h1>
+      <div className="flex ml-10">
         <div className="w-1/2 pr-4">
           <h2 className="text-xl font-bold mb-2">Admin Users</h2>
           <div className="overflow-x-auto">
