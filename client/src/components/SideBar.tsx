@@ -29,8 +29,7 @@ const Sidebar: React.FC<SidebarProps> = ({ token }) => {
       fetchUser();
     }
   }, [token]);
-  console.log(user);
-  console.log(token);
+
   return (
     <div className="fixed top-0 left-0 h-full  bg-gray-800 text-white w-60">
       <div className="p-4">
