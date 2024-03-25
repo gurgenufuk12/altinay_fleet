@@ -50,11 +50,11 @@ const TaskTable: React.FC = () => {
     }
   };
 
-  const applyFilter = (taskName: string) => {
-    if (taskName === "All") {
+  const applyFilter = (taskCode: string) => {
+    if (taskCode === "All") {
       setFilter("");
     } else {
-      setFilter(taskName);
+      setFilter(taskCode);
     }
     setIsDropdownOpen(false);
   };
