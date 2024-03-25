@@ -66,7 +66,7 @@ const TaskTable: React.FC = () => {
   const filteredTasks = tasks
     .filter((task) => {
       if (!filter) return true;
-      return task.Task.taskName === filter;
+      return task.Task.taskCode === filter;
     })
     .reverse();
 
@@ -78,9 +78,8 @@ const TaskTable: React.FC = () => {
           <tr>
             <th className="px-4 py-2">Robot Name</th>
             <th className="px-4 py-2">Given By</th>
-            <th className="px-4 py-2">Task Code</th>
-            <th className="px-4 py-2 relative flex items-center">
-              Task Name
+            <th className="px-4 py-2">
+              Task Code
               <div className="relative inline-block text-left ml-2">
                 <button
                   type="button"
@@ -128,6 +127,7 @@ const TaskTable: React.FC = () => {
                 )}
               </div>
             </th>
+            <th className="px-4 py-2 relative flex items-center">Task Name</th>
             <th className="px-4 py-2">Task Percentage</th>
             <th className="px-4 py-2">Task Priority</th>
             <th className="px-4 py-2">Task Start Time</th>
