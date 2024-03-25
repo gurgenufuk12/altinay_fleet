@@ -96,6 +96,22 @@ const AdminDashboard = () => {
       console.log(error);
     }
   };
+
+  const deleteLocation = async (locationName: string) => {
+    try {
+      const res = await axios.delete(
+        `/locations/deleteLocation/${locationName}`
+      );
+
+      const updatedLocations = locations.filter(
+        (location) => location.locationName !== locationName
+      );
+      setLocations(updatedLocations);
+      toast.success("Location deleted successfully");
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <div className="container mx-auto px-4 py-8">
       <SideBar />
@@ -105,6 +121,14 @@ const AdminDashboard = () => {
           <h2 className="text-xl font-bold mb-2">Admin Users</h2>
           <div className="overflow-x-auto">
             <table className="table-auto w-full border-collapse border border-gray-400">
+              <thead>
+                <tr>
+                  <th className="px-4 py-2">Username</th>
+                  <th className="px-4 py-2">Role</th>
+                  <th className="px-4 py-2">Change Role</th>
+                  <th className="px-4 py-2">Actions</th>
+                </tr>
+              </thead>
               <tbody>
                 {adminUsers.map((user, index) => (
                   <tr
@@ -154,6 +178,13 @@ const AdminDashboard = () => {
           <h2 className="text-xl font-bold mb-2">Locations</h2>
           <div className="overflow-x-auto">
             <table className="table-auto w-full border-collapse border border-gray-400">
+              <thead>
+                <tr>
+                  <th className="px-4 py-2">Location Name</th>
+                  <th className="px-4 py-2">Target Position</th>
+                  <th className="px-4 py-2">Actions</th>
+                </tr>
+              </thead>
               <tbody>
                 {locations.map((location, index) => (
                   <tr
@@ -166,6 +197,14 @@ const AdminDashboard = () => {
                     <td className="px-4 py-2 border border-gray-400">
                       {location.Target.Position.x}, {location.Target.Position.y}
                       , {location.Target.Position.z}
+                    </td>
+                    <td className="px-4 py-2 border border-gray-400">
+                      <button
+                        onClick={() => deleteLocation(location.locationName)}
+                        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                      >
+                        Delete
+                      </button>
                     </td>
                   </tr>
                 ))}

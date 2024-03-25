@@ -35,3 +35,18 @@ exports.addLocation = async (req, res, next) => {
     });
   }
 };
+exports.deleteLocation = async (req, res, next) => {
+  const { locationName } = req.params;
+  try {
+    const location = await Location.findOneAndDelete({
+      locationName: locationName,
+    });
+    if (!location) {
+      return res.status(404).json({ message: "Location not found" });
+    }
+    res.status(200).json({ deletedLocation: location });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
