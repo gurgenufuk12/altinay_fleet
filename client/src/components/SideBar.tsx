@@ -3,6 +3,7 @@ import axios from "axios";
 interface User {
   id: string;
   username: string;
+  user_Role: string;
 }
 const Sidebar = () => {
   const [token, setToken] = React.useState<string | null>("");
@@ -52,7 +53,16 @@ const Sidebar = () => {
           >
             Task History
           </li>
-          {/* <li className="py-2 hover:bg-gray-700">Menu Item 3</li> */}
+          {user && user.user_Role === "admin" && (
+            <li
+              className="py-2 hover:bg-gray-700"
+              onMouseDown={() => {
+                window.location.href = "/adminPage";
+              }}
+            >
+              Admin Dashboard
+            </li>
+          )}
         </ul>
       </div>
     </div>
