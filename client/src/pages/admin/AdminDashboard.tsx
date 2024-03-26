@@ -109,7 +109,7 @@ const AdminDashboard = () => {
       setLocations(updatedLocations);
       toast.success("Location deleted successfully");
     } catch (error) {
-      console.log(error);
+     toast.error("Error deleting location");
     }
   };
   return (
