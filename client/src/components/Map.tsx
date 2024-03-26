@@ -546,29 +546,58 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
       <div className="mr-10">
         <RobotInfo selectedRobot={selectedRobot} />
       </div>
-      <div>
-        <select
-          onChange={handleRobotChange}
-          value={selectedRobot ? selectedRobot.robotName : ""}
-        >
-          <option value="">Select a robot</option>
-          {robots.map((robot) => (
-            <option key={robot.robotName} value={robot.robotName}>
-              {robot.robotName}
-            </option>
-          ))}
-        </select>
-        <select onChange={handleTaskName} value={taskCode}>
-          <option value="">Select Task Code</option>
-          <option value="Patrol">Patrol</option>
-          <option value="Docking">Docking</option>
-          <option value="Lift">Lift</option>
-        </select>
+      <div className="flex flex-col">
+        <div className="flex flex-row mb-5 gap-2">
+          <div className="relative inline-block w-40">
+            <select
+              className="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
+              onChange={handleRobotChange}
+              value={selectedRobot ? selectedRobot.robotName : ""}
+            >
+              <option value="">Select a robot</option>
+              {robots.map((robot) => (
+                <option key={robot.robotName} value={robot.robotName}>
+                  {robot.robotName}
+                </option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+              <svg
+                className="fill-current h-4 w-4"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+              >
+                <path d="M9.293 13.293a1 1 0 0 0 1.414 0l5-5a1 1 0 1 0-1.414-1.414L10 11.586l-4.293-4.293a1 1 0 1 0-1.414 1.414l5 5z" />
+              </svg>
+            </div>
+          </div>
+          <div className="relative inline-block w-51">
+            <select
+              className="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
+              onChange={handleTaskName}
+              value={taskCode}
+            >
+              <option value="">Select Task Code</option>
+              <option value="Patrol">Patrol</option>
+              <option value="Docking">Docking</option>
+              <option value="Lift">Lift</option>
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+              <svg
+                className="fill-current h-4 w-4"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+              >
+                <path d="M9.293 13.293a1 1 0 0 0 1.414 0l5-5a1 1 0 1 0-1.414-1.414L10 11.586l-4.293-4.293a1 1 0 1 0-1.414 1.414l5 5z" />
+              </svg>
+            </div>
+          </div>
+        </div>
         <canvas
           ref={canvasRef}
           width={width}
           height={height}
-          className="border-2 border-black"
+          className="rounded-lg border-2"
           onMouseDown={handleCanvasMouseDown}
           onMouseMove={handleCanvasMouseMove}
           onMouseUp={handleCanvasMouseUp}
@@ -631,16 +660,20 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
                 Location:
                 <input
                   type="text"
-                  placeholder="Name"
-                  className="w-20"
+                  placeholder="Location Name"
+                  className="rounded-md ml-2 w-40 h-8 placeholder:pl-2"
                   value={locationName}
                   onChange={(e) => setLocationName(e.target.value)}
                 />
               </span>
             )}
           </div>
-          <div>
-            <select onChange={handleLocationSelection} value={locationName}>
+          <div className="relative inline-block w-64">
+            <select
+              onChange={handleLocationSelection}
+              value={locationName}
+              className="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
+            >
               <option value="">Select Location</option>
               {locations.map((location) => (
                 <option
@@ -651,6 +684,15 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
                 </option>
               ))}
             </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+              <svg
+                className="fill-current h-4 w-4"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+              >
+                <path d="M9.293 13.293a1 1 0 0 0 1.414 0l5-5a1 1 0 1 0-1.414-1.414L10 11.586l-4.293-4.293a1 1 0 1 0-1.414 1.414l5 5z" />
+              </svg>
+            </div>
           </div>
         </div>
       </div>
