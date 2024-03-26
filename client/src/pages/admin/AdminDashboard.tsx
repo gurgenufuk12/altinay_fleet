@@ -7,6 +7,48 @@ interface AdminUser {
   username: string;
   user_Role: string;
 }
+interface Robot {
+  Pose: {
+    Position: {
+      x: string;
+      y: string;
+      z: string;
+    };
+    Orientation: {
+      x: string;
+      y: string;
+      z: string;
+      w: string;
+    };
+  };
+  robotCharge: string;
+  robotStatus: string;
+  robotVelocity: {
+    linearVelocity: string;
+    angularVelocity: string;
+  };
+  Targets: {
+    Position: {
+      x: string;
+      y: string;
+      z: string;
+    };
+    Orientation: {
+      x: string;
+      y: string;
+      z: string;
+      w: string;
+    };
+    targetExecuted: boolean;
+  }[];
+  Task: {
+    taskCode: string;
+    taskName: string;
+    taskPercentage: string;
+    taskPriority: string;
+  };
+  robotName: string;
+}
 interface Location {
   locationName: string;
   Target: {
@@ -25,6 +67,7 @@ interface Location {
 }
 const AdminDashboard = () => {
   const [adminUsers, setAdminUsers] = React.useState<AdminUser[]>([]);
+  const [robots, setRobots] = React.useState<Robot[]>([]);
   const [locations, setLocations] = React.useState<Location[]>([]);
   const [selectedRoles, setSelectedRoles] = React.useState<{
     [key: string]: string;
@@ -43,6 +86,14 @@ const AdminDashboard = () => {
       console.log(error);
     }
   };
+  const fetchRobots = async () => {
+    try {
+      const res = await axios.get("/robots/getRobots");
+      setRobots(res.data.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   const fetchLocations = async () => {
     try {
       const res = await axios.get("/locations/getLocations");
@@ -53,6 +104,7 @@ const AdminDashboard = () => {
   };
   React.useEffect(() => {
     fetchUsers();
+    fetchRobots();
     fetchLocations();
   }, []);
 
@@ -109,7 +161,7 @@ const AdminDashboard = () => {
       setLocations(updatedLocations);
       toast.success("Location deleted successfully");
     } catch (error) {
-     toast.error("Error deleting location");
+      toast.error("Error deleting location");
     }
   };
   return (
@@ -205,6 +257,41 @@ const AdminDashboard = () => {
                       >
                         Delete
                       </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <h2 className="text-xl font-bold mt-4 mb-2">Robots</h2>
+          <div className="overflow-x-auto">
+            <table className="table-auto w-full border-collapse border border-gray-400">
+              <thead>
+                <tr>
+                  <th className="px-4 py-2">Robot Name</th>
+                  <th className="px-4 py-2">Robot Status</th>
+                  <th className="px-4 py-2">Robot Charge</th>
+                  <th className="px-4 py-2">Robot Velocity</th>
+                </tr>
+              </thead>
+              <tbody>
+                {robots.map((robot, index) => (
+                  <tr
+                    key={index}
+                    className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}
+                  >
+                    <td className="px-4 py-2 border border-gray-400">
+                      {robot.robotName}
+                    </td>
+                    <td className="px-4 py-2 border border-gray-400">
+                      {robot.robotStatus}
+                    </td>
+                    <td className="px-4 py-2 border border-gray-400">
+                      {robot.robotCharge}
+                    </td>
+                    <td className="px-4 py-2 border border-gray-400">
+                      {robot.robotVelocity.linearVelocity},
+                      {robot.robotVelocity.angularVelocity}
                     </td>
                   </tr>
                 ))}

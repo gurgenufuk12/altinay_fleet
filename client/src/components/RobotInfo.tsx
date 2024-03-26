@@ -109,7 +109,7 @@ const RobotInfo: React.FC<RobotInfoProps> = ({ selectedRobot }) => {
     return () => {};
   }, [robotStatus]);
   return (
-    <div className="border-black border-2 h-[37.5rem] mt-6 w-[18.75rem] rounded-2xl p-4 flex flex-col gap-20">
+    <div className="border-black border-1 h-[37.5rem] mt-6 w-[18.75rem] rounded-2xl p-4 flex flex-col gap-20 bg-rose-200">
       <h1 className="text-xl font-medium">Robot Information</h1>
       <div className="flex flex-col items-center">
         <div className="flex m-7">
