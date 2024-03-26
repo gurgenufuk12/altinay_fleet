@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { useUserContext } from "../contexts/UserContext"; // Import the useUserContext hook
+import { useUserContext } from "../contexts/UserContext";
+import { useAuth } from "../contexts/AuthContext";
 
 const Sidebar: React.FC = () => {
   const [isUserAdmin, setIsUserAdmin] = useState<boolean>(false);
   const navigate = useNavigate();
-  const { user, setUser } = useUserContext(); // Use the useUserContext hook to access the user context
+  const { handleLogout } = useAuth();
+  const { user, setUser } = useUserContext();
 
   useEffect(() => {
     if (user && user.user_Role === "admin") {
@@ -48,6 +50,16 @@ const Sidebar: React.FC = () => {
           )}
         </ul>
       </div>
+      <button
+        className="absolute bottom-0 w-full p-4 bg-red-500 text-white"
+        onClick={() => {
+          setUser(null);
+          handleLogout();
+          navigate("/signin");
+        }}
+      >
+        Logout
+      </button>
     </div>
   );
 };
