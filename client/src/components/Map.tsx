@@ -45,6 +45,7 @@ interface Robot {
     taskName: string;
     taskPercentage: string;
     taskPriority: string;
+    pathPoints: [string, string][];
   };
   robotName: string;
 }
@@ -321,6 +322,29 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
       ctx.stroke();
     });
   };
+  const drawPathPoints = (ctx: any, pathPoints: any) => {
+    if (pathPoints.length < 2) return;
+    const originalStrokeStyle = ctx.strokeStyle;
+    ctx.beginPath();
+    const startPoint = convertCoordinates(
+      parseFloat(pathPoints[0][0]),
+      parseFloat(pathPoints[0][1])
+    );
+    ctx.moveTo(startPoint.x, startPoint.y);
+
+    for (let i = 1; i < pathPoints.length; i++) {
+      const { x, y } = convertCoordinates(
+        parseFloat(pathPoints[i][0]),
+        parseFloat(pathPoints[i][1])
+      );
+      ctx.lineTo(x, y);
+    }
+
+    ctx.strokeStyle = "blue";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.strokeStyle = originalStrokeStyle;
+  };
   const handleCanvasMouseUp = async () => {
     if (arrowStart && arrowEnd) {
       const { x: robotXStart, y: robotYStart } = reverseCoordinates(
@@ -453,10 +477,10 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
             parseFloat(robot.Pose.Position.x),
             parseFloat(robot.Pose.Position.y)
           );
-
           const orientationAngle = calculateRotationAngle(
             robot.Pose.Orientation
           );
+          drawPathPoints(ctx, robot.Task.pathPoints);
           drawRobotArrow(ctx, x, y, orientationAngle);
           ctx.beginPath();
           ctx.arc(x, y, 10, 0, 2 * Math.PI);

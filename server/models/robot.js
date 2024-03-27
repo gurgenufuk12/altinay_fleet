@@ -34,6 +34,7 @@ const taskSchema = new mongoose.Schema({
   taskName: String,
   taskPercentage: String,
   taskPriority: String,
+  pathPoints: [[String, String]],
 });
 
 const robotSchema = new mongoose.Schema({
