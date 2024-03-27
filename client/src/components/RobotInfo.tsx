@@ -2,6 +2,7 @@ import React from "react";
 import axios from "axios";
 import Robot from "../assets/amr.png";
 import { toast } from "react-toastify";
+import { format } from "date-fns";
 
 interface Robot {
   Pose: {
@@ -82,7 +83,12 @@ const RobotInfo: React.FC<RobotInfoProps> = ({ selectedRobot }) => {
       if (activeRobot.Targets.length > 0) {
         const lastTarget = activeRobot.Targets[activeRobot.Targets.length - 1];
         if (lastTarget.targetExecuted && robotStatus === "Task In Progress") {
-          toast.success("Task Completed :" + activeRobot.Task.taskName);
+          toast.success(
+            "Task Completed :" +
+              activeRobot.Task.taskCode +
+              " " +
+              format(new Date(), "MMMM do yyyy, h:mm:ss a")
+          );
         }
       }
     }
