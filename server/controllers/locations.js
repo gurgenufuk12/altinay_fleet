@@ -50,3 +50,16 @@ exports.deleteLocation = async (req, res, next) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+exports.checkLocationExist = async (req, res) => {
+  const { locationName } = req.params;
+  try {
+    const location = await Location.findOne({ locationName: locationName });
+    if (!location) {
+      return res.json({ exists: false }); // Location does not exist
+    }
+    return res.json({ exists: true }); // Location exists
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};

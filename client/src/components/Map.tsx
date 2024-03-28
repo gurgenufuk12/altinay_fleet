@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { toast } from "react-toastify";
 import RobotInfo from "./RobotInfo";
 import { useUserContext } from "../contexts/UserContext";
+import LocationConfirm from "./LocationPopUp";
 import Robot from "../assets/amr.png";
 import CanvasMap from "../assets/map.jpg";
 interface Robot {
@@ -102,6 +103,9 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
   const [locations, setLocations] = React.useState<Location[]>([]);
   const [isUserAdmin, setIsUserAdmin] = React.useState<boolean>(false); // DO NOT COMMIT JUST FOR DEV AS TRUE
   const [disableButtons, setDisableButtons] = React.useState<boolean[]>([]);
+  const [selectedTaskIndex, setSelectedTaskIndex] = React.useState<
+    number | null
+  >(null);
   const [arrowStart, setArrowStart] = React.useState<{
     x: number;
     y: number;
@@ -154,35 +158,10 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
       console.log(error);
     }
   };
-  const addLocation = async () => {
-    if (locationName.trim() === "") {
-      toast.error("Location name cannot be empty");
-      return;
-    } else {
-      try {
-        const res = await axios.post("/locations/addLocation", {
-          locationName: locationName,
-          Target: {
-            Position: {
-              x: targetPosition?.x.toString() || "",
-              y: targetPosition?.y.toString() || "",
-              z: "0",
-            },
-            Orientation: {
-              x: targetOrientation?.x.toString() || "",
-              y: targetOrientation?.y.toString() || "",
-              z: targetOrientation?.z.toString() || "",
-              w: targetOrientation?.w.toString() || "",
-            },
-          },
-        });
-        toast.success("Location added successfully");
-        setLocationName("");
-      } catch (error: any) {
-        toast.error(error.response.data.message);
-      }
-    }
+  const handleAddLocation = (index: number) => {
+    setSelectedTaskIndex(index);
   };
+
   const convertCoordinates = (x: number, y: number) => {
     const canvasX = ((x / +1 + 13) / 26) * width;
     const canvasY = ((y / -1 + 13) / 26) * height;
@@ -206,7 +185,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
       const y = event.clientY - rect.top;
 
       setArrowStart({ x: x, y: y });
-      setArrowEnd({ x: x, y: y }); // Start and end are the same initially
+      setArrowEnd({ x: x, y: y });
     }
   };
 
@@ -567,6 +546,13 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
 
   return (
     <div className="flex flex-row ml-96 justify-center mt-11">
+      {selectedTaskIndex !== null && (
+        <LocationConfirm
+          handleClose={() => setSelectedTaskIndex(null)}
+          taskPosition={tasks[selectedTaskIndex].Target.Position}
+          taskOrientation={tasks[selectedTaskIndex].Target.Orientation}
+        />
+      )}
       <div className="mr-10">
         <RobotInfo selectedRobot={selectedRobot} />
       </div>
@@ -667,7 +653,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
                 {isUserAdmin && (
                   <button
                     className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded disabled:opacity-0"
-                    onClick={addLocation}
+                    onClick={() => handleAddLocation(index)}
                     disabled={disableButtons[index]}
                   >
                     Add Location
@@ -678,20 +664,6 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
           ))}
         </div>
         <div className="flex flex-col gap-3 pl-5 mt-6">
-          <div className="flex flex-col">
-            {isUserAdmin && (
-              <span>
-                Location:
-                <input
-                  type="text"
-                  placeholder="Location Name"
-                  className="rounded-md ml-2 w-40 h-8 placeholder:pl-2"
-                  value={locationName}
-                  onChange={(e) => setLocationName(e.target.value)}
-                />
-              </span>
-            )}
-          </div>
           <div className="relative inline-block w-64">
             <select
               onChange={handleLocationSelection}
