@@ -93,6 +93,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
   const [taskCode, settaskCode] = React.useState<string>("");
   const [taskName, setTaskName] = React.useState<string>("");
   const [locationName, setLocationName] = React.useState<string>("");
+  const [taskPriority, setTaskPriority] = React.useState<string>("1");
 
   const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(null);
 
@@ -192,9 +193,9 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
         if (tasks.length > 0 && selectedRobot !== null) {
           try {
             const res = await axios.post("/robots/addTarget", {
-              taskName: "",
+              taskName: taskName,
               taskCode: taskCode,
-              taskPriority: "1",
+              taskPriority: taskPriority,
               taskPercentage: "0",
               robotName: selectedRobot?.robotName,
               linearVelocity: "0",
@@ -211,7 +212,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
               userName: user?.username,
               taskName: taskName,
               taskCode: taskCode,
-              taskPriority: "1",
+              taskPriority: taskPriority,
               taskPercentage: "0",
               robotName: selectedRobot?.robotName,
               targets: tasks.map((task, index) => ({
@@ -308,6 +309,21 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
               className="border border-gray-400 rounded-lg px-4 py-2 w-3/4 text-gray-800"
               value={taskName}
               onChange={(e) => setTaskName(e.target.value)}
+            />
+          </div>
+          <div className="flex flex-row items-center mb-4">
+            <label
+              htmlFor="taskName"
+              className="mr-4 text-gray-800 font-semibold w-1/4"
+            >
+              Task Priority :
+            </label>
+            <input
+              type="text"
+              id="taskPriority"
+              className="border border-gray-400 rounded-lg px-4 py-2 w-3/4 text-gray-800"
+              value={taskPriority}
+              onChange={(e) => setTaskPriority(e.target.value)}
             />
           </div>
           <div className="flex flex-row items-center">

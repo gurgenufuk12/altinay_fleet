@@ -145,6 +145,11 @@ const RobotInfo: React.FC<RobotInfoProps> = ({ selectedRobot }) => {
             ? "Task Percentage: " + activeRobot?.Task.taskPercentage + "%"
             : ""}
         </h1>
+        <h1 className="text-m font-medium">
+          {robotStatus === "Task In Progress"
+            ? "Task Priority: " + activeRobot?.Task.taskPriority
+            : ""}
+        </h1>
       </div>
     </div>
   );
