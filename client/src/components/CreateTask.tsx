@@ -138,7 +138,6 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
       }
     }
   };
-  console.log(tasks);
   const fetchRobots = async () => {
     try {
       const res = await axios.get("/robots/getRobots");
