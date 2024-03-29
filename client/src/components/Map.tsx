@@ -7,7 +7,6 @@ import { useUserContext } from "../contexts/UserContext";
 import LocationConfirm from "./LocationPopUp";
 import Robot from "../assets/amr.png";
 import CanvasMap from "../assets/map.jpg";
-import Arrow from "../assets/arrow.svg";
 interface Robot {
   Pose: {
     Position: {
@@ -559,9 +558,9 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
       </div>
       <div className="flex flex-col">
         <div className="flex flex-row mb-5 gap-2">
-          <div className="relative inline-block w-40">
+          <div className="w-48">
             <select
-              className="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
+              className="w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
               onChange={handleRobotChange}
               value={selectedRobot ? selectedRobot.robotName : ""}
             >
@@ -572,13 +571,10 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
                 </option>
               ))}
             </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-              <img src={Arrow} alt="robot" className="w-5 h-5" />
-            </div>
           </div>
-          <div className="relative inline-block w-51">
+          <div className="w-51">
             <select
-              className="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
+              className="w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
               onChange={handleTaskName}
               value={taskCode}
             >
@@ -587,9 +583,6 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
               <option value="Docking">Docking</option>
               <option value="Lift">Lift</option>
             </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-              <img src={Arrow} alt="robot" className="w-5 h-5" />
-            </div>
           </div>
         </div>
         <canvas
@@ -653,11 +646,11 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
           ))}
         </div>
         <div className="flex flex-col gap-3 pl-5 mt-6">
-          <div className="relative inline-block w-64">
+          <div className="w-64">
             <select
               onChange={handleLocationSelection}
               value={locationName}
-              className="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
+              className="w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
             >
               <option value="">Select Location</option>
               {locations.map((location) => (
@@ -669,9 +662,6 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
                 </option>
               ))}
             </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-              <img src={Arrow} alt="robot" className="w-5 h-5" />
-            </div>
           </div>
         </div>
       </div>

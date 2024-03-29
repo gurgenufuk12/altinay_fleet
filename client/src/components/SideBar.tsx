@@ -2,10 +2,12 @@ import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../contexts/UserContext";
+import CreateTask from "./CreateTask";
 import { useAuth } from "../contexts/AuthContext";
 
 const Sidebar: React.FC = () => {
   const [isUserAdmin, setIsUserAdmin] = useState<boolean>(false);
+  const [showCreateTask, setShowCreateTask] = useState<boolean>(false);
   const navigate = useNavigate();
   const { handleLogout } = useAuth();
   const { user, setUser } = useUserContext();
@@ -25,7 +27,15 @@ const Sidebar: React.FC = () => {
         <h1 className="text-2xl font-bold">
           {user ? `Welcome, ${user.username}` : "Welcome"}
         </h1>
-
+        <button
+          className="py-2 w-full mt-4 rounded-lg bg-orange-400"
+          onClick={() => setShowCreateTask(true)} // Toggle visibility on button click
+        >
+          Create Task
+        </button>
+        {showCreateTask && (
+          <CreateTask onClose={() => setShowCreateTask(false)} />
+        )}
         <ul>
           <li
             className="py-2 hover:bg-gray-700"
