@@ -1,7 +1,7 @@
 import React from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { useUserContext } from "../contexts/UserContext"; // Import the useUserContext hook
+import { useUserContext } from "../contexts/UserContext";
 import CloseButton from "../assets/closeButton.svg";
 import Arrow from "../assets/arrow.svg";
 interface Robot {
@@ -81,7 +81,7 @@ interface Location {
   };
 }
 interface CreateTaskProps {
-  onClose: () => void; // Function to close the CreateTask component
+  onClose: () => void;
 }
 
 const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
@@ -165,7 +165,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
         taskWindowRef.current &&
         !taskWindowRef.current.contains(event.target as Node)
       ) {
-        onClose(); // Call the onClose function to close the window
+        onClose();
       }
     };
 
