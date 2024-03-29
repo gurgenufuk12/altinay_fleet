@@ -2,7 +2,7 @@ import React from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useUserContext } from "../contexts/UserContext";
-import CloseButton from "../assets/closeButton.svg";
+import CloseIcon from "@mui/icons-material/Close";
 import Arrow from "../assets/arrow.svg";
 interface Robot {
   Pose: {
@@ -138,6 +138,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
       }
     }
   };
+  console.log(tasks);
   const fetchRobots = async () => {
     try {
       const res = await axios.get("/robots/getRobots");
@@ -230,7 +231,10 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
         break;
     }
   };
-
+  const handleDeleteLocation = (index: number) => {
+    const newTasks = tasks.filter((_, i) => i !== index);
+    setTasks(newTasks);
+  };
   return (
     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-75">
       <div
@@ -238,7 +242,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
         ref={taskWindowRef}
       >
         <button className="absolute top-2 right-2" onClick={onClose}>
-          <img src={CloseButton} alt="Close" className="w-6 h-6" />
+          <CloseIcon className="text-black" />
         </button>
         <h1 className="text-3xl font-bold mb-6 text-gray-800">Create Task</h1>
         <div className="mb-6 flex flex-col">
@@ -346,6 +350,12 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
             <span className="text-gray-800">
               {task.Target.locationName || "No Location"}
             </span>
+            <button
+              className=" text-white rounded-lg   w-8 h-8"
+              onClick={() => handleDeleteLocation(index)}
+            >
+              <CloseIcon className="text-black" />
+            </button>
           </div>
         ))}
         <button
