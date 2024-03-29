@@ -7,6 +7,7 @@ import { useUserContext } from "../contexts/UserContext";
 import LocationConfirm from "./LocationPopUp";
 import Robot from "../assets/amr.png";
 import CanvasMap from "../assets/map.jpg";
+import Arrow from "../assets/arrow.svg";
 interface Robot {
   Pose: {
     Position: {
@@ -572,13 +573,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
               ))}
             </select>
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-              <svg
-                className="fill-current h-4 w-4"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-              >
-                <path d="M9.293 13.293a1 1 0 0 0 1.414 0l5-5a1 1 0 1 0-1.414-1.414L10 11.586l-4.293-4.293a1 1 0 1 0-1.414 1.414l5 5z" />
-              </svg>
+              <img src={Arrow} alt="robot" className="w-5 h-5" />
             </div>
           </div>
           <div className="relative inline-block w-51">
@@ -593,13 +588,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
               <option value="Lift">Lift</option>
             </select>
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-              <svg
-                className="fill-current h-4 w-4"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-              >
-                <path d="M9.293 13.293a1 1 0 0 0 1.414 0l5-5a1 1 0 1 0-1.414-1.414L10 11.586l-4.293-4.293a1 1 0 1 0-1.414 1.414l5 5z" />
-              </svg>
+              <img src={Arrow} alt="robot" className="w-5 h-5" />
             </div>
           </div>
         </div>
@@ -681,13 +670,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
               ))}
             </select>
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-              <svg
-                className="fill-current h-4 w-4"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-              >
-                <path d="M9.293 13.293a1 1 0 0 0 1.414 0l5-5a1 1 0 1 0-1.414-1.414L10 11.586l-4.293-4.293a1 1 0 1 0-1.414 1.414l5 5z" />
-              </svg>
+              <img src={Arrow} alt="robot" className="w-5 h-5" />
             </div>
           </div>
         </div>

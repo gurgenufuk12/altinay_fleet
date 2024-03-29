@@ -1,0 +1,7 @@
+<svg
+                className="fill-current"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+              >
+                <path d="M9.293 13.293a1 1 0 0 0 1.414 0l5-5a1 1 0 1 0-1.414-1.414L10 11.586l-4.293-4.293a1 1 0 1 0-1.414 1.414l5 5z" />
+              </svg>
