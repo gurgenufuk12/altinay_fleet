@@ -85,9 +85,12 @@ const RobotInfo: React.FC<RobotInfoProps> = ({ selectedRobot }) => {
         if (lastTarget.targetExecuted && robotStatus === "Task In Progress") {
           toast.success(
             "Task Completed :" +
+              " " +
               activeRobot.Task.taskCode +
               " " +
-              format(new Date(), "MMMM do yyyy, h:mm:ss a")
+              format(new Date(), "MMMM do yyyy, h:mm:ss a") +
+              " " +
+              activeRobot.robotName
           );
         }
       }
