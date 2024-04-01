@@ -94,6 +94,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
   const [taskName, setTaskName] = React.useState<string>("");
   const [locationName, setLocationName] = React.useState<string>("");
   const [taskPriority, setTaskPriority] = React.useState<string>("1");
+  const [savedTask, setSavedTask] = React.useState<boolean>(false);
 
   const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(null);
 
@@ -221,6 +222,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
                 targetExecuted: false,
               })),
               taskStartTime: new Date().toISOString(),
+              savedTask: savedTask,
             });
           } catch (error: any) {
             toast.error(error.response.data.message);
@@ -324,6 +326,21 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
               className="border border-gray-400 rounded-lg px-4 py-2 w-3/4 text-gray-800"
               value={taskPriority}
               onChange={(e) => setTaskPriority(e.target.value)}
+            />
+          </div>
+          <div className="flex flex-row items-center mb-4">
+            <label
+              htmlFor="taskName"
+              className="mr-4 text-gray-800 font-semibold w-1/4"
+            >
+              Save Task :
+            </label>
+            <input
+              type="checkbox"
+              id="saveTask"
+              className="border border-gray-400 rounded-lg px-4 py-2 w-3/4 text-gray-800"
+              checked={savedTask}
+              onChange={(e) => setSavedTask(e.target.checked)}
             />
           </div>
           <div className="flex flex-row items-center">
