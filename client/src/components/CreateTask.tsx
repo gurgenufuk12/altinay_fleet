@@ -330,7 +330,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
           </div>
           <div className="flex flex-row items-center mb-4">
             <label
-              htmlFor="taskName"
+              htmlFor="saveTask"
               className="mr-4 text-gray-800 font-semibold w-1/4"
             >
               Save Task :
