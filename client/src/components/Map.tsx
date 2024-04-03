@@ -66,10 +66,30 @@ interface Task {
     targetExecuted: boolean;
   };
 }
-interface User {
-  id: string;
-  username: string;
-  user_Role: string;
+interface SavedTask {
+  robotName: string;
+  userName: string;
+  taskStartTime: string;
+  Targets: {
+    Position: {
+      x: string;
+      y: string;
+      z: string;
+    };
+    Orientation: {
+      x: string;
+      y: string;
+      z: string;
+      w: string;
+    };
+    targetExecuted: boolean;
+  }[];
+  Task: {
+    taskCode: string;
+    taskName: string;
+    taskPercentage: string;
+    taskPriority: string;
+  };
 }
 interface Location {
   locationName: string;
@@ -103,6 +123,8 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
   const [locations, setLocations] = React.useState<Location[]>([]);
   const [isUserAdmin, setIsUserAdmin] = React.useState<boolean>(false); // DO NOT COMMIT JUST FOR DEV AS TRUE
   const [disableButtons, setDisableButtons] = React.useState<boolean[]>([]);
+  const [savedTasks, setSavedTasks] = React.useState<SavedTask[]>([]);
+  const [savedTaskName, setSavedTaskName] = React.useState<string>("");
   const [selectedTaskIndex, setSelectedTaskIndex] = React.useState<
     number | null
   >(null);
@@ -188,7 +210,14 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
       setArrowEnd({ x: x, y: y });
     }
   };
-
+  const fetchSavedTasks = async () => {
+    try {
+      const res = await axios.get("/tasks/getSavedTasks");
+      setSavedTasks(res.data.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   const fetchLocations = async () => {
     try {
       const res = await axios.get("/locations/getLocations");
@@ -200,6 +229,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
   React.useEffect(() => {
     const intervalId = setInterval(() => {
       fetchLocations();
+      fetchSavedTasks();
     }, 1000);
     return () => clearInterval(intervalId);
   }, []);
@@ -499,13 +529,67 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
       }
     }
   }, [robots, width, height, arrowStart, arrowEnd]);
+  const handleSavedTaskSelection = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const selectedTaskName = event.target.value;
+    const selectedTask = savedTasks.find(
+      (task) => task.Task.taskName === selectedTaskName
+    );
+    console.log(selectedTask);
+    console.log(selectedTask?.Targets.length);
+    if (selectedTask) {
+      const newTasks = selectedTask.Targets.map((target) => ({
+        Target: {
+          Position: {
+            x: target.Position.x,
+            y: target.Position.y,
+            z: target.Position.z,
+          },
+          Orientation: {
+            x: target.Orientation.x,
+            y: target.Orientation.y,
+            z: target.Orientation.z,
+            w: target.Orientation.w,
+          },
+          targetExecuted: false,
+        },
+      }));
+      setTasks([...tasks, ...newTasks]);
+      setSavedTaskName("");
+    }
+    settaskCode(selectedTask?.Task.taskCode || "");
+    setSelectedRobot(
+      robots.find((robot) => robot.robotName === selectedTask?.robotName) ||
+        null
+    );
+    toast.success(
+      <div className="flex flex-col">
+        <span>
+          <strong>Task Selected Successfully !</strong>
+        </span>
+        <span>
+          <strong>Task Name:</strong> {selectedTaskName}
+        </span>
+        <span>
+          <strong>Task Code:</strong> {selectedTask?.Task.taskCode}
+        </span>
+        <span>
+          <strong>Robot Name:</strong> {selectedTask?.robotName}
+        </span>
+      </div>,
+      {
+        className: "flex flex-row ",
+      }
+    );
+  };
   const handleRobotChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const robotName = event.target.value;
     const selectedRobot = robots.find((robot) => robot.robotName === robotName);
     setSelectedRobot(selectedRobot || null);
     toast.success("Robot selected successfully: " + robotName);
   };
-  const handleTaskName = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleTaskCode = (event: React.ChangeEvent<HTMLSelectElement>) => {
     settaskCode(event.target.value);
     toast.success("Task code selected successfully: " + event.target.value);
   };
@@ -574,8 +658,8 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
           </div>
           <div className="w-51">
             <select
-              className="w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
-              onChange={handleTaskName}
+              className=" bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
+              onChange={handleTaskCode}
               value={taskCode}
             >
               <option value="">Select Task Code</option>
@@ -659,6 +743,20 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
                   value={location.locationName}
                 >
                   {location.locationName}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="w-64">
+            <select
+              onChange={handleSavedTaskSelection}
+              value={savedTaskName}
+              className="w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
+            >
+              <option value="">Select Saved Task</option>
+              {savedTasks.map((task) => (
+                <option key={task.Task.taskName} value={task.Task.taskName}>
+                  {task.Task.taskName}
                 </option>
               ))}
             </select>

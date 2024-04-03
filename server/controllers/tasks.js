@@ -58,3 +58,18 @@ exports.addTasks = async (req, res, next) => {
     });
   }
 };
+exports.getSavedTasks = async (req, res, next) => {
+  try {
+    const tasks = await Task.find({ savedTask: true });
+    res.status(200).json({
+      success: true,
+      data: tasks,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+}
