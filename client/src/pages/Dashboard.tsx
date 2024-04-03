@@ -6,13 +6,9 @@ import Sidebar from "../components/SideBar";
 
 const Dashboard = () => {
   return (
-    <div className="flex bg-orange-100 w-screen h-screen">
+    <div className="flex w-full h-screen bg-orange-300">
       <Sidebar />
-      <div className="flex flex-col w-full h-full">
-        <div className="flex w-full h-full">
-          <Map width={600} height={600} />
-        </div>
-      </div>
+      <Map width={600} height={600} />
     </div>
   );
 };
