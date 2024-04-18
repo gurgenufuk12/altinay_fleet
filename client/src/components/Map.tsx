@@ -126,6 +126,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
   const [disableButtons, setDisableButtons] = React.useState<boolean[]>([]);
   const [savedTasks, setSavedTasks] = React.useState<SavedTask[]>([]);
   const [savedTaskName, setSavedTaskName] = React.useState<string>("");
+  const [showCostmap, setShowCostmap] = React.useState(true);
   const [selectedTaskIndex, setSelectedTaskIndex] = React.useState<
     number | null
   >(null);
@@ -355,19 +356,35 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
     ctx.stroke();
     ctx.strokeStyle = originalStrokeStyle;
   };
-  const drawCostmap = (ctx: CanvasRenderingContext2D, costmap: any) => {
+  const toggleCostmapVisibility = () => {
+    setShowCostmap(!showCostmap);
+  };
+  const drawCostmap = (
+    ctx: CanvasRenderingContext2D,
+    costmap: any,
+    selectedRobotName: String
+  ) => {
     costmap.forEach((point: any) => {
       const [x, y] = point;
       const { x: canvasX, y: canvasY } = convertCoordinates(
         parseFloat(x),
         parseFloat(y)
       );
-
-      ctx.beginPath();
-      ctx.arc(canvasX, canvasY, 3, 0, 2 * Math.PI);
-      ctx.fillStyle = "red";
-      ctx.fill();
-      ctx.closePath();
+      if (!showCostmap) return;
+      if (selectedRobot?.robotName === selectedRobotName) {
+        ctx.beginPath();
+        ctx.arc(canvasX, canvasY, 3, 0, 2 * Math.PI);
+        ctx.fillStyle = "red";
+        ctx.fill();
+        ctx.closePath();
+      }
+      if (selectedRobot?.robotName === undefined) {
+        ctx.beginPath();
+        ctx.arc(canvasX, canvasY, 3, 0, 2 * Math.PI);
+        ctx.fillStyle = "red";
+        ctx.fill();
+        ctx.closePath();
+      }
     });
   };
   const handleCanvasMouseUp = async () => {
@@ -506,7 +523,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
             robot.Pose.Orientation
           );
           drawPathPoints(ctx, robot.Task.pathPoints);
-          drawCostmap(ctx, robot.createdCostmap);
+          drawCostmap(ctx, robot.createdCostmap, robot.robotName);
           drawRobotArrow(ctx, x, y, orientationAngle);
           ctx.beginPath();
           ctx.arc(x, y, 10, 0, 2 * Math.PI);
@@ -705,7 +722,12 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
           >
             Give Task
           </button>
-
+          <button
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-40 h-14"
+            onClick={toggleCostmapVisibility}
+          >
+            {showCostmap ? "Hide Costmaps" : "Show Costmaps"}
+          </button>
           <button
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-40 h-14"
             onClick={clearTaskList}
