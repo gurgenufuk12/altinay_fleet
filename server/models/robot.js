@@ -48,6 +48,7 @@ const robotSchema = new mongoose.Schema({
   Targets: [targetSchema],
   Task: taskSchema,
   robotName: String,
+  createdCostmap: [[String, String]],
 });
 
 module.exports = mongoose.model("Robot", robotSchema);

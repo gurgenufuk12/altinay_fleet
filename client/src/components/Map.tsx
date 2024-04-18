@@ -49,6 +49,7 @@ interface Robot {
     pathPoints: [string, string][];
   };
   robotName: string;
+  createdCostmap: [[String, String]];
 }
 interface Task {
   Target: {
@@ -354,6 +355,21 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
     ctx.stroke();
     ctx.strokeStyle = originalStrokeStyle;
   };
+  const drawCostmap = (ctx: CanvasRenderingContext2D, costmap: any) => {
+    costmap.forEach((point: any) => {
+      const [x, y] = point;
+      const { x: canvasX, y: canvasY } = convertCoordinates(
+        parseFloat(x),
+        parseFloat(y)
+      );
+
+      ctx.beginPath();
+      ctx.arc(canvasX, canvasY, 3, 0, 2 * Math.PI);
+      ctx.fillStyle = "red";
+      ctx.fill();
+      ctx.closePath();
+    });
+  };
   const handleCanvasMouseUp = async () => {
     if (arrowStart && arrowEnd) {
       const { x: robotXStart, y: robotYStart } = reverseCoordinates(
@@ -490,6 +506,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
             robot.Pose.Orientation
           );
           drawPathPoints(ctx, robot.Task.pathPoints);
+          drawCostmap(ctx, robot.createdCostmap);
           drawRobotArrow(ctx, x, y, orientationAngle);
           ctx.beginPath();
           ctx.arc(x, y, 10, 0, 2 * Math.PI);
