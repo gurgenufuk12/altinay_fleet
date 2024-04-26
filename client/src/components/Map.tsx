@@ -127,6 +127,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
   const [savedTasks, setSavedTasks] = React.useState<SavedTask[]>([]);
   const [savedTaskName, setSavedTaskName] = React.useState<string>("");
   const [showCostmap, setShowCostmap] = React.useState(true);
+  const [taskMode, setTaskMode] = React.useState<"auto" | "manual">("auto");
   const [selectedTaskIndex, setSelectedTaskIndex] = React.useState<
     number | null
   >(null);
@@ -359,6 +360,9 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
   const toggleCostmapVisibility = () => {
     setShowCostmap(!showCostmap);
   };
+  const toggleTaskMode = () => {
+    setTaskMode(taskMode === "auto" ? "manual" : "auto");
+  };
   const drawCostmap = (
     ctx: CanvasRenderingContext2D,
     costmap: any,
@@ -442,58 +446,90 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
     console.log(tasks);
   };
   const giveTaskToRobot = async () => {
-    switch (true) {
-      case selectedRobot === null && tasks.length === 0:
-        toast.error("Please select a robot and target position");
-        break;
-      case selectedRobot !== null && tasks.length === 0:
-        toast.error("Please give a task to the robot");
-        break;
-      case selectedRobot === null && tasks.length !== 0:
-        toast.error("Please select a robot to give a task");
-        break;
-      case taskCode.trim() === "":
-        toast.error("Task code cannot be empty");
-        break;
-      default:
-        if (tasks.length > 0 && selectedRobot !== null) {
-          try {
-            const res = await axios.post("/robots/addTarget", {
-              taskName: "",
-              taskCode: taskCode,
-              taskPriority: "1",
-              taskPercentage: "0",
-              robotName: selectedRobot?.robotName,
-              linearVelocity: "0",
-              angularVelocity: "0",
-              targets: tasks.map((task, index) => ({
-                targetPosition: task.Target.Position,
-                targetOrientation: task.Target.Orientation,
-                targetExecuted: false,
-              })),
-            });
-            toast.success("Task is given to robot successfully");
+    if (taskMode === "manual") {
+      switch (true) {
+        case selectedRobot === null && tasks.length === 0:
+          toast.error("Please select a robot and target position");
+          break;
+        case selectedRobot !== null && tasks.length === 0:
+          toast.error("Please give a task to the robot");
+          break;
+        case selectedRobot === null && tasks.length !== 0:
+          toast.error("Please select a robot to give a task");
+          break;
+        case taskCode.trim() === "":
+          toast.error("Task code cannot be empty");
+          break;
+        default:
+          if (tasks.length > 0 && selectedRobot !== null) {
+            try {
+              const res = await axios.post("/robots/addTarget", {
+                taskName: "",
+                taskCode: taskCode,
+                taskPriority: "1",
+                taskPercentage: "0",
+                robotName: selectedRobot?.robotName,
+                linearVelocity: "0",
+                angularVelocity: "0",
+                targets: tasks.map((task, index) => ({
+                  targetPosition: task.Target.Position,
+                  targetOrientation: task.Target.Orientation,
+                  targetExecuted: false,
+                })),
+              });
+              toast.success("Task is given to robot successfully");
 
-            const res2 = await axios.post("/tasks/addTasks", {
-              userName: user?.username,
-              taskName: "",
-              taskCode: taskCode,
-              taskPriority: "1",
-              taskPercentage: "0",
-              robotName: selectedRobot?.robotName,
-              targets: tasks.map((task, index) => ({
-                targetPosition: task.Target.Position,
-                targetOrientation: task.Target.Orientation,
-                targetExecuted: false,
-              })),
-              taskStartTime: new Date().toISOString(),
-            });
-          } catch (error: any) {
-            toast.error(error.response.data.message);
+              const res2 = await axios.post("/tasks/addTasks", {
+                userName: user?.username,
+                taskName: "",
+                taskCode: taskCode,
+                taskPriority: "1",
+                taskPercentage: "0",
+                robotName: selectedRobot?.robotName,
+                targets: tasks.map((task, index) => ({
+                  targetPosition: task.Target.Position,
+                  targetOrientation: task.Target.Orientation,
+                  targetExecuted: false,
+                })),
+                taskStartTime: new Date().toISOString(),
+              });
+            } catch (error: any) {
+              toast.error(error.response.data.message);
+            }
           }
+          setTasks([]);
+          break;
+      }
+    } else {
+      if (taskCode.trim() === "") {
+        toast.error("Task code cannot be empty");
+        return;
+      }
+      if (tasks.length === 0) {
+        toast.error("Please give a task to the robot");
+        return;
+      } else {
+        try {
+          const res2 = await axios.post("/tasks/addTasks", {
+            userName: user?.username,
+            taskName: "",
+            taskCode: taskCode,
+            taskPriority: "1",
+            taskPercentage: "0",
+            robotName: " ",
+            targets: tasks.map((task, index) => ({
+              targetPosition: task.Target.Position,
+              targetOrientation: task.Target.Orientation,
+              targetExecuted: false,
+            })),
+            taskStartTime: new Date().toISOString(),
+          });
+          toast.success("Task is given robot will chosen automatically!");
+          setTasks([]);
+        } catch (error: any) {
+          toast.error(error.response.data.message);
         }
-        setTasks([]);
-        break;
+      }
     }
   };
   const clearTaskList = () => {
@@ -680,6 +716,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
             <select
               className="w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
               onChange={handleRobotChange}
+              disabled = {taskMode === "auto"}
               value={selectedRobot ? selectedRobot.robotName : ""}
             >
               <option value="">Select a robot</option>
@@ -702,6 +739,18 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
               <option value="Lift">Lift</option>
             </select>
           </div>
+          <span className="mr-2">Task Mode:</span>
+          <label className="switch">
+            <input
+              type="checkbox"
+              checked={taskMode === "auto"}
+              onChange={toggleTaskMode}
+            />
+            <span className="slider round"></span>
+          </label>
+          <span className="ml-2">
+            {taskMode === "auto" ? "Auto" : "Manual"}
+          </span>
         </div>
         <canvas
           ref={canvasRef}
