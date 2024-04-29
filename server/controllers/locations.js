@@ -17,10 +17,11 @@ exports.getLocations = async (req, res, next) => {
 };
 exports.addLocation = async (req, res, next) => {
   try {
-    const { locationName, Target } = req.body;
+    const { locationName, Target,locationDescription } = req.body;
     const location = new Location({
       locationName,
       Target,
+      locationDescription,
     });
     await location.save();
     res.status(200).json({

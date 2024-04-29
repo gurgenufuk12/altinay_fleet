@@ -15,6 +15,7 @@ const LocationConfirm: React.FC<LocationConfirmProps> = ({
   taskOrientation,
 }) => {
   const [locationName, setLocationName] = useState("");
+  const [locaitonDescription, setLocationDescription] = useState("");
   const [locationExists, setLocationExists] = useState<boolean | undefined>();
   const popUpWindowRef = React.useRef<HTMLDivElement>(null);
 
@@ -46,6 +47,7 @@ const LocationConfirm: React.FC<LocationConfirmProps> = ({
             Position: taskPosition,
             Orientation: taskOrientation,
           },
+          locationDescription: locaitonDescription,
         });
         toast.success("Location added successfully");
         setLocationName("");
@@ -89,6 +91,12 @@ const LocationConfirm: React.FC<LocationConfirmProps> = ({
           value={locationName}
           onChange={(e) => setLocationName(e.target.value)}
           onBlur={checkLocationExist}
+        />
+        <input
+          placeholder="Location Description"
+          className="w-full border rounded-md py-2 px-3 mb-4"
+          value={locaitonDescription}
+          onChange={(e) => setLocationDescription(e.target.value)}
         />
         <div className="flex justify-end">
           <button
