@@ -65,6 +65,7 @@ interface Task {
       w: string;
     };
     targetExecuted: boolean;
+    locationName: string;
   };
 }
 interface SavedTask {
@@ -84,6 +85,7 @@ interface SavedTask {
       w: string;
     };
     targetExecuted: boolean;
+    locationName: string;
   }[];
   Task: {
     taskCode: string;
@@ -434,6 +436,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
               w: taskOrientation.w.toString(),
             },
             targetExecuted: false,
+            locationName: "",
           },
         },
       ]);
@@ -445,6 +448,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
   const showTasks = () => {
     console.log(tasks);
   };
+  console.log("tasks", tasks);
   const giveTaskToRobot = async () => {
     if (taskMode === "manual") {
       switch (true) {
@@ -475,6 +479,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
                   targetPosition: task.Target.Position,
                   targetOrientation: task.Target.Orientation,
                   targetExecuted: false,
+                  locationName: task.Target.locationName,
                 })),
               });
               toast.success("Task is given to robot successfully");
@@ -490,6 +495,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
                   targetPosition: task.Target.Position,
                   targetOrientation: task.Target.Orientation,
                   targetExecuted: false,
+                  locationName: task.Target.locationName,
                 })),
                 taskStartTime: new Date().toISOString(),
               });
@@ -606,8 +612,6 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
     const selectedTask = savedTasks.find(
       (task) => task.Task.taskName === selectedTaskName
     );
-    console.log(selectedTask);
-    console.log(selectedTask?.Targets.length);
     if (selectedTask) {
       const newTasks = selectedTask.Targets.map((target) => ({
         Target: {
@@ -623,6 +627,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
             w: target.Orientation.w,
           },
           targetExecuted: false,
+          locationName: target.locationName,
         },
       }));
       setTasks([...tasks, ...newTasks]);
@@ -687,6 +692,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
               w: Orientation.w,
             },
             targetExecuted: false,
+            locationName: selectedLocationName,
           },
         };
         setTasks([...tasks, newTask]);
@@ -716,7 +722,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
             <select
               className="w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
               onChange={handleRobotChange}
-              disabled = {taskMode === "auto"}
+              disabled={taskMode === "auto"}
               value={selectedRobot ? selectedRobot.robotName : ""}
             >
               <option value="">Select a robot</option>
@@ -790,13 +796,18 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
           Task List:
           {tasks.map((task, index) => (
             <div key={index}>
-              <h1>Target Position</h1>
-              <p>X: {task.Target.Position.x}</p>
-              <p>Y: {task.Target.Position.y}</p>
-
-              <h1>Target Orientation</h1>
-              <p>Z: {task.Target.Orientation.z}</p>
-              <p>W: {task.Target.Orientation.w}</p>
+              {task.Target.locationName !== "" && (
+                <div className="flex flex-col gap-2">
+                  <span>
+                    <strong>{index + 1}. Destination: </strong>{" "}
+                    {task.Target.locationName}
+                  </span>
+                  <span>
+                    <strong>Position:</strong> {task.Target.Position.x},{" "}
+                    {task.Target.Position.y}
+                  </span>
+                </div>
+              )}
               <div className="flex gap-3">
                 <button
                   className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"

@@ -62,10 +62,12 @@ interface Task {
     };
     targetExecuted: boolean;
     locationName?: string;
+    locationDescription: string;
   };
 }
 interface Location {
   locationName: string;
+  locationDescription: string;
   Target: {
     Position: {
       x: string;
@@ -131,6 +133,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
             },
             targetExecuted: false,
             locationName: selectedLocationName,
+            locationDescription: selectedLocation.locationDescription,
           },
         };
         setTasks([...tasks, newTask]);
@@ -205,6 +208,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
                 targetPosition: task.Target.Position,
                 targetOrientation: task.Target.Orientation,
                 targetExecuted: false,
+                locationName: task.Target.locationName,
               })),
             });
             toast.success("Task is given to robot successfully");
@@ -220,6 +224,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
                 targetPosition: task.Target.Position,
                 targetOrientation: task.Target.Orientation,
                 targetExecuted: false,
+                locationName: task.Target.locationName,
               })),
               taskStartTime: new Date().toISOString(),
               savedTask: savedTask,
@@ -381,6 +386,9 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
             <span className="text-gray-800">{index + 1}. Destination: </span>
             <span className="text-gray-800">
               {task.Target.locationName || "No Location"}
+            </span>
+            <span className="text-gray-800">
+              {task.Target.locationDescription}
             </span>
             <button
               className=" text-white rounded-lg   w-8 h-8"

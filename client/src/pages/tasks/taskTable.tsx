@@ -21,6 +21,7 @@ interface Task {
       w: string;
     };
     targetExecuted: boolean;
+    locationName: string;
   }[];
   Task: {
     taskCode: string;
@@ -69,7 +70,7 @@ const TaskTable: React.FC = () => {
       return task.Task.taskCode === filter;
     })
     .reverse();
-
+  console.log(tasks);
   return (
     <div className="flex items-center justify-center pl-20 bg-orange-100">
       <Sidebar />
@@ -148,15 +149,7 @@ const TaskTable: React.FC = () => {
                 {task.Targets &&
                   task.Targets.map((target, idx) => (
                     <div key={idx}>
-                      <p>
-                        Position: {target.Position.x}, {target.Position.y},{" "}
-                        {target.Position.z}
-                      </p>
-                      <p>
-                        Orientation: {target.Orientation.x},{" "}
-                        {target.Orientation.y}, {target.Orientation.z},{" "}
-                        {target.Orientation.w}
-                      </p>
+                      <p>Location Name: {target.locationName}</p>
                       <p>
                         Target Executed:
                         {target.targetExecuted ? "Yes" : "No"}
