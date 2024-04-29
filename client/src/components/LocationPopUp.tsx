@@ -37,6 +37,10 @@ const LocationConfirm: React.FC<LocationConfirmProps> = ({
       toast.error("Location name cannot be empty");
       return;
     }
+    if (locaitonDescription.trim() === "") {
+      toast.error("Location description cannot be empty");
+      return;
+    }
     if (locationExists) {
       return;
     } else {
