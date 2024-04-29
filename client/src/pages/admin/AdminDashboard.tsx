@@ -51,6 +51,7 @@ interface Robot {
 }
 interface Location {
   locationName: string;
+  locationDescription: string;
   Target: {
     Position: {
       x: string;
@@ -233,6 +234,7 @@ const AdminDashboard = () => {
               <thead>
                 <tr>
                   <th className="px-4 py-2">Location Name</th>
+                  <th className="px-4 py-2">Location Description</th>
                   <th className="px-4 py-2">Target Position</th>
                   <th className="px-4 py-2">Actions</th>
                 </tr>
@@ -245,6 +247,9 @@ const AdminDashboard = () => {
                   >
                     <td className="px-4 py-2 border border-gray-400">
                       {location.locationName}
+                    </td>
+                    <td className="px-4 py-2 border border-gray-400">
+                      {location.locationDescription}
                     </td>
                     <td className="px-4 py-2 border border-gray-400">
                       {location.Target.Position.x}, {location.Target.Position.y}
