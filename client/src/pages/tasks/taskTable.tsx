@@ -72,7 +72,7 @@ const TaskTable: React.FC = () => {
     .reverse();
   console.log(tasks);
   return (
-    <div className="flex items-center justify-center pl-20 bg-orange-100">
+    <div className="flex items-center justify-center pl-20 bg-red-200">
       <Sidebar />
       <table className="table-auto">
         <thead>
@@ -128,7 +128,7 @@ const TaskTable: React.FC = () => {
                 )}
               </div>
             </th>
-            <th className="px-4 py-2 relative flex items-center">Task Name</th>
+            <th className="px-4 py-2">Task Name</th>
             <th className="px-4 py-2">Task Percentage</th>
             <th className="px-4 py-2">Task Priority</th>
             <th className="px-4 py-2">Task Start Time</th>
