@@ -546,7 +546,6 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
     const updatedTasks = [...tasks];
     updatedTasks.splice(index, 1);
     setTasks(updatedTasks);
-    toast.success("Task deleted successfully!");
   };
 
   React.useEffect(() => {
@@ -608,6 +607,9 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
   const handleSavedTaskSelection = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
+    if (taskMode === "auto") {
+      setTaskMode("manual");
+    }
     const selectedTaskName = event.target.value;
     const selectedTask = savedTasks.find(
       (task) => task.Task.taskName === selectedTaskName
@@ -697,9 +699,6 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
         };
         setTasks([...tasks, newTask]);
         setLocationName("");
-        toast.success(
-          `Location "${selectedLocationName}" added to the task list successfully`
-        );
       }
     }
   };
