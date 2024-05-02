@@ -796,15 +796,23 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
           Task List:
           {tasks.map((task, index) => (
             <div key={index}>
-              {task.Target.locationName !== "" && (
-                <div className="flex flex-col gap-2">
+              {task.Target.locationName ? (
+                <div className="flex flex-col">
                   <span>
-                    <strong>{index + 1}. Destination: </strong>{" "}
-                    {task.Target.locationName}
+                    <strong>Location Name:</strong> {task.Target.locationName}
                   </span>
                   <span>
-                    <strong>Position:</strong> {task.Target.Position.x},{" "}
-                    {task.Target.Position.y}
+                    <strong>Position:</strong> x :{" "}
+                    {parseFloat(task.Target.Position.x).toFixed(2)}, y :{" "}
+                    {parseFloat(task.Target.Position.y).toFixed(2)}
+                  </span>
+                </div>
+              ) : (
+                <div>
+                  <span>
+                    <strong>Position:</strong> x :{" "}
+                    {parseFloat(task.Target.Position.x).toFixed(2)}, y :{" "}
+                    {parseFloat(task.Target.Position.y).toFixed(2)}
                   </span>
                 </div>
               )}
