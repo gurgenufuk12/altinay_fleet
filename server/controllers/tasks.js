@@ -40,6 +40,7 @@ exports.addTasks = async (req, res, next) => {
         Orientation: target.targetOrientation,
         targetExecuted: target.targetExecuted,
         locationName: target.locationName,
+        locationDescription: target.locationDescription,
       })),
       robotName: robotName,
       userName: userName,
@@ -73,4 +74,4 @@ exports.getSavedTasks = async (req, res, next) => {
       message: error.message,
     });
   }
-}
+};

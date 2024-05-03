@@ -39,6 +39,7 @@ exports.addTarget = async (req, res, next) => {
       Orientation: target.targetOrientation,
       targetExecuted: target.targetExecuted,
       locationName: target.locationName,
+      locationDescription: target.locationDescription,
     }));
     robot.Task = {
       taskName: taskName,

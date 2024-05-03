@@ -28,6 +28,7 @@ const targetSchema = new mongoose.Schema({
   },
   targetExecuted: Boolean,
   locationName: String,
+  locationDescription: String,
 });
 
 const taskSchema = new mongoose.Schema({
