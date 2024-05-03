@@ -448,7 +448,6 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
   const showTasks = () => {
     console.log(tasks);
   };
-  console.log("tasks", tasks);
   const giveTaskToRobot = async () => {
     if (taskMode === "manual") {
       switch (true) {
@@ -807,7 +806,10 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
                   </span>
                 </div>
               ) : (
-                <div>
+                <div className="flex flex-col">
+                  <span>
+                    <strong>Location Name:</strong> Not Chosen
+                  </span>
                   <span>
                     <strong>Position:</strong> x :{" "}
                     {parseFloat(task.Target.Position.x).toFixed(2)}, y :{" "}
