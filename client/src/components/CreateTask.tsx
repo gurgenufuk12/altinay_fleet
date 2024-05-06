@@ -3,7 +3,10 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { useUserContext } from "../contexts/UserContext";
 import CloseIcon from "@mui/icons-material/Close";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 import Arrow from "../assets/arrow.svg";
+import isEqual from "lodash/isEqual";
 interface Robot {
   Pose: {
     Position: {
@@ -107,6 +110,7 @@ interface SavedTask {
     taskPercentage: string;
     taskPriority: string;
   };
+  _id: string;
 }
 interface CreateTaskProps {
   onClose: () => void;
@@ -124,6 +128,12 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
   const [taskPriority, setTaskPriority] = React.useState<string>("1");
   const [savedTask, setSavedTask] = React.useState<boolean>(false);
   const [savedTasks, setSavedTasks] = React.useState<SavedTask[]>([]);
+  const [selectedSavedTask, setSelectedSavedTask] =
+    React.useState<SavedTask | null>(null);
+  const [showConfirmation, setShowConfirmation] = React.useState(false);
+  const [viewMode, setViewMode] = React.useState<"editMode" | "defaultMode">(
+    "defaultMode"
+  );
 
   const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(null);
 
@@ -217,6 +227,12 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
     };
   }, [onClose]);
   const handleClick = async () => {
+    if (viewMode === "editMode") {
+      if (selectedSavedTask) {
+        handleUpdateTask(selectedSavedTask);
+      }
+      return;
+    }
     switch (true) {
       case selectedRobot === null && tasks.length === 0:
         toast.error("Please select a robot and target position");
@@ -281,36 +297,87 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
     const newTasks = tasks.filter((_, i) => i !== index);
     setTasks(newTasks);
   };
-  const handleSavedTaskSelection = (
-    event: React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    const selectedTaskName = event.target.value;
-    if (selectedTaskName) {
-      const selectedTask = savedTasks.find(
-        (task) => task.Task.taskName === selectedTaskName
-      );
-      if (selectedTask) {
-        const newTasks = selectedTask.Targets.map((target) => ({
-          Target: target,
-        }));
 
-        setTasks(
-          newTasks.map((task) => ({
-            Target: {
-              ...task.Target,
-              locationName: task.Target.locationName,
-              locationDescription: task.Target.locationDescription,
-            },
-          }))
-        );
-        setTaskName(selectedTask.Task.taskName);
-        settaskCode(selectedTask.Task.taskCode);
-        setTaskPriority(selectedTask.Task.taskPriority);
-        setSelectedRobot(
-          robots.find((robot) => robot.robotName === selectedTask.robotName) ||
-            null
-        );
-      }
+  const handleSavedTaskSelection = (task: SavedTask) => {
+    setSelectedSavedTask(task);
+    const newTasks = task.Targets.map((target) => ({
+      Target: {
+        ...target,
+        locationName: target.locationName,
+        locationDescription: target.locationDescription,
+      },
+    }));
+    setTasks(newTasks);
+    setTaskName(task.Task.taskName);
+    settaskCode(task.Task.taskCode);
+    setTaskPriority(task.Task.taskPriority);
+    setSelectedRobot(
+      robots.find((robot) => robot.robotName === task.robotName) || null
+    );
+  };
+
+  const handleDeleteTask = async (task: SavedTask | null) => {
+    try {
+      await axios.put(`/tasks/deleteTask/${task?._id}`);
+      toast.success("Task deleted successfully");
+      fetchSavedTasks();
+      setShowConfirmation(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleUpdateTask = async (task: SavedTask) => {
+    const isRobotChanged = selectedRobot?.robotName !== task.robotName;
+    const isTaskCodeChanged = taskCode !== task.Task.taskCode;
+    const isTaskNameChanged = taskName !== task.Task.taskName;
+    const isTaskPriorityChanged = taskPriority !== task.Task.taskPriority;
+    const isTasksChanged = !isEqual(tasks, task.Targets);
+    if (isRobotChanged) {
+      setSelectedRobot(
+        robots.find((robot) => robot.robotName === task.robotName) || null
+      );
+    }
+    if (isTaskCodeChanged) {
+      settaskCode(task.Task.taskCode);
+    }
+    if (isTaskNameChanged) {
+      setTaskName(task.Task.taskName);
+    }
+    if (isTaskPriorityChanged) {
+      setTaskPriority(task.Task.taskPriority);
+    }
+    if (isTasksChanged) {
+      setTasks(
+        task.Targets.map((target) => ({
+          Target: {
+            ...target,
+            locationName: target.locationName,
+            locationDescription: target.locationDescription,
+          },
+        }))
+      );
+    }
+    setSavedTask(true);
+
+    try {
+      const res = await axios.put(`/tasks/updateTask/${task._id}`, {
+        taskName: taskName,
+        taskCode: taskCode,
+        taskPriority: taskPriority,
+        targets: tasks.map((task) => ({
+          targetPosition: task.Target.Position,
+          targetOrientation: task.Target.Orientation,
+          targetExecuted: false,
+          locationName: task.Target.locationName,
+          locationDescription: task.Target.locationDescription,
+        })),
+        savedTask: savedTask,
+      });
+      toast.success("Task updated successfully");
+      setViewMode("defaultMode");
+    } catch (error) {
+      console.log(error);
     }
   };
   return (
@@ -458,28 +525,77 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
               margin: "0 20px",
             }}
           />
-          <div className="flex flex-row">
+          <div className="flex flex-col">
             <label
-              htmlFor="location"
-              className="mr-4 text-gray-800 font-semibold w-1/4"
+              htmlFor="savedTasks"
+              className="mr-4 text-gray-800 font-semibold"
             >
               Choose from saved tasks :
             </label>
-            <div className="relative">
-              <select
-                className="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline text-gray-800"
-                onChange={handleSavedTaskSelection}
-              >
-                <option value="">Select Saved Task</option>
-                {savedTasks.map((task) => (
-                  <option key={task.Task.taskName} value={task.Task.taskName}>
+            <div className="flex flex-col max-h-60 overflow-auto mt-10">
+              {savedTasks.map((task) => (
+                <div key={task.Task.taskName} className="flex items-center">
+                  <button
+                    className={`text-gray-800 mr-2 ${
+                      selectedSavedTask &&
+                      selectedSavedTask.Task.taskName === task.Task.taskName
+                        ? "font-bold"
+                        : ""
+                    }`}
+                    onClick={() => handleSavedTaskSelection(task)}
+                  >
                     {task.Task.taskName}
-                  </option>
-                ))}
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0  px-2 pt-2 text-gray-700">
-                <img src={Arrow} alt="location" className="w-5 h-5" />
-              </div>
+                  </button>
+                  <div className="ml-auto flex items-center">
+                    <button
+                      className="text-red-600 mr-2"
+                      onClick={() => {
+                        setSelectedSavedTask(task);
+                        setShowConfirmation(true);
+                      }}
+                    >
+                      <DeleteIcon />
+                    </button>
+                    <button
+                      className="text-green-600"
+                      onClick={() => {
+                        setViewMode("editMode");
+                        handleSavedTaskSelection(task);
+                        setSavedTask(true);
+                      }}
+                    >
+                      <EditIcon />
+                    </button>
+                  </div>
+                </div>
+              ))}
+              {showConfirmation && (
+                <div className="absolute top-0 left-0 w-full h-full flex justify-center items-center bg-opacity-100">
+                  <div className="w-80 h-80 bg-white rounded-lg p-8 relative flex flex-col shadow-lg justify-between">
+                    <h1 className="text-3xl font-bold mb-6 text-gray-800">
+                      Confirm Deletion
+                    </h1>
+                    <p className="text-black">
+                      Are you sure you want to delete task "
+                      {selectedSavedTask?.Task.taskName}"?
+                    </p>
+                    <div className="mt-4 flex justify-end">
+                      <button
+                        className="mr-2 px-4 py-2 bg-gray-700 rounded-lg"
+                        onClick={() => setShowConfirmation(false)}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        className="px-4 py-2 bg-red-600 text-white rounded-lg"
+                        onClick={() => handleDeleteTask(selectedSavedTask)}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -510,7 +626,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
           className="py-2 px-4 bg-blue-500 text-white rounded-2xl  self-center mt-6 w-36 h-12"
           onClick={handleClick}
         >
-          Submit
+          {viewMode === "editMode" ? "Save" : "Submit"}
         </button>
       </div>
     </div>
