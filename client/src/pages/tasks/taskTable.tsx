@@ -70,7 +70,6 @@ const TaskTable: React.FC = () => {
       return task.Task.taskCode === filter;
     })
     .reverse();
-  console.log(tasks);
   return (
     <div className="flex items-center justify-center pl-20 bg-red-200">
       <Sidebar />
