@@ -384,7 +384,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
   return (
     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-75">
       <div
-        className="w-2/3 h-4/5 bg-white rounded-lg p-8 relative flex flex-col shadow-lg"
+        className="w-2/3 h-4/5 bg-white rounded-lg p-8 relative flex flex-col shadow-lg overflow-auto"
         ref={taskWindowRef}
       >
         <Button onClick={onClose} className="absolute top-4 right-4">
