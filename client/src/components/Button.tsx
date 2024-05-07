@@ -7,7 +7,7 @@ interface Props {
   className: string;
   disabled?: boolean;
   id?: string;
-  type?: "button" | "submit" | "reset"; // Add type prop
+  type?: "button" | "submit" | "reset";
 }
 
 const Button: React.FC<Props> = ({
