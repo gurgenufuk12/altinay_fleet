@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../contexts/UserContext";
 import CreateTask from "./CreateTask";
 import { useAuth } from "../contexts/AuthContext";
+import Button from "./Button";
+import AddIcon from "@mui/icons-material/Add";
 
 const Sidebar: React.FC = () => {
   const [isUserAdmin, setIsUserAdmin] = useState<boolean>(false);
@@ -27,12 +29,13 @@ const Sidebar: React.FC = () => {
         <h1 className="text-2xl font-bold">
           {user ? `Welcome, ${user.username}` : "Welcome"}
         </h1>
-        <button
+        <Button
           className="py-2 w-full mt-4 rounded-lg bg-orange-400"
-          onClick={() => setShowCreateTask(true)} // Toggle visibility on button click
+          onClick={() => setShowCreateTask(true)}
         >
+          {<AddIcon />}
           Create Task
-        </button>
+        </Button>
         {showCreateTask && (
           <CreateTask onClose={() => setShowCreateTask(false)} />
         )}
@@ -60,7 +63,7 @@ const Sidebar: React.FC = () => {
           )}
         </ul>
       </div>
-      <button
+      <Button
         className="absolute bottom-0 w-full p-4 bg-red-500 text-white"
         onClick={() => {
           setUser(null);
@@ -69,7 +72,7 @@ const Sidebar: React.FC = () => {
         }}
       >
         Logout
-      </button>
+      </Button>
     </div>
   );
 };

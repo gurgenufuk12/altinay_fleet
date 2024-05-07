@@ -2,6 +2,7 @@ import React from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useUserContext } from "../contexts/UserContext";
+import Button from "./Button";
 import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
@@ -386,9 +387,10 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
         className="w-2/3 h-4/5 bg-white rounded-lg p-8 relative flex flex-col shadow-lg"
         ref={taskWindowRef}
       >
-        <button className="absolute top-2 right-2" onClick={onClose}>
+        <Button onClick={onClose} className="absolute top-4 right-4">
           <CloseIcon className="text-black" />
-        </button>
+        </Button>
+
         <h1 className="text-3xl font-bold mb-6 text-gray-800">Create Task</h1>
         <div className="flex flex-row justify-center gap-10">
           <div className="mb-6 flex flex-col">
@@ -535,7 +537,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
             <div className="flex flex-col max-h-60 overflow-auto mt-10">
               {savedTasks.map((task) => (
                 <div key={task.Task.taskName} className="flex items-center">
-                  <button
+                  <Button
                     className={`text-gray-800 mr-2 ${
                       selectedSavedTask &&
                       selectedSavedTask.Task.taskName === task.Task.taskName
@@ -545,9 +547,9 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
                     onClick={() => handleSavedTaskSelection(task)}
                   >
                     {task.Task.taskName}
-                  </button>
+                  </Button>
                   <div className="ml-auto flex items-center">
-                    <button
+                    <Button
                       className="text-red-600 mr-2"
                       onClick={() => {
                         setSelectedSavedTask(task);
@@ -555,8 +557,8 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
                       }}
                     >
                       <DeleteIcon />
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       className="text-green-600"
                       onClick={() => {
                         setViewMode("editMode");
@@ -565,7 +567,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
                       }}
                     >
                       <EditIcon />
-                    </button>
+                    </Button>
                   </div>
                 </div>
               ))}
@@ -580,18 +582,18 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
                       {selectedSavedTask?.Task.taskName}"?
                     </p>
                     <div className="mt-4 flex justify-end">
-                      <button
+                      <Button
                         className="mr-2 px-4 py-2 bg-gray-700 rounded-lg"
                         onClick={() => setShowConfirmation(false)}
                       >
                         Cancel
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         className="px-4 py-2 bg-red-600 text-white rounded-lg"
                         onClick={() => handleDeleteTask(selectedSavedTask)}
                       >
                         Delete
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 </div>
@@ -613,21 +615,21 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
               <span className="text-gray-800">
                 {task.Target.locationDescription}
               </span>
-              <button
+              <Button
                 className=" text-white rounded-lg   w-8 h-8"
                 onClick={() => handleDeleteLocation(index)}
               >
                 <CloseIcon className="text-black" />
-              </button>
+              </Button>
             </div>
           ))}
         </div>
-        <button
+        <Button
           className="py-2 px-4 bg-blue-500 text-white rounded-2xl  self-center mt-6 w-36 h-12"
           onClick={handleClick}
         >
           {viewMode === "editMode" ? "Save" : "Submit"}
-        </button>
+        </Button>
       </div>
     </div>
   );

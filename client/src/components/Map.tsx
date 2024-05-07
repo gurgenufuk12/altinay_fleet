@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { toast } from "react-toastify";
 import RobotInfo from "./RobotInfo";
 import { useUserContext } from "../contexts/UserContext";
+import Button from "./Button";
 import LocationConfirm from "./LocationPopUp";
 import Robot from "../assets/amr.png";
 import CanvasMap from "../assets/map.jpg";
@@ -769,24 +770,21 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
           }}
         />
         <div className="flex justify-between mt-2">
-          <button
+          <Button
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-40 h-14"
             onClick={giveTaskToRobot}
-          >
-            Give Task
-          </button>
-          <button
+            title="Give Task"
+          ></Button>
+          <Button
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-40 h-14"
             onClick={toggleCostmapVisibility}
-          >
-            {showCostmap ? "Hide Costmaps" : "Show Costmaps"}
-          </button>
-          <button
+            title={showCostmap ? "Hide Costmaps" : "Show Costmaps"}
+          ></Button>
+          <Button
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-40 h-14"
             onClick={clearTaskList}
-          >
-            Clear Task List
-          </button>
+            title="Clear Task List"
+          ></Button>
         </div>
       </div>
       <div className="gap-10 flex flex-row">
@@ -818,20 +816,18 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
                 </div>
               )}
               <div className="flex gap-3">
-                <button
+                <Button
                   className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
                   onClick={() => handleDeleteTask(index)}
-                >
-                  Delete
-                </button>
+                  title="Delete Task"
+                ></Button>
                 {isUserAdmin && (
-                  <button
+                  <Button
                     className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded disabled:opacity-0"
                     onClick={() => handleAddLocation(index)}
                     disabled={disableButtons[index]}
-                  >
-                    Add Location
-                  </button>
+                    title="Add Location"
+                  ></Button>
                 )}
               </div>
             </div>

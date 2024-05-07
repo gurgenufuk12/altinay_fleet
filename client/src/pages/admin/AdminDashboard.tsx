@@ -2,6 +2,7 @@ import React from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import SideBar from "../../components/SideBar";
+import Button from "../../components/Button";
 
 interface AdminUser {
   username: string;
@@ -208,18 +209,16 @@ const AdminDashboard = () => {
                       </select>
                     </td>
                     <td className="px-4 py-2 border border-gray-400">
-                      <button
+                      <Button
                         onClick={() => saveUserRoleChanges(user.username)}
                         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2"
-                      >
-                        Save
-                      </button>
-                      <button
+                        title="Save"
+                      ></Button>
+                      <Button
                         onClick={() => deleteUser(user.username)}
                         className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-                      >
-                        Delete
-                      </button>
+                        title="Delete"
+                      ></Button>
                     </td>
                   </tr>
                 ))}
@@ -256,12 +255,12 @@ const AdminDashboard = () => {
                       , {location.Target.Position.z}
                     </td>
                     <td className="px-4 py-2 border border-gray-400">
-                      <button
+                      <Button
                         onClick={() => deleteLocation(location.locationName)}
                         className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
                       >
                         Delete
-                      </button>
+                      </Button>
                     </td>
                   </tr>
                 ))}

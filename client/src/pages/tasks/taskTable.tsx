@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import Sidebar from "../../components/SideBar";
+import Button from "../../components/Button";
 import Filter from "../../assets/filter.png";
 
 interface Task {
@@ -81,15 +82,15 @@ const TaskTable: React.FC = () => {
             <th className="px-4 py-2">
               Task Code
               <div className="relative inline-block text-left ml-2">
-                <button
-                  type="button"
+                <Button
                   id="options-menu"
+                  className="text-gray-700 block w-full text-left px-4 py-2 text-sm"
                   aria-expanded="true"
                   aria-haspopup="true"
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 >
                   <img src={Filter} alt="filter" width={20} height={20} />
-                </button>
+                </Button>
                 {isDropdownOpen && (
                   <div
                     className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5"
@@ -98,30 +99,30 @@ const TaskTable: React.FC = () => {
                     aria-labelledby="options-menu"
                   >
                     <div className="py-1" role="none">
-                      <button
+                      <Button
                         className="text-gray-700 block w-full text-left px-4 py-2 text-sm"
                         onClick={() => applyFilter("All")}
                       >
                         All
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         className="text-gray-700 block w-full text-left px-4 py-2 text-sm"
                         onClick={() => applyFilter("Patrol")}
                       >
                         Patrol
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         className="text-gray-700 block w-full text-left px-4 py-2 text-sm"
                         onClick={() => applyFilter("Docking")}
                       >
                         Docking
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         className="text-gray-700 block w-full text-left px-4 py-2 text-sm"
                         onClick={() => applyFilter("Docking")}
                       >
                         Lift
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 )}

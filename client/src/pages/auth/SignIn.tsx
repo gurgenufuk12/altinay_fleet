@@ -5,6 +5,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { useAuth } from "../../contexts/AuthContext";
 import { useUserContext } from "../../contexts/UserContext";
+import Button from "../../components/Button";
 
 const SignIn = () => {
   const navigate = useNavigate();
@@ -86,13 +87,13 @@ const SignIn = () => {
               />
             </div>
             <div className="mb-4">
-              <button
+              <Button
                 type="submit"
-                onClick={handleSubmit}
+                onClick={(event) => handleSubmit(event)}
                 className="w-full bg-indigo-500 text-white py-2 px-4 rounded-md hover:bg-indigo-600 focus:outline-none focus:bg-indigo-600"
               >
                 Sign In
-              </button>
+              </Button>
             </div>
           </form>
           <div className="text-sm text-center text-gray-600">

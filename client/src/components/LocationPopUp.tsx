@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import CloseIcon from "@mui/icons-material/Close";
 import { toast } from "react-toastify";
+import Button from "./Button";
 
 interface LocationConfirmProps {
   handleClose: () => void;
@@ -84,9 +85,9 @@ const LocationConfirm: React.FC<LocationConfirmProps> = ({
       >
         <div className="flex flex-row justify-center">
           <h2 className="text-lg font-bold mb-4">Add Location</h2>
-          <button className="absolute top-2 right-2" onClick={handleClose}>
+          <Button className="absolute top-4 right-4" onClick={handleClose}>
             <CloseIcon className="text-black" />
-          </button>
+          </Button>
         </div>
         <input
           type="text"
@@ -103,19 +104,17 @@ const LocationConfirm: React.FC<LocationConfirmProps> = ({
           onChange={(e) => setLocationDescription(e.target.value)}
         />
         <div className="flex justify-end">
-          <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2"
+          <Button
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg mr-2"
             onClick={addLocation}
             disabled={locationExists}
-          >
-            Save
-          </button>
-          <button
-            className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded"
+            title="Save"
+          ></Button>
+          <Button
+            className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-lg"
             onClick={handleClose}
-          >
-            Cancel
-          </button>
+            title="Cancel"
+          ></Button>
         </div>
       </div>
     </div>

@@ -2,6 +2,7 @@ import React from "react";
 import { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import Button from "../../components/Button";
 
 const SignUp = () => {
   const [values, setValues] = useState({
@@ -69,13 +70,13 @@ const SignUp = () => {
               />
             </div>
             <div className="mb-4">
-              <button
+              <Button
                 type="submit"
-                onClick={handleSubmit}
+                onClick={(event) => handleSubmit(event)}
                 className="w-full bg-indigo-500 text-white py-2 px-4 rounded-md hover:bg-indigo-600 focus:outline-none focus:bg-indigo-600"
               >
                 Sign Up
-              </button>
+              </Button>
             </div>
           </form>
           <div className="text-sm text-center text-gray-600">
