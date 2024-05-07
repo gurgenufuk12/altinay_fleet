@@ -136,3 +136,16 @@ exports.updateTask = async (req, res, next) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+exports.isTaskNameExist = async (req, res, next) => {
+  const { taskName } = req.params;
+  try {
+    const task = await Task.findOne({ "Task.taskName": taskName });
+    if (task) {
+      return res.status(200).json({ isExist: true });
+    }
+    res.status(200).json({ isExist: false });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};

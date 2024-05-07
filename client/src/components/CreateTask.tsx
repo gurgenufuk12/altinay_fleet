@@ -227,11 +227,27 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [onClose]);
+
+  const isTaskNameExists = async (taskName: string): Promise<boolean> => {
+    try {
+      const res = await axios.get(`/tasks/isTaskNameExist/${taskName}`);
+      return res.data.isExist;
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
+  };
+
   const handleClick = async () => {
     if (viewMode === "editMode") {
       if (selectedSavedTask) {
         handleUpdateTask(selectedSavedTask);
       }
+      return;
+    }
+    const isTaskNameExist = await isTaskNameExists(taskName);
+    if (isTaskNameExist && !selectedSavedTask) {
+      toast.error(`Task name already exists: ${taskName}`);
       return;
     }
     switch (true) {
