@@ -7,7 +7,6 @@ const { getSavedTasks } = require("../controllers/tasks");
 const { deleteTask } = require("../controllers/tasks");
 const { updateTask } = require("../controllers/tasks");
 const { isTaskNameExist } = require("../controllers/tasks");
-const { updateTaskLogsByName } = require("../controllers/tasks");
 const { getTaskByName } = require("../controllers/tasks");
 
 router.get("/getTasks", getTasks);
