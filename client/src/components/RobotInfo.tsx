@@ -45,6 +45,7 @@ interface Robot {
     taskPriority: string;
   };
   robotName: string;
+  _id: string;
 }
 
 interface RobotInfoProps {
@@ -54,30 +55,20 @@ interface RobotInfoProps {
 const RobotInfo: React.FC<RobotInfoProps> = ({ selectedRobot }) => {
   const [activeRobot, setActiveRobot] = React.useState<Robot | null>(null);
   const [robotStatus, setRobotStatus] = React.useState<string>("");
-
   const getRobotInfo = async () => {
     try {
       if (selectedRobot) {
         const res = await axios.get(
-          `/robots/getRobotInfo/${selectedRobot.robotName}`
+          `/robots/getRobotInfo/${selectedRobot._id}`
         );
         setActiveRobot(res.data.data);
+        setRobotStatus(res.data.data.robotStatus);
       }
     } catch (error) {
       console.error("Error fetching robot info:", error);
     }
   };
-  React.useEffect(() => {
-    if (activeRobot) {
-      if (activeRobot.Targets.length > 0) {
-        const lastTarget = activeRobot.Targets[activeRobot.Targets.length - 1];
-        const newStatus = lastTarget.targetExecuted
-          ? "Idle"
-          : "Task In Progress";
-        setRobotStatus(newStatus);
-      }
-    }
-  }, [activeRobot]);
+
   React.useEffect(() => {
     if (activeRobot) {
       if (activeRobot.Targets.length > 0) {
@@ -101,22 +92,6 @@ const RobotInfo: React.FC<RobotInfoProps> = ({ selectedRobot }) => {
 
     return () => clearInterval(intervalId);
   }, [selectedRobot]);
-  React.useEffect(() => {
-    const updateRobotStatus = async () => {
-      if (activeRobot) {
-        try {
-          await axios.put(`/robots/updateRobotInfo/${activeRobot.robotName}`, {
-            robotStatus,
-          });
-        } catch (error) {
-          console.error("Error updating robot status:", error);
-        }
-      }
-    };
-    updateRobotStatus();
-
-    return () => {};
-  }, [robotStatus]);
   return (
     <div className="border-black border-1 h-[37.5rem] mt-6 w-[18.75rem] rounded-2xl p-4 flex flex-col gap-20 bg-rose-200">
       <h1 className="text-xl font-medium">Robot Information</h1>

@@ -22,6 +22,7 @@ const taskSchema = new mongoose.Schema({
   taskName: String,
   taskPercentage: String,
   taskPriority: String,
+  taskId: String,
 });
 
 const tasksSchema = new mongoose.Schema({

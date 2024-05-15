@@ -27,6 +27,7 @@ exports.addTasks = async (req, res, next) => {
       targets,
       taskStartTime,
       savedTask,
+      taskId,
     } = req.body;
     const task = new Task({
       Task: {
@@ -34,6 +35,7 @@ exports.addTasks = async (req, res, next) => {
         taskCode: taskCode,
         taskPriority: taskPriority,
         taskPercentage: taskPercentage,
+        taskId: taskId,
       },
       Targets: targets.map((target) => ({
         Position: target.targetPosition,
@@ -93,7 +95,7 @@ exports.deleteTask = async (req, res, next) => {
   }
 };
 exports.updateTask = async (req, res, next) => {
-  const { _id } = req.params;
+  const { taskId } = req.params;
   try {
     const {
       taskName,
@@ -103,12 +105,12 @@ exports.updateTask = async (req, res, next) => {
       robotName,
       targets,
       taskStartTime,
-      savedTask,
     } = req.body;
     const task = await Task.findOneAndUpdate(
-      { _id: _id },
+      { "Task.taskId": taskId },
       {
         Task: {
+          taskId: taskId,
           taskName: taskName,
           taskCode: taskCode,
           taskPriority: taskPriority,
@@ -123,7 +125,6 @@ exports.updateTask = async (req, res, next) => {
         })),
         robotName: robotName,
         taskStartTime: taskStartTime,
-        savedTask: savedTask,
       },
       { new: true }
     );

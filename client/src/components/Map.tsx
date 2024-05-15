@@ -51,6 +51,7 @@ interface Robot {
   };
   robotName: string;
   createdCostmap: [[String, String]];
+  _id: string;
 }
 interface Task {
   Target: {

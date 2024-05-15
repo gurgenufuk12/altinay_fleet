@@ -10,7 +10,7 @@ const { updateRobotInfo } = require("../controllers/robots");
 router.get("/getRobots", getRobots);
 router.post("/addTarget", addTarget);
 router.get("/getCurrentRobotVelocity/:robotName", getCurrentRobotVelocity);
-router.get("/getRobotInfo/:robotName", getRobotInfo);
-router.put("/updateRobotInfo/:robotName", updateRobotInfo);
+router.get("/getRobotInfo/:_id", getRobotInfo);
+router.put("/updateRobotInfo/:_id", updateRobotInfo);
 
 module.exports = router;

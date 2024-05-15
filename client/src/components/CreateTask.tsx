@@ -110,6 +110,7 @@ interface SavedTask {
     taskName: string;
     taskPercentage: string;
     taskPriority: string;
+    taskId: string;
   };
   _id: string;
 }
@@ -272,6 +273,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
               taskPriority: taskPriority,
               taskPercentage: "0",
               robotName: selectedRobot?.robotName,
+              robotStatus: "Task In Progress",
               linearVelocity: "0",
               angularVelocity: "0",
               targets: tasks.map((task, index) => ({
@@ -283,8 +285,10 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
               })),
             });
             toast.success("Task is given to robot successfully");
+            const taskId = res.data.data.Task._id;
 
             const res2 = await axios.post("/tasks/addTasks", {
+              taskId: taskId,
               userName: user?.username,
               taskName: taskName,
               taskCode: taskCode,
@@ -378,7 +382,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
     setSavedTask(true);
 
     try {
-      const res = await axios.put(`/tasks/updateTask/${task._id}`, {
+      const res = await axios.put(`/tasks/updateTask/${task.Task.taskId}`, {
         taskName: taskName,
         taskCode: taskCode,
         taskPriority: taskPriority,

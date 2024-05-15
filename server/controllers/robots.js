@@ -26,6 +26,7 @@ exports.addTarget = async (req, res, next) => {
       linearVelocity,
       angularVelocity,
       targets,
+      robotStatus,
     } = req.body;
     const robot = await Robot.findOne({ robotName: robotName });
     if (!robot) {
@@ -34,6 +35,7 @@ exports.addTarget = async (req, res, next) => {
         message: "Robot not found",
       });
     }
+    robot.robotStatus = robotStatus;
     robot.Targets = targets.map((target) => ({
       Position: target.targetPosition,
       Orientation: target.targetOrientation,
@@ -92,8 +94,8 @@ exports.getCurrentRobotVelocity = async (req, res, next) => {
 };
 exports.getRobotInfo = async (req, res, next) => {
   try {
-    const { robotName } = req.params;
-    const robot = await Robot.findOne({ robotName: robotName });
+    const { _id } = req.params;
+    const robot = await Robot.findOne({ _id: _id });
     if (!robot) {
       return res.status(404).json({
         success: false,
@@ -114,10 +116,10 @@ exports.getRobotInfo = async (req, res, next) => {
 };
 exports.updateRobotInfo = async (req, res, next) => {
   try {
-    const { robotName } = req.params;
+    const { _id } = req.params;
     const { robotStatus } = req.body;
 
-    const robot = await Robot.findOne({ robotName: robotName });
+    const robot = await Robot.findOne({ _id: _id });
 
     if (!robot) {
       return res.status(404).json({
