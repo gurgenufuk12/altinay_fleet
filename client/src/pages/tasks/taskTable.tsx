@@ -168,7 +168,9 @@ const TaskTable: React.FC = () => {
                 {formatDate(task.taskStartTime)}
               </td>
               <td className="border px-4 py-2">
-                {formatDate(task.taskEndTime)}
+                {task.taskEndTime
+                  ? formatDate(task.taskEndTime)
+                  : "Not Finished"}
               </td>
               <td className="border px-4 py-2">
                 {task.Targets &&
