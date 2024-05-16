@@ -105,7 +105,7 @@ eventEmitter.on("robotSaved", async (robot) => {
           }
         }
       }
-      setTimeout(updateTask, 1000);
+      setTimeout(updateTask, 2000);
     } catch (error) {
       console.log(error);
     }
