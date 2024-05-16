@@ -68,6 +68,16 @@ eventEmitter.on("robotSaved", async (robot) => {
       } catch (error) {
         console.log(error);
       }
+      try {
+        axios.put(
+          `http://localhost:8000/tasks/updateTaskEndTime/${robot.Task._id}`,
+          {
+            taskEndTime: new Date().toISOString(),
+          }
+        );
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
   const updateTask = async () => {

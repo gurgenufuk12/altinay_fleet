@@ -32,6 +32,7 @@ interface TaskInspectorProps {
       taskPriority: string;
       taskId: string;
     };
+    taskEndTime: string;
   };
   onClose: () => void;
 }
@@ -55,7 +56,15 @@ const TaskInspector: React.FC<TaskInspectorProps> = ({ task, onClose }) => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [onClose]);
-
+  const formatDate = (date: string) => {
+    return new Date(date).toLocaleString("en-GB", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
   return (
     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-75">
       <div
@@ -75,7 +84,8 @@ const TaskInspector: React.FC<TaskInspectorProps> = ({ task, onClose }) => {
             <p>Task Code: {task.Task.taskCode}</p>
             <p>Task Name: {task.Task.taskName}</p>
             <p>Task Priority: {task.Task.taskPriority}</p>
-            <p>Task Start Time: {task.taskStartTime}</p>
+            <p>Task Start Time: {formatDate(task.taskStartTime)}</p>
+            <p>Task End Time: {formatDate(task.taskEndTime)}</p>
             <p>Task Percentage: {task.Task.taskPercentage}</p>
             <div>
               {task.Targets &&

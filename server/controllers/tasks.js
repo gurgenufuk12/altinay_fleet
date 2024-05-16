@@ -150,3 +150,21 @@ exports.isTaskNameExist = async (req, res, next) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+exports.updateTaskEndTime = async (req, res, next) => {
+  const { taskId } = req.params;
+  try {
+    const { taskEndTime } = req.body;
+    const task = await Task.findOneAndUpdate(
+      { "Task.taskId": taskId },
+      { taskEndTime: taskEndTime },
+      { new: true }
+    );
+    if (!task) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+    res.status(200).json({ updatedTask: task });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};

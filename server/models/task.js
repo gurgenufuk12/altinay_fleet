@@ -31,6 +31,7 @@ const tasksSchema = new mongoose.Schema({
   robotName: String,
   userName: String,
   taskStartTime: String,
+  taskEndTime: String,
   savedTask: Boolean,
 });
 
