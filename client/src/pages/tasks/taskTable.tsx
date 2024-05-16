@@ -3,6 +3,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import Sidebar from "../../components/SideBar";
 import Button from "../../components/Button";
+import TaskInspector from "../../components/TaskInspector";
 import Filter from "../../assets/filter.png";
 
 interface Task {
@@ -23,12 +24,14 @@ interface Task {
     };
     targetExecuted: boolean;
     locationName: string;
+    locationDescription: string;
   }[];
   Task: {
     taskCode: string;
     taskName: string;
     taskPercentage: string;
     taskPriority: string;
+    taskId: string;
   };
 }
 
@@ -36,11 +39,13 @@ const TaskTable: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [filter, setFilter] = useState<string>("");
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
-
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [isTaskInspectorOpen, setIsTaskInspectorOpen] =
+    useState<boolean>(false);
   React.useEffect(() => {
     const intervalId = setInterval(() => {
       retrieveTasks();
-    }, 500);
+    }, 5000);
     return () => clearInterval(intervalId);
   }, []);
   const retrieveTasks = async () => {
@@ -64,15 +69,20 @@ const TaskTable: React.FC = () => {
   const clearFilter = () => {
     setFilter("");
   };
-
   const filteredTasks = tasks
     .filter((task) => {
       if (!filter) return true;
       return task.Task.taskCode === filter;
     })
     .reverse();
+
+  const handleTaskClick = (task: Task) => {
+    setSelectedTask(task);
+    setIsTaskInspectorOpen(true);
+  };
+
   return (
-    <div className="flex items-center justify-center pl-20 bg-red-200">
+    <div className="flex items-center justify-center pl-20 bg-red-200 relative">
       <Sidebar />
       <table className="table-auto">
         <thead>
@@ -137,7 +147,7 @@ const TaskTable: React.FC = () => {
         </thead>
         <tbody>
           {filteredTasks.map((task, index) => (
-            <tr key={index}>
+            <tr key={index} onClick={() => handleTaskClick(task)}>
               <td className="border px-4 py-2">{task.robotName}</td>
               <td className="border px-4 py-2">{task.userName}</td>
               <td className="border px-4 py-2">{task.Task.taskCode}</td>
@@ -161,6 +171,12 @@ const TaskTable: React.FC = () => {
           ))}
         </tbody>
       </table>
+      {selectedTask && isTaskInspectorOpen && (
+        <TaskInspector
+          task={selectedTask}
+          onClose={() => setIsTaskInspectorOpen(false)}
+        />
+      )}
     </div>
   );
 };
