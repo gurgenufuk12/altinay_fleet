@@ -403,23 +403,21 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
   };
   return (
     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-75">
-      <div
-        className="w-2/3 h-4/5 bg-white rounded-lg p-8 relative flex flex-col shadow-lg overflow-auto"
-        ref={taskWindowRef}
-      >
-        <Button onClick={onClose} className="absolute top-4 right-4">
+      <div className="w-2/3 h-4/5 bg-white rounded-lg p-8 relative flex flex-col shadow-lg overflow-auto">
+        <button onClick={onClose} className="absolute top-4 right-4">
           <CloseIcon className="text-black" />
-        </Button>
+        </button>
 
         <h1 className="text-3xl font-bold mb-6 text-gray-800">Create Task</h1>
-        <div className="flex flex-row justify-center gap-10">
-          <div className="mb-6 flex flex-col">
-            <div className="flex flex-row items-center mb-4">
+
+        <div className="grid grid-cols-2 gap-8">
+          <div className="flex flex-col">
+            <div className="flex items-center mb-4">
               <label
                 htmlFor="robot"
                 className="mr-4 text-gray-800 font-semibold w-1/4"
               >
-                Choose Robot :
+                Choose Robot:
               </label>
               <div className="relative w-3/4">
                 <select
@@ -440,6 +438,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
                 </div>
               </div>
             </div>
+
             <div className="flex flex-row items-center mb-4">
               <label
                 htmlFor="taskCode"
@@ -539,25 +538,17 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
               </div>
             </div>
           </div>
-          <hr
-            style={{
-              width: "1px",
-              height: "100%",
-              backgroundColor: "black",
-              margin: "0 20px",
-            }}
-          />
           <div className="flex flex-col">
-            <label
-              htmlFor="savedTasks"
-              className="mr-4 text-gray-800 font-semibold"
-            >
-              Choose from saved tasks :
+            <label htmlFor="savedTasks" className="text-gray-800 font-semibold">
+              Choose from saved tasks:
             </label>
-            <div className="flex flex-col max-h-60 overflow-auto mt-10">
+            <div className="flex flex-col mt-4">
               {savedTasks.map((task) => (
-                <div key={task.Task.taskName} className="flex items-center">
-                  <Button
+                <div
+                  key={task.Task.taskName}
+                  className="flex items-center mb-4"
+                >
+                  <button
                     className={`text-gray-800 mr-2 ${
                       selectedSavedTask &&
                       selectedSavedTask.Task.taskName === task.Task.taskName
@@ -567,9 +558,9 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
                     onClick={() => handleSavedTaskSelection(task)}
                   >
                     {task.Task.taskName}
-                  </Button>
+                  </button>
                   <div className="ml-auto flex items-center">
-                    <Button
+                    <button
                       className="text-red-600 mr-2"
                       onClick={() => {
                         setSelectedSavedTask(task);
@@ -577,8 +568,8 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
                       }}
                     >
                       <DeleteIcon />
-                    </Button>
-                    <Button
+                    </button>
+                    <button
                       className="text-green-600"
                       onClick={() => {
                         setViewMode("editMode");
@@ -587,70 +578,67 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
                       }}
                     >
                       <EditIcon />
-                    </Button>
+                    </button>
                   </div>
                 </div>
               ))}
-              {showConfirmation && (
-                <div className="absolute top-0 left-0 w-full h-full flex justify-center items-center bg-opacity-100">
-                  <div className="w-80 h-80 bg-white rounded-lg p-8 relative flex flex-col shadow-lg justify-between">
-                    <h1 className="text-3xl font-bold mb-6 text-gray-800">
-                      Confirm Deletion
-                    </h1>
-                    <p className="text-black">
-                      Are you sure you want to delete task "
-                      {selectedSavedTask?.Task.taskName}"?
-                    </p>
-                    <div className="mt-4 flex justify-end">
-                      <Button
-                        className="mr-2 px-4 py-2 bg-gray-700 rounded-lg"
-                        onClick={() => setShowConfirmation(false)}
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        className="px-4 py-2 bg-red-600 text-white rounded-lg"
-                        onClick={() => handleDeleteTask(selectedSavedTask)}
-                      >
-                        Delete
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         </div>
-        <span className="text-black flex justify-center"> Task Summary: </span>
-        <div className="flex flex-col pt-5">
-          {tasks.map((task, index) => (
-            <div
-              key={index}
-              className="flex flex-row items-center gap-4 justify-center mb-2"
-            >
-              <span className="text-gray-800">{index + 1}. Destination: </span>
-              <span className="text-gray-800">
-                {task.Target.locationName || "No Location"}
-              </span>
-              <span className="text-gray-800">
-                {task.Target.locationDescription}
-              </span>
-              <Button
-                className=" text-white rounded-lg   w-8 h-8"
-                onClick={() => handleDeleteLocation(index)}
-              >
-                <CloseIcon className="text-black" />
-              </Button>
-            </div>
-          ))}
+        <div className="mt-8">
+          <span className="text-black block">Task Summary:</span>
+          <div className="flex flex-col pt-5">
+            {tasks.map((task, index) => (
+              <div key={index} className="flex items-center mb-4">
+                <span className="text-gray-800">
+                  {index + 1}. Destination:{" "}
+                  {task.Target.locationName || "No Location"}{" "}
+                  {task.Target.locationDescription}
+                </span>
+                <button
+                  className="ml-auto text-red-600"
+                  onClick={() => handleDeleteLocation(index)}
+                >
+                  <CloseIcon className="w-6 h-6" />
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
-        <Button
-          className="py-2 px-4 bg-blue-500 text-white rounded-2xl  self-center mt-6 w-36 h-12"
+        <button
+          className="py-2 px-4 bg-blue-500 text-white rounded-lg self-center mt-8"
           onClick={handleClick}
         >
           {viewMode === "editMode" ? "Save" : "Submit"}
-        </Button>
+        </button>
       </div>
+      {showConfirmation && (
+        <div className="absolute top-0 left-0 w-full h-full flex justify-center items-center bg-opacity-75">
+          <div className="w-80 h-80 bg-white rounded-lg p-8 flex flex-col shadow-lg">
+            <h1 className="text-3xl font-bold mb-6 text-gray-800">
+              Confirm Deletion
+            </h1>
+            <p className="text-black">
+              Are you sure you want to delete task "
+              {selectedSavedTask?.Task.taskName}"?
+            </p>
+            <div className="mt-4 flex justify-end">
+              <button
+                className="mr-2 px-4 py-2 bg-gray-700 rounded-lg"
+                onClick={() => setShowConfirmation(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-2 bg-red-600 text-white rounded-lg"
+                onClick={() => handleDeleteTask(selectedSavedTask)}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
