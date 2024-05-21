@@ -5,6 +5,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { useAuth } from "../../contexts/AuthContext";
 import { useUserContext } from "../../contexts/UserContext";
+import Logo from "../../assets/altınay.png";
 import Button from "../../components/Button";
 
 const SignIn = () => {
@@ -55,56 +56,64 @@ const SignIn = () => {
   };
 
   return (
-    <div>
-      <div className="bg-gray-100 flex items-center justify-center h-screen">
-        <div className="bg-white p-8 rounded shadow-md w-96">
-          <h2 className="text-2xl font-semibold mb-6">Sign In</h2>
-          <form>
-            <div className="mb-4">
-              <label htmlFor="username" className="block text-gray-600">
-                Username
-              </label>
-              <input
-                type="text"
-                id="username"
-                name="username"
-                value={username}
-                onChange={handleChange("username")}
-                className="mt-1 block w-full rounded-md border border-black shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-              />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="password" className="block text-gray-600">
-                Password
-              </label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                value={password}
-                onChange={handleChange("password")}
-                className="mt-1 block w-full rounded-md border border-black shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-              />
-            </div>
-            <div className="mb-4">
+    <>
+      <div className="flex flex-row h-screen p-20 bg-companyRed">
+        <div className="flex rounded-xl w-1/2 justify-center items-center">
+          <img src={Logo} alt="logo" />
+        </div>
+        <div className="flex flex-col rounded-xl w-1/2 justify-center items-center">
+          <div className="w-1/2 h-1/2">
+            <h2 className="text-2xl font-semibold mb-6 text-white">Sign In</h2>
+            <form>
+              <div className="mb-4">
+                <label htmlFor="username" className="block text-white">
+                  Username
+                </label>
+                <input
+                  type="text"
+                  id="username"
+                  name="username"
+                  value={username}
+                  onChange={handleChange("username")}
+                  className="mt-1 block w-full h-10 rounded-md border shadow-sm"
+                />
+              </div>
+              <div className="mb-4">
+                <label htmlFor="password" className="block text-white">
+                  Password
+                </label>
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  value={password}
+                  onChange={handleChange("password")}
+                  className="mt-1 block w-full h-10 rounded-md border shadow-sm"
+                />
+              </div>
+              <div className="mb-4 flex justify-end">
+                <Button
+                  type="submit"
+                  onClick={(event) => handleSubmit(event)}
+                  className=" bg-black text-white py-2 px-4 rounded-md"
+                >
+                  Sign In
+                </Button>
+              </div>
+            </form>
+            <div className="text-sm text-center text-white flex flex-col gap-2  items-center">
+              Don't you have an account yet ?{" "}
               <Button
-                type="submit"
-                onClick={(event) => handleSubmit(event)}
-                className="w-full bg-indigo-500 text-white py-2 px-4 rounded-md hover:bg-indigo-600 focus:outline-none focus:bg-indigo-600"
+                onClick={() => navigate("/signup")}
+                className=" bg-black text-white py-2 px-4 rounded-md"
               >
-                Sign In
+                Sign Up
               </Button>
             </div>
-          </form>
-          <div className="text-sm text-center text-gray-600">
-            Already have an account ?{" "}
-            <a href="/signup" className="text-indigo-500 hover:text-indigo-700">
-              Sign Up
-            </a>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
