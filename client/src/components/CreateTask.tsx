@@ -589,7 +589,12 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
           <span className="text-black block">Task Summary:</span>
           <div className="flex flex-col pt-5">
             {tasks.map((task, index) => (
-              <div key={index} className="flex items-center mb-4">
+              <div
+                key={index}
+                className={` flex items-center mb-4 font-bold rounded-lg p-5 ${
+                  index % 2 === 0 ? "bg-white" : "bg-gray-300"
+                }`}
+              >
                 <span className="text-gray-800">
                   {index + 1}. Destination:{" "}
                   {task.Target.locationName || "No Location"}{" "}
@@ -599,17 +604,19 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
                   className="ml-auto text-red-600"
                   onClick={() => handleDeleteLocation(index)}
                 >
-                  <CloseIcon className="w-6 h-6" />
+                  <DeleteIcon className="w-6 h-6" />
                 </button>
               </div>
             ))}
           </div>
         </div>
         <button
-          className="py-2 px-4 bg-blue-500 text-white rounded-lg self-center mt-8"
+          className={` flex items-center mb-4 font-bold  p-5 py-2 px-4  text-white rounded-lg self-center mt-8 ${
+            viewMode === "editMode" ? " bg-orange-400" : "bg-blue-500"
+          }`}
           onClick={handleClick}
         >
-          {viewMode === "editMode" ? "Save" : "Submit"}
+          {viewMode === "editMode" ? "Update" : "Submit"}
         </button>
       </div>
       {showConfirmation && (
