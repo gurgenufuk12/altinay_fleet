@@ -253,10 +253,10 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
       toast.error(`Task name already exists: ${taskName}`);
       return;
     }
-    // write  me a function to generate random string as number
+
     const randomNumberGenerator = (): string => {
-      const min = 100000000; // Minimum 9-digit number (100,000,000)
-      const max = 999999999; // Maximum 9-digit number (999,999,999)
+      const min = 100000000;
+      const max = 999999999;
       const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
       return "T" + randomNumber.toString();
     };
