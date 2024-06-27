@@ -20,6 +20,7 @@ exports.addTarget = async (req, res, next) => {
     const {
       taskName,
       taskCode,
+      taskId,
       taskPriority,
       taskPercentage,
       robotName,
@@ -48,6 +49,7 @@ exports.addTarget = async (req, res, next) => {
       taskCode: taskCode,
       taskPriority: taskPriority,
       taskPercentage: taskPercentage,
+      taskId: taskId,
     };
     robot.robotVelocity = {
       linearVelocity: linearVelocity,

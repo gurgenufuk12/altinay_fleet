@@ -48,6 +48,7 @@ interface Robot {
     taskPercentage: string;
     taskPriority: string;
     pathPoints: [string, string][];
+    taskId: string;
   };
   robotName: string;
 }
@@ -138,6 +139,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
   );
 
   const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(null);
+  const [randomNumber, setRandomNumber] = React.useState<string>("");
 
   const handleRobotChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const robotName = event.target.value;
@@ -251,6 +253,13 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
       toast.error(`Task name already exists: ${taskName}`);
       return;
     }
+    // write  me a function to generate random string as number
+    const randomNumberGenerator = (): string => {
+      const min = 100000000; // Minimum 9-digit number (100,000,000)
+      const max = 999999999; // Maximum 9-digit number (999,999,999)
+      const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
+      return "T" + randomNumber.toString();
+    };
     switch (true) {
       case selectedRobot === null && tasks.length === 0:
         toast.error("Please select a robot and target position");
@@ -266,14 +275,17 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
         break;
       default:
         if (tasks.length > 0 && selectedRobot !== null) {
+          const randomNineDigitString = randomNumberGenerator();
+
           try {
             const res = await axios.post("/robots/addTarget", {
               taskName: taskName,
               taskCode: taskCode,
               taskPriority: taskPriority,
+              taskId: randomNineDigitString,
               taskPercentage: "0",
               robotName: selectedRobot?.robotName,
-              robotStatus: "Task In Progress",
+              robotStatus: "Task In Progress", // DO NOT COMMIT LIKE THIS CONVERT TO Task In Progress
               linearVelocity: "0",
               angularVelocity: "0",
               targets: tasks.map((task, index) => ({
@@ -285,10 +297,10 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
               })),
             });
             toast.success("Task is given to robot successfully");
-            const taskId = res.data.data.Task._id;
+            // const taskId = res.data.data.Task._id;
 
             const res2 = await axios.post("/tasks/addTasks", {
-              taskId: taskId,
+              taskId: randomNineDigitString,
               userName: user?.username,
               taskName: taskName,
               taskCode: taskCode,

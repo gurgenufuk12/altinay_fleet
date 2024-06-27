@@ -40,6 +40,7 @@ const taskSchema = new mongoose.Schema({
   taskPercentage: String,
   taskPriority: String,
   pathPoints: [[String, String]],
+  taskId: String,
 });
 
 const robotSchema = new mongoose.Schema({
@@ -87,7 +88,7 @@ eventEmitter.on("robotSaved", async (robot) => {
         if (robot.robotStatus === "Task In Progress") {
           try {
             const res = await axios.put(
-              `http://localhost:8000/tasks/updateTask/${robot.Task._id}`,
+              `http://localhost:8000/tasks/updateTask/${robot.Task.taskId}`,
               {
                 taskName: robot.Task.taskName,
                 taskCode: robot.Task.taskCode,
