@@ -70,65 +70,50 @@ const RobotInfo: React.FC<RobotInfoProps> = ({ selectedRobot }) => {
   };
 
   React.useEffect(() => {
-    if (activeRobot) {
-      if (activeRobot.Targets.length > 0) {
-        const lastTarget = activeRobot.Targets[activeRobot.Targets.length - 1];
-        if (lastTarget.targetExecuted && robotStatus === "Task In Progress") {
-          toast.success(
-            "Task Completed :" +
-              " " +
-              activeRobot.Task.taskCode +
-              " " +
-              format(new Date(), "MMMM do yyyy, h:mm:ss a") +
-              " " +
-              activeRobot.robotName
-          );
-        }
-      }
-    }
-  }, [activeRobot]);
-  React.useEffect(() => {
     const intervalId = setInterval(getRobotInfo, 500);
 
     return () => clearInterval(intervalId);
   }, [selectedRobot]);
   return (
-    <div className="border-black border-1 h-[37.5rem] mt-6 w-[18.75rem] rounded-2xl p-4 flex flex-col gap-20 bg-rose-200">
+    <div className="flex flex-col items-center gap-4 p-4 bg-gray-100 rounded-lg">
       <h1 className="text-xl font-medium">Robot Information</h1>
-      <div className="flex flex-col items-center">
-        <div className="flex m-7">
-          <img src={Robot} alt="robot" />
+      <img src={Robot} alt="robot" className="w-36" />
+      {activeRobot && (
+        <div className="flex flex-col gap-2">
+          <div className="flex justify-between">
+            <span className="font-medium">Robot Name:</span>
+            <span>{activeRobot.robotName}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="font-medium">Robot Status:</span>
+            <span>{activeRobot.robotStatus}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="font-medium">Robot Charge:</span>
+            <span>{activeRobot.robotCharge}%</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="font-medium">Robot Velocity:</span>
+            <span>{activeRobot.robotVelocity.linearVelocity} m/s</span>
+          </div>
+          {robotStatus !== "Idle" && (
+            <>
+              <div className="flex justify-between">
+                <span className="font-medium">Task Name:</span>
+                <span>{activeRobot.Task.taskName}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-medium">Task Percentage:</span>
+                <span>{activeRobot.Task.taskPercentage}%</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-medium">Task Priority:</span>
+                <span>{activeRobot.Task.taskPriority}</span>
+              </div>
+            </>
+          )}
         </div>
-      </div>
-      <div className="flex flex-col">
-        <h1 className="text-m font-medium">
-          Robot Name: {activeRobot?.robotName}
-        </h1>
-        <h1 className="text-m font-medium">
-          Robot Status: {activeRobot?.robotStatus}
-        </h1>
-        <h1 className="text-m font-medium">
-          Robot Charge: {activeRobot?.robotCharge + "%"}
-        </h1>
-        <h1 className="text-m font-medium">
-          Robot Velocity: {activeRobot?.robotVelocity.linearVelocity + " m/s"}
-        </h1>
-        <h1 className="text-m font-medium">
-          {robotStatus === "Idle"
-            ? ""
-            : "Task Name: " + activeRobot?.Task.taskName}
-        </h1>
-        <h1 className="text-m font-medium">
-          {robotStatus === "Task In Progress"
-            ? "Task Percentage: " + activeRobot?.Task.taskPercentage + "%"
-            : ""}
-        </h1>
-        <h1 className="text-m font-medium">
-          {robotStatus === "Task In Progress"
-            ? "Task Priority: " + activeRobot?.Task.taskPriority
-            : ""}
-        </h1>
-      </div>
+      )}
     </div>
   );
 };

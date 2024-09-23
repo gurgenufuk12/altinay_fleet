@@ -50,6 +50,9 @@ exports.addTasks = async (req, res, next) => {
       savedTask: savedTask,
     });
     await task.save();
+
+    req.broadcast({ type: "new_task", data: task });
+
     res.status(200).json({
       success: true,
       data: task,
@@ -78,6 +81,7 @@ exports.getSavedTasks = async (req, res, next) => {
   }
 };
 exports.deleteTask = async (req, res, next) => {
+  console.log(req.params);
   const { _id } = req.params;
   try {
     const task = await Task.findOneAndUpdate(
