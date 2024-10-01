@@ -23,13 +23,12 @@ interface TaskInspectorProps {
       locationName: string;
       locationDescription: string;
     }[];
-    Task: {
-      taskCode: string;
-      taskName: string;
-      taskPercentage: string;
-      taskPriority: string;
-      taskId: string;
-    };
+    taskCode: string;
+    taskName: string;
+    taskPercentage: string;
+    taskPriority: string;
+    taskId: string;
+
     taskEndTime: string;
   };
   onClose: () => void;
@@ -90,15 +89,15 @@ const TaskInspector: React.FC<TaskInspectorProps> = ({ task, onClose }) => {
               </p>
               <p>
                 <span className="font-semibold">Task Code:</span>{" "}
-                {task.Task.taskCode}
+                {task.taskCode}
               </p>
               <p>
                 <span className="font-semibold">Task Name:</span>{" "}
-                {task.Task.taskName}
+                {task.taskName}
               </p>
               <p>
                 <span className="font-semibold">Task Priority:</span>{" "}
-                {task.Task.taskPriority}
+                {task.taskPriority}
               </p>
               <p>
                 <span className="font-semibold">Task Start Time:</span>{" "}
@@ -106,11 +105,13 @@ const TaskInspector: React.FC<TaskInspectorProps> = ({ task, onClose }) => {
               </p>
               <p>
                 <span className="font-semibold">Task End Time:</span>{" "}
-                {task.taskEndTime ? formatDate(task.taskEndTime) : "Not Finished"}
+                {task.taskEndTime
+                  ? formatDate(task.taskEndTime)
+                  : "Not Finished"}
               </p>
               <p>
                 <span className="font-semibold">Task Percentage:</span>{" "}
-                {task.Task.taskPercentage}
+                {task.taskPercentage}
               </p>
             </div>
           </div>
@@ -132,7 +133,9 @@ const TaskInspector: React.FC<TaskInspectorProps> = ({ task, onClose }) => {
                     <span className="font-semibold">Target Executed:</span>{" "}
                     <span
                       className={`font-bold ${
-                        target.targetExecuted ? "text-green-500" : "text-red-500"
+                        target.targetExecuted
+                          ? "text-green-500"
+                          : "text-red-500"
                       }`}
                     >
                       {target.targetExecuted ? "Yes" : "No"}
