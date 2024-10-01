@@ -1,5 +1,7 @@
 import React from "react";
 import axios from "axios";
+import { collection, onSnapshot } from "firebase/firestore";
+import { db } from "../../firebase/firebaseConfig";
 import { toast } from "react-toastify";
 import SideBar from "../../components/SideBar";
 import Button from "../../components/Button";
@@ -96,17 +98,24 @@ const AdminDashboard = () => {
       console.log(error);
     }
   };
-  const fetchLocations = async () => {
+  const fetchLocations = () => {
     try {
-      const res = await axios.get("/locations/getLocations");
-      setLocations(res.data.data);
+      const locationsRef = collection(db, "locations");
+
+      onSnapshot(locationsRef, (snapshot) => {
+        const locations: Location[] = snapshot.docs.map((doc) => ({
+          ...(doc.data() as Location),
+        }));
+
+        setLocations(locations);
+      });
     } catch (error) {
-      console.log(error);
+      console.log("Error fetching locations: ", error);
     }
   };
   React.useEffect(() => {
-    fetchUsers();
-    fetchRobots();
+    // fetchUsers();
+    // fetchRobots();
     fetchLocations();
   }, []);
 
@@ -162,8 +171,8 @@ const AdminDashboard = () => {
       );
       setLocations(updatedLocations);
       toast.success("Location deleted successfully");
-    } catch (error) {
-      toast.error("Error deleting location");
+    } catch (error: any) {
+      toast.error("Error deleting location " + error.response.data.message);
     }
   };
   return (
