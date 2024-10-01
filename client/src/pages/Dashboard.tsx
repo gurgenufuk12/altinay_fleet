@@ -1,7 +1,5 @@
 import React from "react";
-import axios from "axios";
 import Map from "../components/Map";
-import TaskTable from "./tasks/taskTable";
 import Sidebar from "../components/SideBar";
 
 const Dashboard = () => {
