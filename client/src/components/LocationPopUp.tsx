@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import randomStringGenerator from "../hooks/useRandomStringGenerator";
 import CloseIcon from "@mui/icons-material/Close";
 import { toast } from "react-toastify";
 import Button from "./Button";
@@ -16,19 +17,18 @@ const LocationConfirm: React.FC<LocationConfirmProps> = ({
   taskOrientation,
 }) => {
   const [locationName, setLocationName] = useState("");
-  const [locaitonDescription, setLocationDescription] = useState("");
-  const [locationExists, setLocationExists] = useState<boolean | undefined>();
+  const [locationDescription, setLocationDescription] = useState("");
   const popUpWindowRef = React.useRef<HTMLDivElement>(null);
+  const { generateRandomString } = randomStringGenerator();
 
   const checkLocationExist = async () => {
     try {
       const res = await axios.get(
         `/locations/checkLocationExist/${locationName}`
       );
-      setLocationExists(res.data.exists);
-      if (res.data.exists) {
-        toast.error("Location name already exists");
-      }
+      console.log("res data", res.data);
+
+      return res;
     } catch (error: any) {
       toast.error(error.response.data.message);
     }
@@ -38,21 +38,49 @@ const LocationConfirm: React.FC<LocationConfirmProps> = ({
       toast.error("Location name cannot be empty");
       return;
     }
-    if (locaitonDescription.trim() === "") {
+    if (locationDescription.trim() === "") {
       toast.error("Location description cannot be empty");
       return;
     }
-    if (locationExists) {
+    const isLocationExists = await checkLocationExist();
+    console.log(isLocationExists);
+    console.log(isLocationExists?.data.locationExists);
+
+    if (isLocationExists?.data.locationExists) {
+      toast.error(
+        <div className="flex flex-col">
+          <span>
+            <strong>Location with the name already exists!</strong>
+          </span>
+          <span>
+            Location Name:{" "}
+            <strong>{isLocationExists.data.locationData.locationName}</strong>
+          </span>
+          <span>
+            Location Description:{" "}
+            <strong>
+              {isLocationExists.data.locationData.locaptionDescription}
+            </strong>
+          </span>
+          <span>
+            Location Id:{" "}
+            <strong>{isLocationExists.data.locationData.locationId}</strong>
+          </span>
+        </div>
+      );
       return;
     } else {
+      const randomNineDigitString = generateRandomString("location");
+
       try {
         const res = await axios.post("/locations/addLocation", {
+          locationId: randomNineDigitString,
           locationName: locationName,
           Target: {
             Position: taskPosition,
             Orientation: taskOrientation,
           },
-          locationDescription: locaitonDescription,
+          locationDescription: locationDescription,
         });
         toast.success("Location added successfully");
         setLocationName("");
@@ -95,19 +123,18 @@ const LocationConfirm: React.FC<LocationConfirmProps> = ({
           className="w-full border rounded-md py-2 px-3 mb-4"
           value={locationName}
           onChange={(e) => setLocationName(e.target.value)}
-          onBlur={checkLocationExist}
         />
         <input
           placeholder="Location Description"
           className="w-full border rounded-md py-2 px-3 mb-4"
-          value={locaitonDescription}
+          value={locationDescription}
           onChange={(e) => setLocationDescription(e.target.value)}
         />
         <div className="flex justify-end">
           <Button
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg mr-2"
             onClick={addLocation}
-            disabled={locationExists}
+            // disabled={locationExists}
             title="Save"
           ></Button>
           <Button
