@@ -2,16 +2,24 @@ import React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { toast } from "react-toastify";
 import { useAuth } from "../../contexts/AuthContext";
 import { useUserContext } from "../../contexts/UserContext";
 import Logo from "../../assets/altınay.png";
 import Button from "../../components/Button";
 
+interface User {
+  id: string;
+  username: string;
+  user_Role: string;
+}
 const SignIn = () => {
   const navigate = useNavigate();
   const { setUser } = useUserContext();
-  const { handleLogin } = useAuth();
+  const auth = getAuth();
+  const { handleLogin, setIsLoggedIn } = useAuth();
+
   const [values, setValues] = useState({
     username: "",
     password: "",
@@ -25,33 +33,40 @@ const SignIn = () => {
 
   const handleSubmit = async (event: any) => {
     event.preventDefault();
-    try {
-      const signUser = await axios.post("/api/login", {
-        username,
-        password,
-      });
 
-      if (signUser) {
-        setValues({ ...values, username: "", password: "" });
-        toast.success("Sign in successfully, redirecting to home page...");
-        const userData = signUser.data.token;
-        sessionStorage.setItem("userData", JSON.stringify(userData));
-        const token = signUser.data.token;
-        try {
-          const res = await axios.get("/api/getUserByToken", {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          setUser(res.data.data);
-        } catch (error) {
-          console.log(error);
-        }
-        handleLogin();
-        navigate("/");
-      }
+    try {
+      // Sign in with Firebase
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        username,
+        password
+      );
+
+      // Successfully signed in
+      const user = userCredential.user;
+      setValues({ ...values, username: "", password: "" });
+      toast.success("Sign in successfully, redirecting to home page...");
+
+      // Store the user token
+      const token = await user.getIdToken();
+      sessionStorage.setItem(
+        "userData",
+        JSON.stringify({ token, uid: user.uid })
+      );
+
+      const userData: User = {
+        id: user.uid,
+        username: user.email?.split("@")[0] || "",
+        user_Role: "admin",
+      };
+
+      setUser(userData);
+      handleLogin();
+      setIsLoggedIn(true);
+
+      navigate("/");
     } catch (error: any) {
-      toast.error(error.response.data.message);
+      toast.error(error.message);
     }
   };
 

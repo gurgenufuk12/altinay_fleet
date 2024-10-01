@@ -1,4 +1,5 @@
 import React from "react";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -7,6 +8,7 @@ import Button from "../../components/Button";
 import Logo from "../../assets/altınay.png";
 
 const SignUp = () => {
+  const auth = getAuth();
   const [values, setValues] = useState({
     username: "",
     password: "",
@@ -21,18 +23,19 @@ const SignUp = () => {
   const handleSubmit = async (event: any) => {
     event.preventDefault();
     try {
-      const signUser = await axios.post("/api/signup", {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
         username,
-        password,
-      });
-      console.log(signUser);
-      if (signUser) {
-        setValues({ ...values, username: "", password: "" });
-        toast.success("Sign up successfully, redirecting to sign in page...");
-        setInterval(() => {
-          window.location.href = "/signin";
-        }, 2000);
-      }
+        password
+      );
+
+      // Successfully created user
+      const user = userCredential.user;
+      setValues({ ...values, username: "", password: "" });
+      toast.success("Sign up successfully, redirecting to sign in page...");
+      navigate("/signin");
+      // Optionally, you can store the user's data in session storage
+      sessionStorage.setItem("userData", JSON.stringify({ uid: user.uid }));
     } catch (error: any) {
       console.log(error.response);
       toast.error(error.response.data.message);
