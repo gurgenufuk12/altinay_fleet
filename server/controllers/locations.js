@@ -30,9 +30,9 @@ exports.addLocation = async (req, res, next) => {
   }
 };
 exports.deleteLocation = async (req, res, next) => {
-  const { locationName } = req.params;
+  const { locationId } = req.params;
   try {
-    const locationRef = db.doc(locationName.trim());
+    const locationRef = db.doc(locationId.trim());
     await locationRef.delete();
     res.status(200).json({
       success: true,

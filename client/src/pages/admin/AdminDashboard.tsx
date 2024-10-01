@@ -53,6 +53,7 @@ interface Robot {
   robotName: string;
 }
 interface Location {
+  locationId: string;
   locationName: string;
   locationDescription: string;
   Target: {
@@ -160,14 +161,12 @@ const AdminDashboard = () => {
     }
   };
 
-  const deleteLocation = async (locationName: string) => {
+  const deleteLocation = async (locationId: string) => {
     try {
-      const res = await axios.delete(
-        `/locations/deleteLocation/${locationName}`
-      );
+      const res = await axios.delete(`/locations/deleteLocation/${locationId}`);
 
       const updatedLocations = locations.filter(
-        (location) => location.locationName !== locationName
+        (location) => location.locationId !== locationId
       );
       setLocations(updatedLocations);
       toast.success("Location deleted successfully");
@@ -283,7 +282,7 @@ const AdminDashboard = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <Button
-                        onClick={() => deleteLocation(location.locationName)}
+                        onClick={() => deleteLocation(location.locationId)}
                         className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
                         title="Delete"
                       />

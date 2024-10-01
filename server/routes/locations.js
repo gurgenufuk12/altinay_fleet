@@ -6,7 +6,7 @@ const { deleteLocation } = require("../controllers/locations");
 const { checkLocationExist } = require("../controllers/locations");
 
 router.post("/addLocation", addLocation);
-router.delete("/deleteLocation/:locationName", deleteLocation);
+router.delete("/deleteLocation/:locationId", deleteLocation);
 router.get("/checkLocationExist/:locationName", checkLocationExist);
 
 module.exports = router;
