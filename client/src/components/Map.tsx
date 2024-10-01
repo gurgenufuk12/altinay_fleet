@@ -2,8 +2,11 @@ import React from "react";
 import axios from "axios";
 import { useRef } from "react";
 import { toast } from "react-toastify";
+import { collection, onSnapshot } from "firebase/firestore";
+import { db } from "../firebase/firebaseConfig";
 import RobotInfo from "./RobotInfo";
 import { useUserContext } from "../contexts/UserContext";
+import useRandomStringGenerator from "../hooks/useRandomStringGenerator";
 import Button from "./Button";
 import LocationConfirm from "./LocationPopUp";
 import Robot from "../assets/amr.png";
@@ -89,15 +92,15 @@ interface SavedTask {
     targetExecuted: boolean;
     locationName: string;
   }[];
-  Task: {
-    taskCode: string;
-    taskName: string;
-    taskPercentage: string;
-    taskPriority: string;
-  };
+  taskId: string;
+  taskCode: string;
+  taskName: string;
+  taskPercentage: string;
+  taskPriority: string;
 }
 interface Location {
   locationName: string;
+  locationDescription: string;
   Target: {
     Position: {
       x: string;
@@ -154,17 +157,18 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
     z: number;
     w: number;
   } | null>(null);
+  const {generateRandomString} = useRandomStringGenerator();
   React.useEffect(() => {
     if (user && user.user_Role === "admin") {
       setIsUserAdmin(true);
     }
   }, [user]);
-  React.useEffect(() => {
-    const intervalId = setInterval(() => {
-      fetchRobots();
-    }, 1000);
-    return () => clearInterval(intervalId);
-  }, []);
+  // React.useEffect(() => {
+  //   const intervalId = setInterval(() => {
+  //     fetchRobots();
+  //   }, 1000);
+  //   return () => clearInterval(intervalId);
+  // }, []);
   React.useEffect(() => {
     const newDisableButtons = tasks.map((task) =>
       locations.some(
@@ -217,28 +221,42 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
       setArrowEnd({ x: x, y: y });
     }
   };
-  const fetchSavedTasks = async () => {
+  const fetchSavedTasks = () => {
     try {
-      const res = await axios.get("/tasks/getSavedTasks");
-      setSavedTasks(res.data.data);
+      const savedTasksRef = collection(db, "tasks");
+
+      onSnapshot(savedTasksRef, (snapshot) => {
+        const savedTasks: SavedTask[] = snapshot.docs
+          .filter((doc) => doc.data().savedTask === true)
+          .map((doc) => ({
+            ...(doc.data() as SavedTask),
+          }));
+
+        setSavedTasks(savedTasks);
+      });
     } catch (error) {
-      console.log(error);
+      console.log("Error fetching saved tasks: ", error);
     }
   };
-  const fetchLocations = async () => {
+  const fetchLocations = () => {
     try {
-      const res = await axios.get("/locations/getLocations");
-      setLocations(res.data.data);
+      const locationsRef = collection(db, "locations");
+
+      onSnapshot(locationsRef, (snapshot) => {
+        const locations: Location[] = snapshot.docs.map((doc) => ({
+          ...(doc.data() as Location),
+        }));
+
+        setLocations(locations);
+      });
     } catch (error) {
-      console.log(error);
+      console.log("Error fetching locations: ", error);
     }
   };
   React.useEffect(() => {
-    const intervalId = setInterval(() => {
-      fetchLocations();
-      fetchSavedTasks();
-    }, 1000);
-    return () => clearInterval(intervalId);
+    // fetchRobots();
+    fetchLocations();
+    fetchSavedTasks();
   }, []);
   const handleCanvasMouseMove = (
     event: React.MouseEvent<HTMLCanvasElement>
@@ -450,48 +468,55 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
   const showTasks = () => {
     console.log(tasks);
   };
+
   const giveTaskToRobot = async () => {
     if (taskMode === "manual") {
+      console.log("fasdfdasfdsafadsf");
+
       switch (true) {
-        case selectedRobot === null && tasks.length === 0:
-          toast.error("Please select a robot and target position");
-          break;
-        case selectedRobot !== null && tasks.length === 0:
-          toast.error("Please give a task to the robot");
-          break;
-        case selectedRobot === null && tasks.length !== 0:
-          toast.error("Please select a robot to give a task");
-          break;
-        case taskCode.trim() === "":
-          toast.error("Task code cannot be empty");
-          break;
+        // INFO: CHANGE LATER DO NOT FORGET
+        // case selectedRobot === null && tasks.length === 0:
+        //   toast.error("Please select a robot and target position");
+        //   break;
+        // case selectedRobot !== null && tasks.length === 0:
+        //   toast.error("Please give a task to the robot");
+        //   break;
+        // case selectedRobot === null && tasks.length !== 0:
+        //   toast.error("Please select a robot to give a task");
+        //   break;
+        // case taskCode.trim() === "":
+        //   toast.error("Task code cannot be empty");
+        //   break;
         default:
           if (tasks.length > 0 && selectedRobot !== null) {
             try {
-              const res = await axios.post("/robots/addTarget", {
-                taskName: "",
-                taskCode: taskCode,
-                taskPriority: "1",
-                taskPercentage: "0",
-                robotName: selectedRobot?.robotName,
-                linearVelocity: "0",
-                angularVelocity: "0",
-                targets: tasks.map((task, index) => ({
-                  targetPosition: task.Target.Position,
-                  targetOrientation: task.Target.Orientation,
-                  targetExecuted: false,
-                  locationName: task.Target.locationName,
-                })),
-              });
-              toast.success("Task is given to robot successfully");
+              // INFO : This is the old way of giving task to robot
+              // const res = await axios.post("/robots/addTarget", {
+              //   taskName: "",
+              //   taskCode: taskCode,
+              //   taskPriority: "1",
+              //   taskPercentage: "0",
+              //   robotName: selectedRobot?.robotName,
+              //   linearVelocity: "0",
+              //   angularVelocity: "0",
+              //   targets: tasks.map((task, index) => ({
+              //     targetPosition: task.Target.Position,
+              //     targetOrientation: task.Target.Orientation,
+              //     targetExecuted: false,
+              //     locationName: task.Target.locationName,
+              //   })),
+              // });
+              // toast.success("Task is given to robot successfully");
+              const randomNineDigitString = generateRandomString("task");
 
               const res2 = await axios.post("/tasks/addTasks", {
+                taskId: randomNineDigitString,
                 userName: user?.username,
-                taskName: "",
+                taskName: "MAP",
                 taskCode: taskCode,
                 taskPriority: "1",
                 taskPercentage: "0",
-                robotName: selectedRobot?.robotName,
+                robotName: "ROBOT1",
                 targets: tasks.map((task, index) => ({
                   targetPosition: task.Target.Position,
                   targetOrientation: task.Target.Orientation,
@@ -499,6 +524,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
                   locationName: task.Target.locationName,
                 })),
                 taskStartTime: new Date().toISOString(),
+                savedTask: false,
               });
             } catch (error: any) {
               toast.error(error.response.data.message);
@@ -613,7 +639,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
     }
     const selectedTaskName = event.target.value;
     const selectedTask = savedTasks.find(
-      (task) => task.Task.taskName === selectedTaskName
+      (task) => task.taskName === selectedTaskName
     );
     if (selectedTask) {
       const newTasks = selectedTask.Targets.map((target) => ({
@@ -633,10 +659,10 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
           locationName: target.locationName,
         },
       }));
-      setTasks([...tasks, ...newTasks]);
+      setTasks(newTasks);
       setSavedTaskName("");
     }
-    settaskCode(selectedTask?.Task.taskCode || "");
+    settaskCode(selectedTask?.taskCode || "");
     setSelectedRobot(
       robots.find((robot) => robot.robotName === selectedTask?.robotName) ||
         null
@@ -650,7 +676,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
           <strong>Task Name:</strong> {selectedTaskName}
         </span>
         <span>
-          <strong>Task Code:</strong> {selectedTask?.Task.taskCode}
+          <strong>Task Code:</strong> {selectedTask?.taskCode}
         </span>
         <span>
           <strong>Robot Name:</strong> {selectedTask?.robotName}
@@ -822,14 +848,14 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
                   onClick={() => handleDeleteTask(index)}
                   title="Delete Task"
                 ></Button>
-                {isUserAdmin && (
-                  <Button
-                    className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-2 rounded disabled:opacity-0  w-50 h-10"
-                    onClick={() => handleAddLocation(index)}
-                    disabled={disableButtons[index]}
-                    title="Add Location"
-                  ></Button>
-                )}
+                {/* {isUserAdmin && ( */}
+                <Button
+                  className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-2 rounded disabled:opacity-0  w-50 h-10"
+                  onClick={() => handleAddLocation(index)}
+                  disabled={disableButtons[index]}
+                  title="Add Location"
+                ></Button>
+                {/* )} */}
               </div>
             </div>
           ))}
@@ -860,8 +886,8 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
             >
               <option value="">Select Saved Task</option>
               {savedTasks.map((task) => (
-                <option key={task.Task.taskName} value={task.Task.taskName}>
-                  {task.Task.taskName}
+                <option key={task.taskName} value={task.taskName}>
+                  {task.taskName}
                 </option>
               ))}
             </select>
