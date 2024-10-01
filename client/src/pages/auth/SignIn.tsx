@@ -1,23 +1,19 @@
 import React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { toast } from "react-toastify";
 import { useAuth } from "../../contexts/AuthContext";
 import { useUserContext } from "../../contexts/UserContext";
+import { getFirestore, doc, getDoc } from "firebase/firestore"; // Firestore functions
 import Logo from "../../assets/altınay.png";
 import Button from "../../components/Button";
 
-interface User {
-  id: string;
-  username: string;
-  user_Role: string;
-}
 const SignIn = () => {
   const navigate = useNavigate();
   const { setUser } = useUserContext();
   const auth = getAuth();
+  const db = getFirestore();
   const { handleLogin, setIsLoggedIn } = useAuth();
 
   const [values, setValues] = useState({
@@ -35,36 +31,36 @@ const SignIn = () => {
     event.preventDefault();
 
     try {
-      // Sign in with Firebase
       const userCredential = await signInWithEmailAndPassword(
         auth,
         username,
         password
       );
 
-      // Successfully signed in
       const user = userCredential.user;
-      setValues({ ...values, username: "", password: "" });
-      toast.success("Sign in successfully, redirecting to home page...");
 
-      // Store the user token
-      const token = await user.getIdToken();
-      sessionStorage.setItem(
-        "userData",
-        JSON.stringify({ token, uid: user.uid })
-      );
+      const userDoc = await getDoc(doc(db, "users", user.uid));
 
-      const userData: User = {
-        id: user.uid,
-        username: user.email?.split("@")[0] || "",
-        user_Role: "admin",
-      };
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        setUser({
+          id: user.uid,
+          username: userData.username,
+          user_Role: userData.userRole,
+        });
 
-      setUser(userData);
-      handleLogin();
-      setIsLoggedIn(true);
+        sessionStorage.setItem(
+          "userData",
+          JSON.stringify({ token: await user.getIdToken(), uid: user.uid })
+        );
 
-      navigate("/");
+        handleLogin();
+        setIsLoggedIn(true);
+
+        navigate("/");
+      } else {
+        throw new Error("User data not found.");
+      }
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -116,8 +112,8 @@ const SignIn = () => {
                 </Button>
               </div>
             </form>
-            <div className="text-sm text-center text-white flex flex-col gap-2  items-center">
-              Don't you have an account yet ?{" "}
+            <div className="text-sm text-center text-white flex flex-col gap-2 items-center">
+              Don't have an account yet?
               <Button
                 onClick={() => navigate("/signup")}
                 className=" bg-black text-white py-2 px-4 rounded-md"

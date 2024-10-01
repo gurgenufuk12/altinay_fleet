@@ -1,14 +1,15 @@
 import React from "react";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
-import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { getFirestore, doc, setDoc } from "firebase/firestore"; // Firestore functions
 import Button from "../../components/Button";
 import Logo from "../../assets/altınay.png";
 
 const SignUp = () => {
   const auth = getAuth();
+  const db = getFirestore();
   const [values, setValues] = useState({
     username: "",
     password: "",
@@ -29,16 +30,19 @@ const SignUp = () => {
         password
       );
 
-      // Successfully created user
       const user = userCredential.user;
+
+      await setDoc(doc(db, "users", user.uid), {
+        username: user.email?.split("@")[0] || "",
+        userRole: "user",
+      });
+
       setValues({ ...values, username: "", password: "" });
       toast.success("Sign up successfully, redirecting to sign in page...");
       navigate("/signin");
-      // Optionally, you can store the user's data in session storage
-      sessionStorage.setItem("userData", JSON.stringify({ uid: user.uid }));
     } catch (error: any) {
-      console.log(error.response);
-      toast.error(error.response.data.message);
+      console.log(error.message);
+      toast.error(error.message);
     }
   };
 
@@ -88,8 +92,8 @@ const SignUp = () => {
                 </Button>
               </div>
             </form>
-            <div className="text-sm text-center text-white flex flex-col gap-2  items-center">
-              Already have an account ?{" "}
+            <div className="text-sm text-center text-white flex flex-col gap-2 items-center">
+              Already have an account?
               <Button
                 onClick={() => navigate("/signin")}
                 className=" bg-black text-white py-2 px-4 rounded-md"
