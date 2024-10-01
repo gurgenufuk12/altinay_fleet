@@ -2,6 +2,9 @@ import React from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useUserContext } from "../contexts/UserContext";
+import randomStringGenerator from "../hooks/useRandomStringGenerator";
+import { collection, onSnapshot } from "firebase/firestore";
+import { db } from "../firebase/firebaseConfig";
 import Button from "./Button";
 import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -106,14 +109,11 @@ interface SavedTask {
     locationName: string;
     locationDescription: string;
   }[];
-  Task: {
-    taskCode: string;
-    taskName: string;
-    taskPercentage: string;
-    taskPriority: string;
-    taskId: string;
-  };
-  _id: string;
+  taskCode: string;
+  taskName: string;
+  taskPercentage: string;
+  taskPriority: string;
+  taskId: string;
 }
 interface CreateTaskProps {
   onClose: () => void;
@@ -139,19 +139,29 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
   );
 
   const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(null);
-  const [randomNumber, setRandomNumber] = React.useState<string>("");
-
+  const { generateRandomString } = randomStringGenerator();
   const handleRobotChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const robotName = event.target.value;
     const selectedRobot = robots.find((robot) => robot.robotName === robotName);
     setSelectedRobot(selectedRobot || null);
   };
-  const fetchSavedTasks = async () => {
+  const fetchSavedTasks = () => {
     try {
-      const res = await axios.get("/tasks/getSavedTasks");
-      setSavedTasks(res.data.data);
+      const savedTasksRef = collection(db, "tasks");
+
+      // Listen for real-time updates
+      onSnapshot(savedTasksRef, (snapshot) => {
+        const savedTasks: SavedTask[] = snapshot.docs
+          .filter((doc) => doc.data().savedTask === true) // Filter for saved tasks
+          .map((doc) => ({
+            ...(doc.data() as SavedTask), // Spread the data and cast it to match the SavedTask interface
+          }));
+
+        // Update the state with the fetched saved tasks
+        setSavedTasks(savedTasks);
+      });
     } catch (error) {
-      console.log(error);
+      console.log("Error fetching saved tasks: ", error);
     }
   };
 
@@ -201,16 +211,23 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
       console.log(error);
     }
   };
-  const fetchLocations = async () => {
+  const fetchLocations = () => {
     try {
-      const res = await axios.get("/locations/getLocations");
-      setLocations(res.data.data);
+      const locationsRef = collection(db, "locations");
+
+      onSnapshot(locationsRef, (snapshot) => {
+        const locations: Location[] = snapshot.docs.map((doc) => ({
+          ...(doc.data() as Location),
+        }));
+
+        setLocations(locations);
+      });
     } catch (error) {
-      console.log(error);
+      console.log("Error fetching locations: ", error);
     }
   };
   React.useEffect(() => {
-    fetchRobots();
+    // fetchRobots();
     fetchLocations();
     fetchSavedTasks();
   }, []);
@@ -231,72 +248,53 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
     };
   }, [onClose]);
 
-  const isTaskNameExists = async (taskName: string): Promise<boolean> => {
-    try {
-      const res = await axios.get(`/tasks/isTaskNameExist/${taskName}`);
-      return res.data.isExist;
-    } catch (error) {
-      console.log(error);
-      return false;
-    }
-  };
-
   const handleClick = async () => {
     if (viewMode === "editMode") {
+      console.log(selectedSavedTask);
+
       if (selectedSavedTask) {
         handleUpdateTask(selectedSavedTask);
       }
       return;
     }
-    const isTaskNameExist = await isTaskNameExists(taskName);
-    if (isTaskNameExist && !selectedSavedTask) {
-      toast.error(`Task name already exists: ${taskName}`);
-      return;
-    }
-
-    const randomNumberGenerator = (): string => {
-      const min = 100000000;
-      const max = 999999999;
-      const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
-      return "T" + randomNumber.toString();
-    };
     switch (true) {
-      case selectedRobot === null && tasks.length === 0:
-        toast.error("Please select a robot and target position");
-        break;
-      case selectedRobot !== null && tasks.length === 0:
-        toast.error("Please give a task to the robot");
-        break;
-      case selectedRobot === null && tasks.length !== 0:
-        toast.error("Please select a robot to give a task");
-        break;
-      case taskCode.trim() === "":
-        toast.error("Task code cannot be empty");
-        break;
+      // INFO: CHANGE LATER DO NOT FORGET
+      // case selectedRobot === null && tasks.length === 0:
+      //   toast.error("Please select a robot and target position");
+      //   break;
+      // case selectedRobot !== null && tasks.length === 0:
+      //   toast.error("Please give a task to the robot");
+      //   break;
+      // case selectedRobot === null && tasks.length !== 0:
+      //   toast.error("Please select a robot to give a task");
+      //   break;
+      // case taskCode.trim() === "":
+      //   toast.error("Task code cannot be empty");
+      //   break;
       default:
-        if (tasks.length > 0 && selectedRobot !== null) {
-          const randomNineDigitString = randomNumberGenerator();
+        if (tasks.length > 0) {
+          const randomNineDigitString = generateRandomString("task");
 
           try {
-            const res = await axios.post("/robots/addTarget", {
-              taskName: taskName,
-              taskCode: taskCode,
-              taskPriority: taskPriority,
-              taskId: randomNineDigitString,
-              taskPercentage: "0",
-              robotName: selectedRobot?.robotName,
-              robotStatus: "Task In Progress", // DO NOT COMMIT LIKE THIS CONVERT TO Task In Progress
-              linearVelocity: "0",
-              angularVelocity: "0",
-              targets: tasks.map((task, index) => ({
-                targetPosition: task.Target.Position,
-                targetOrientation: task.Target.Orientation,
-                targetExecuted: false,
-                locationName: task.Target.locationName,
-                locationDescription: task.Target.locationDescription,
-              })),
-            });
-            toast.success("Task is given to robot successfully");
+            // const res = await axios.post("/robots/addTarget", {
+            //   taskName: taskName,
+            //   taskCode: taskCode,
+            //   taskPriority: taskPriority,
+            //   taskId: randomNineDigitString,
+            //   taskPercentage: "0",
+            //   robotName: selectedRobot?.robotName,
+            //   robotStatus: "Task In Progress", // DO NOT COMMIT LIKE THIS CONVERT TO Task In Progress
+            //   linearVelocity: "0",
+            //   angularVelocity: "0",
+            //   targets: tasks.map((task, index) => ({
+            //     targetPosition: task.Target.Position,
+            //     targetOrientation: task.Target.Orientation,
+            //     targetExecuted: false,
+            //     locationName: task.Target.locationName,
+            //     locationDescription: task.Target.locationDescription,
+            //   })),
+            // });
+            // toast.success("Task is given to robot successfully");
             // const taskId = res.data.data.Task._id;
 
             const res2 = await axios.post("/tasks/addTasks", {
@@ -306,7 +304,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
               taskCode: taskCode,
               taskPriority: taskPriority,
               taskPercentage: "0",
-              robotName: selectedRobot?.robotName,
+              robotName: "",
               targets: tasks.map((task, index) => ({
                 targetPosition: task.Target.Position,
                 targetOrientation: task.Target.Orientation,
@@ -320,6 +318,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
           } catch (error: any) {
             toast.error(error.response.data.message);
           }
+          toast.success("Task is added to list successfully!");
         }
         setTasks([]);
         onClose();
@@ -341,9 +340,9 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
       },
     }));
     setTasks(newTasks);
-    setTaskName(task.Task.taskName);
-    settaskCode(task.Task.taskCode);
-    setTaskPriority(task.Task.taskPriority);
+    setTaskName(task.taskName);
+    settaskCode(task.taskCode);
+    setTaskPriority(task.taskPriority);
     setSelectedRobot(
       robots.find((robot) => robot.robotName === task.robotName) || null
     );
@@ -351,7 +350,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
 
   const handleDeleteTask = async (task: SavedTask | null) => {
     try {
-      await axios.put(`/tasks/deleteTask/${task?._id}`);
+      await axios.put(`/tasks/deleteTask/${task?.taskId}`);
       toast.success("Task deleted successfully");
       fetchSavedTasks();
       setShowConfirmation(false);
@@ -359,12 +358,11 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
       console.log(error);
     }
   };
-
   const handleUpdateTask = async (task: SavedTask) => {
     const isRobotChanged = selectedRobot?.robotName !== task.robotName;
-    const isTaskCodeChanged = taskCode !== task.Task.taskCode;
-    const isTaskNameChanged = taskName !== task.Task.taskName;
-    const isTaskPriorityChanged = taskPriority !== task.Task.taskPriority;
+    const isTaskCodeChanged = taskCode !== task.taskCode;
+    const isTaskNameChanged = taskName !== task.taskName;
+    const isTaskPriorityChanged = taskPriority !== task.taskPriority;
     const isTasksChanged = !isEqual(tasks, task.Targets);
     if (isRobotChanged) {
       setSelectedRobot(
@@ -372,13 +370,13 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
       );
     }
     if (isTaskCodeChanged) {
-      settaskCode(task.Task.taskCode);
+      settaskCode(task.taskCode);
     }
     if (isTaskNameChanged) {
-      setTaskName(task.Task.taskName);
+      setTaskName(task.taskName);
     }
     if (isTaskPriorityChanged) {
-      setTaskPriority(task.Task.taskPriority);
+      setTaskPriority(task.taskPriority);
     }
     if (isTasksChanged) {
       setTasks(
@@ -394,7 +392,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
     setSavedTask(true);
 
     try {
-      const res = await axios.put(`/tasks/updateTask/${task.Task.taskId}`, {
+      const res = await axios.put(`/tasks/updateSavedTask/${task.taskId}`, {
         taskName: taskName,
         taskCode: taskCode,
         taskPriority: taskPriority,
@@ -405,10 +403,11 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
           locationName: task.Target.locationName,
           locationDescription: task.Target.locationDescription,
         })),
-        savedTask: savedTask,
       });
       toast.success("Task updated successfully");
       setViewMode("defaultMode");
+      setTasks([]);
+      setSelectedSavedTask(null);
     } catch (error) {
       console.log(error);
     }
@@ -505,21 +504,23 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
                 onChange={(e) => setTaskPriority(e.target.value)}
               />
             </div>
-            <div className="flex flex-row items-center mb-4">
-              <label
-                htmlFor="saveTask"
-                className="mr-4 text-gray-800 font-semibold w-1/4"
-              >
-                Save Task :
-              </label>
-              <input
-                type="checkbox"
-                id="saveTask"
-                className="border border-gray-400 rounded-lg px-4 py-2 w-3/4 text-gray-800"
-                checked={savedTask}
-                onChange={(e) => setSavedTask(e.target.checked)}
-              />
-            </div>
+            {!selectedSavedTask && (
+              <div className="flex flex-row items-center mb-4">
+                <label
+                  htmlFor="saveTask"
+                  className="mr-4 text-gray-800 font-semibold w-1/4"
+                >
+                  Save Task :
+                </label>
+                <input
+                  type="checkbox"
+                  id="saveTask"
+                  className="border border-gray-400 rounded-lg px-4 py-2 w-3/4 text-gray-800"
+                  checked={savedTask}
+                  onChange={(e) => setSavedTask(e.target.checked)}
+                />
+              </div>
+            )}
             <div className="flex flex-row items-center">
               <label
                 htmlFor="location"
@@ -556,20 +557,17 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
             </label>
             <div className="flex flex-col mt-4">
               {savedTasks.map((task) => (
-                <div
-                  key={task.Task.taskName}
-                  className="flex items-center mb-4"
-                >
+                <div key={task.taskName} className="flex items-center mb-4">
                   <button
                     className={`text-gray-800 mr-2 ${
                       selectedSavedTask &&
-                      selectedSavedTask.Task.taskName === task.Task.taskName
+                      selectedSavedTask.taskName === task.taskName
                         ? "font-bold"
                         : ""
                     }`}
                     onClick={() => handleSavedTaskSelection(task)}
                   >
-                    {task.Task.taskName}
+                    {task.taskName}
                   </button>
                   <div className="ml-auto flex items-center">
                     <button
@@ -639,7 +637,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
             </h1>
             <p className="text-black">
               Are you sure you want to delete task "
-              {selectedSavedTask?.Task.taskName}"?
+              {selectedSavedTask?.taskName}"?
             </p>
             <div className="mt-4 flex justify-end">
               <button
