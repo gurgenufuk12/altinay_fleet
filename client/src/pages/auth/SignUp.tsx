@@ -35,6 +35,7 @@ const SignUp = () => {
       await setDoc(doc(db, "users", user.uid), {
         username: user.email?.split("@")[0] || "",
         userRole: "user",
+        userUid: user.uid,
       });
 
       setValues({ ...values, username: "", password: "" });

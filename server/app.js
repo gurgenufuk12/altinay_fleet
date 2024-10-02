@@ -10,7 +10,6 @@ const config = require("./config");
 
 //IMPORT ROUTES
 const userRoutes = require("./routes/user");
-const adminRoutes = require("./routes/admin");
 const robotsRoutes = require("./routes/robots");
 const tasksRoutes = require("./routes/tasks");
 const locationsRoutes = require("./routes/locations");
@@ -44,7 +43,6 @@ app.use((req, res, next) => {
 });
 
 app.use("/api", userRoutes);
-app.use("/admin", adminRoutes);
 app.use("/robots", robotsRoutes);
 app.use("/tasks", tasksRoutes);
 app.use("/locations", locationsRoutes);
