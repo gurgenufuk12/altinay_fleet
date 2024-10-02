@@ -5,10 +5,12 @@ import { db } from "../../firebase/firebaseConfig";
 import { toast } from "react-toastify";
 import SideBar from "../../components/SideBar";
 import Button from "../../components/Button";
+import Close from "@mui/icons-material/Close";
 
-interface AdminUser {
+interface User {
+  userUid: string;
   username: string;
-  user_Role: string;
+  userRole: string;
 }
 interface Robot {
   Pose: {
@@ -71,25 +73,25 @@ interface Location {
   };
 }
 const AdminDashboard = () => {
-  const [adminUsers, setAdminUsers] = React.useState<AdminUser[]>([]);
+  const [users, setUsers] = React.useState<User[]>([]);
   const [robots, setRobots] = React.useState<Robot[]>([]);
   const [locations, setLocations] = React.useState<Location[]>([]);
   const [selectedRoles, setSelectedRoles] = React.useState<{
     [key: string]: string;
   }>({});
+  const [showConfirmation, setShowConfirmation] = React.useState(false);
+  const [selectedUser, setSelectedUser] = React.useState<User | null>(null);
 
   const fetchUsers = async () => {
     try {
-      const res = await axios.get("/admin/getUsers");
-      const initialSelectedRoles: { [key: string]: string } = {};
-      res.data.data.forEach((user: any) => {
-        initialSelectedRoles[user.username] = user.user_Role;
+      const usersRef = collection(db, "users");
+      onSnapshot(usersRef, (snapshot) => {
+        const users: User[] = snapshot.docs.map((doc) => ({
+          ...(doc.data() as User),
+        }));
+        setUsers(users);
       });
-      setSelectedRoles(initialSelectedRoles);
-      setAdminUsers(res.data.data);
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) {}
   };
   const fetchRobots = async () => {
     try {
@@ -115,46 +117,44 @@ const AdminDashboard = () => {
     }
   };
   React.useEffect(() => {
-    // fetchUsers();
+    fetchUsers();
     // fetchRobots();
     fetchLocations();
   }, []);
 
   const handleRoleChange = (
     event: React.ChangeEvent<HTMLSelectElement>,
-    username: string
+    userUid: string
   ) => {
     const newSelectedRoles = {
       ...selectedRoles,
-      [username]: event.target.value,
+      [userUid]: event.target.value,
     };
     setSelectedRoles(newSelectedRoles);
   };
 
-  const saveUserRoleChanges = async (username: string) => {
+  const saveUserRoleChanges = async (userUid: string) => {
     try {
-      const res = await axios.put(`/admin/changeUserRole/${username}`, {
-        newRole: selectedRoles[username],
+      const res = await axios.put(`/api/changeUserRole/${userUid}`, {
+        newRole: selectedRoles[userUid],
       });
-      const updatedUsers = adminUsers.map((user) => {
-        if (user.username === username) {
-          return res.data.updatedUser;
-        }
-        return user;
-      });
-      setAdminUsers(updatedUsers);
+      const updatedUsers = users.map((user) =>
+        user.userUid === userUid
+          ? { ...user, userRole: selectedRoles[userUid] }
+          : user
+      );
+      setUsers(updatedUsers);
       toast.success("User role updated successfully");
     } catch (error) {
       console.log(error);
     }
   };
-  const deleteUser = async (username: string) => {
+  const deleteUser = async (userUid: string | undefined) => {
     try {
-      const res = await axios.delete(`/admin/deleteUser/${username}`);
-      const updatedUsers = adminUsers.filter(
-        (user) => user.username !== username
-      );
-      setAdminUsers(updatedUsers);
+      const res = await axios.delete(`/api/deleteUser/${userUid}`);
+      const updatedUsers = users.filter((user) => user.userUid !== userUid);
+      setUsers(updatedUsers);
+      setShowConfirmation(false);
       toast.success("User deleted successfully");
     } catch (error) {
       console.log(error);
@@ -174,6 +174,7 @@ const AdminDashboard = () => {
       toast.error("Error deleting location " + error.response.data.message);
     }
   };
+
   return (
     <div className="container mx-auto px-4 py-8">
       <SideBar />
@@ -202,7 +203,7 @@ const AdminDashboard = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {adminUsers.map((user, index) => (
+                {users.map((user, index) => (
                   <tr
                     key={index}
                     className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
@@ -211,29 +212,33 @@ const AdminDashboard = () => {
                       {user.username}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                      {user.user_Role}
+                      {user.userRole}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <select
-                        id={`role_${user.username}`}
-                        value={selectedRoles[user.username]}
+                        id={`role_${user.userUid}`}
+                        value={selectedRoles[user.userUid]}
                         onChange={(event) =>
-                          handleRoleChange(event, user.username)
+                          handleRoleChange(event, user.userUid)
                         }
                         className="block w-full bg-white border border-gray-300 hover:border-gray-500 px-4 py-2 rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                       >
+                        <option value="default">-</option>
                         <option value="admin">Admin</option>
                         <option value="user">User</option>
                       </select>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <Button
-                        onClick={() => saveUserRoleChanges(user.username)}
+                        onClick={() => saveUserRoleChanges(user.userUid)}
                         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2"
                         title="Save"
                       />
                       <Button
-                        onClick={() => deleteUser(user.username)}
+                        onClick={() => {
+                          setSelectedUser(user);
+                          setShowConfirmation(true);
+                        }}
                         className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
                         title="Delete"
                       />
@@ -339,6 +344,37 @@ const AdminDashboard = () => {
           </div>
         </div>
       </div>
+      {showConfirmation && (
+        <div className="absolute top-0 left-0 w-full h-full flex justify-center items-center bg-opacity-75">
+          <div className="w-1000 h-80 bg-white rounded-lg p-8 flex flex-col shadow-lg">
+            <Button
+              onClick={() => setShowConfirmation(false)}
+              className="ml-auto"
+              children={<Close />}
+            />
+            <h1 className="text-3xl font-bold mb-6 text-gray-800">
+              Confirm Deletion
+            </h1>
+            <p className="text-black">
+              Are you sure you want to delete user "{selectedUser?.username}"?
+            </p>
+            <div className="mt-4 flex justify-end">
+              <button
+                className="mr-2 px-4 py-2 bg-gray-700 rounded-lg text-white"
+                onClick={() => setShowConfirmation(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-2 bg-red-600 text-white rounded-lg"
+                onClick={() => deleteUser(selectedUser?.userUid)}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
