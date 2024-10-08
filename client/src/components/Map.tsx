@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import axios from "axios";
 import { useRef } from "react";
 import { toast } from "react-toastify";
@@ -157,18 +157,12 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
     z: number;
     w: number;
   } | null>(null);
-  const {generateRandomString} = useRandomStringGenerator();
+  const { generateRandomString } = useRandomStringGenerator();
   React.useEffect(() => {
     if (user && user.user_Role === "admin") {
       setIsUserAdmin(true);
     }
   }, [user]);
-  // React.useEffect(() => {
-  //   const intervalId = setInterval(() => {
-  //     fetchRobots();
-  //   }, 1000);
-  //   return () => clearInterval(intervalId);
-  // }, []);
   React.useEffect(() => {
     const newDisableButtons = tasks.map((task) =>
       locations.some(
@@ -242,21 +236,29 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
     try {
       const locationsRef = collection(db, "locations");
 
-      onSnapshot(locationsRef, (snapshot) => {
-        const locations: Location[] = snapshot.docs.map((doc) => ({
+      const unsubscribe = onSnapshot(locationsRef, (snapshot) => {
+        const newLocations: Location[] = snapshot.docs.map((doc) => ({
           ...(doc.data() as Location),
         }));
 
-        setLocations(locations);
+        if (JSON.stringify(newLocations) !== JSON.stringify(locations)) {
+          setLocations(newLocations);
+        }
       });
+
+      return unsubscribe;
     } catch (error) {
       console.log("Error fetching locations: ", error);
     }
   };
   React.useEffect(() => {
-    // fetchRobots();
-    fetchLocations();
+    const unsubscribeLocations = fetchLocations();
     fetchSavedTasks();
+    
+
+    return () => {
+      if (unsubscribeLocations) unsubscribeLocations();
+    };
   }, []);
   const handleCanvasMouseMove = (
     event: React.MouseEvent<HTMLCanvasElement>
@@ -630,7 +632,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
         }
       }
     }
-  }, [robots, width, height, arrowStart, arrowEnd]);
+  }, [robots, width, height, arrowStart, arrowEnd, locations]);
   const handleSavedTaskSelection = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
