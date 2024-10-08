@@ -11,6 +11,7 @@ import Button from "./Button";
 import LocationConfirm from "./LocationPopUp";
 import Robot from "../assets/amr.png";
 import CanvasMap from "../assets/map.jpg";
+
 interface Robot {
   Pose: {
     Position: {
@@ -51,10 +52,11 @@ interface Robot {
     taskPercentage: string;
     taskPriority: string;
     pathPoints: [string, string][];
+    taskId: string;
   };
   robotName: string;
-  createdCostmap: [[String, String]];
-  _id: string;
+  robotId: string;
+  createdCostmap: [string, string][];
 }
 interface Task {
   Target: {
@@ -177,14 +179,6 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
     );
     setDisableButtons(newDisableButtons);
   }, [tasks, locations]);
-  const fetchRobots = async () => {
-    try {
-      const res = await axios.get("/robots/getRobots");
-      setRobots(res.data.data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
   const handleAddLocation = (index: number) => {
     setSelectedTaskIndex(index);
   };
@@ -251,10 +245,29 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
       console.log("Error fetching locations: ", error);
     }
   };
+  const fetchRobots = () => {
+    try {
+      const robotsRef = collection(db, "robots");
+
+      const unsubscribe = onSnapshot(robotsRef, (snapshot) => {
+        const newRobots: Robot[] = snapshot.docs.map((doc) => ({
+          ...(doc.data() as Robot),
+        }));
+
+        if (JSON.stringify(newRobots) !== JSON.stringify(robots)) {
+          setRobots(newRobots);
+        }
+      });
+
+      return unsubscribe;
+    } catch (error) {
+      console.log("Error fetching robots: ", error);
+    }
+  };
   React.useEffect(() => {
     const unsubscribeLocations = fetchLocations();
     fetchSavedTasks();
-    
+    fetchRobots();
 
     return () => {
       if (unsubscribeLocations) unsubscribeLocations();
@@ -518,7 +531,8 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
                 taskCode: taskCode,
                 taskPriority: "1",
                 taskPercentage: "0",
-                robotName: "ROBOT1",
+                robotName: selectedRobot?.robotName,
+                robotId: selectedRobot?.robotId,
                 targets: tasks.map((task, index) => ({
                   targetPosition: task.Target.Position,
                   targetOrientation: task.Target.Orientation,
@@ -552,6 +566,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
             taskPriority: "1",
             taskPercentage: "0",
             robotName: " ",
+            robotId: " ",
             targets: tasks.map((task, index) => ({
               targetPosition: task.Target.Position,
               targetOrientation: task.Target.Orientation,
