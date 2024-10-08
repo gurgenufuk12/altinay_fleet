@@ -3,6 +3,7 @@ class Task {
     Targets = [],
     Task,
     robotName,
+    robotId,
     userName,
     taskStartTime,
     taskEndTime,
@@ -11,6 +12,7 @@ class Task {
     this.Targets = Targets;
     this.Task = Task;
     this.robotName = robotName;
+    this.robotId = robotId;
     this.userName = userName;
     this.taskStartTime = taskStartTime;
     this.taskEndTime = taskEndTime;
