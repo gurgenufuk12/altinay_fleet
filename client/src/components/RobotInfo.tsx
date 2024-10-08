@@ -1,6 +1,8 @@
 import React from "react";
 import axios from "axios";
 import Robot from "../assets/amr.png";
+import { collection, onSnapshot } from "firebase/firestore";
+import { db } from "../firebase/firebaseConfig";
 import { toast } from "react-toastify";
 import { format } from "date-fns";
 
@@ -45,7 +47,7 @@ interface Robot {
     taskPriority: string;
   };
   robotName: string;
-  _id: string;
+  robotId: string;
 }
 
 interface RobotInfoProps {
@@ -55,24 +57,27 @@ interface RobotInfoProps {
 const RobotInfo: React.FC<RobotInfoProps> = ({ selectedRobot }) => {
   const [activeRobot, setActiveRobot] = React.useState<Robot | null>(null);
   const [robotStatus, setRobotStatus] = React.useState<string>("");
-  const getRobotInfo = async () => {
+
+  const fetchRobotInfo = () => {
     try {
-      if (selectedRobot) {
-        const res = await axios.get(
-          `/robots/getRobotInfo/${selectedRobot._id}`
-        );
-        setActiveRobot(res.data.data);
-        setRobotStatus(res.data.data.robotStatus);
-      }
+      const robotsRef = collection(db, "robots");
+
+      onSnapshot(robotsRef, (snapshot) => {
+        const robot: Robot[] = snapshot.docs
+          .filter((doc) => doc.data().robotId === selectedRobot?.robotId)
+          .map((doc) => ({
+            ...(doc.data() as Robot),
+          }));
+
+        setActiveRobot(robot[0]);
+      });
     } catch (error) {
-      console.error("Error fetching robot info:", error);
+      console.log("Error fetching saved tasks: ", error);
     }
   };
 
   React.useEffect(() => {
-    const intervalId = setInterval(getRobotInfo, 500);
-
-    return () => clearInterval(intervalId);
+    fetchRobotInfo();
   }, [selectedRobot]);
   return (
     <div className="flex flex-col items-center gap-4 p-4 bg-gray-100 rounded-lg">
