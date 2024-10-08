@@ -54,6 +54,7 @@ interface Robot {
     taskId: string;
   };
   robotName: string;
+  robotId: string;
 }
 interface Task {
   Target: {
@@ -205,10 +206,17 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
   };
   const fetchRobots = async () => {
     try {
-      const res = await axios.get("/robots/getRobots");
-      setRobots(res.data.data);
+      const robotsRef = collection(db, "robots");
+
+      onSnapshot(robotsRef, (snapshot) => {
+        const robots: Robot[] = snapshot.docs.map((doc) => ({
+          ...(doc.data() as Robot),
+        }));
+
+        setRobots(robots);
+      });
     } catch (error) {
-      console.log(error);
+      console.log("Error fetching robots: ", error);
     }
   };
   const fetchLocations = () => {
@@ -227,7 +235,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
     }
   };
   React.useEffect(() => {
-    // fetchRobots();
+    fetchRobots();
     fetchLocations();
     fetchSavedTasks();
   }, []);
@@ -276,27 +284,6 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
           const randomNineDigitString = generateRandomString("task");
 
           try {
-            // const res = await axios.post("/robots/addTarget", {
-            //   taskName: taskName,
-            //   taskCode: taskCode,
-            //   taskPriority: taskPriority,
-            //   taskId: randomNineDigitString,
-            //   taskPercentage: "0",
-            //   robotName: selectedRobot?.robotName,
-            //   robotStatus: "Task In Progress", // DO NOT COMMIT LIKE THIS CONVERT TO Task In Progress
-            //   linearVelocity: "0",
-            //   angularVelocity: "0",
-            //   targets: tasks.map((task, index) => ({
-            //     targetPosition: task.Target.Position,
-            //     targetOrientation: task.Target.Orientation,
-            //     targetExecuted: false,
-            //     locationName: task.Target.locationName,
-            //     locationDescription: task.Target.locationDescription,
-            //   })),
-            // });
-            // toast.success("Task is given to robot successfully");
-            // const taskId = res.data.data.Task._id;
-
             const res2 = await axios.post("/tasks/addTasks", {
               taskId: randomNineDigitString,
               userName: user?.username,
@@ -304,7 +291,8 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
               taskCode: taskCode,
               taskPriority: taskPriority,
               taskPercentage: "0",
-              robotName: "",
+              robotName: selectedRobot?.robotName,
+              robotId: selectedRobot?.robotId,
               targets: tasks.map((task, index) => ({
                 targetPosition: task.Target.Position,
                 targetOrientation: task.Target.Orientation,
@@ -315,6 +303,26 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
               taskStartTime: new Date().toISOString(),
               savedTask: savedTask,
             });
+            // const res = await axios.post("/robots/addTarget", {
+            //   taskName: taskName,
+            //   taskCode: taskCode,
+            //   taskPriority: taskPriority,
+            //   taskId: randomNineDigitString,
+            //   taskPercentage: "0",
+            //   robotId: selectedRobot?.robotId,
+            //   robotStatus: "Task In Progress", // DO NOT COMMIT LIKE THIS CONVERT TO Task In Progress
+            //   linearVelocity: "0",
+            //   angularVelocity: "0",
+            //   pathPoints: [],
+            //   targets: tasks.map((task, index) => ({
+            //     targetPosition: task.Target.Position,
+            //     targetOrientation: task.Target.Orientation,
+            //     targetExecuted: false,
+            //     locationName: task.Target.locationName,
+            //     locationDescription: task.Target.locationDescription,
+            //   })),
+            // });
+            toast.success("Task is given to robot successfully");
           } catch (error: any) {
             toast.error(error.response.data.message);
           }
@@ -414,7 +422,10 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
   };
   return (
     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-75">
-      <div className="w-2/3 h-4/5 bg-white rounded-lg p-8 relative flex flex-col shadow-lg overflow-auto">
+      <div
+        ref={taskWindowRef}
+        className="w-2/3 h-4/5 bg-white rounded-lg p-8 relative flex flex-col shadow-lg overflow-auto"
+      >
         <button onClick={onClose} className="absolute top-4 right-4">
           <CloseIcon className="text-black" />
         </button>
