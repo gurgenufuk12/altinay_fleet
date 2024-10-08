@@ -28,8 +28,8 @@ interface TaskInspectorProps {
     taskPercentage: string;
     taskPriority: string;
     taskId: string;
-
     taskEndTime: string;
+    robotId: string;
   };
   onClose: () => void;
 }
@@ -79,6 +79,9 @@ const TaskInspector: React.FC<TaskInspectorProps> = ({ task, onClose }) => {
           <div className="flex-1 flex flex-col gap-5 bg-gray-100 p-6 rounded-xl font-sans shadow-inner">
             <h2 className="text-xl font-bold text-center">Task Details</h2>
             <div className="space-y-2">
+              <p>
+                <span className="font-semibold">Robot Id:</span> {task.robotId}
+              </p>
               <p>
                 <span className="font-semibold">Robot Name:</span>{" "}
                 {task.robotName}

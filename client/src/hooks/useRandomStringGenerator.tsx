@@ -9,6 +9,9 @@ const useRandomStringGenerator = () => {
     if (jobType === "task") {
       return "T" + randomNumber.toString();
     }
+    if (jobType === "robot") {
+      return "R" + randomNumber.toString();
+    }
     return "L" + randomNumber.toString();
   }, []);
 

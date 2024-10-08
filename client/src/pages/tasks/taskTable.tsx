@@ -35,6 +35,7 @@ interface Task {
   taskPriority: string;
   taskId: string;
   taskEndTime: string;
+  robotId: string;
 }
 
 const TaskTable: React.FC = () => {
@@ -163,6 +164,7 @@ const TaskTable: React.FC = () => {
             <tr>
               {[
                 "Robot Name",
+                "Robot Id",
                 "Given By",
                 "Task Code",
                 "Task Name",
@@ -189,6 +191,7 @@ const TaskTable: React.FC = () => {
                 onClick={() => handleTaskClick(task)}
               >
                 <td className="px-4 py-2">{task.robotName}</td>
+                <td className="px-4 py-2">{task.robotId}</td>
                 <td className="px-4 py-2">{task.userName}</td>
                 <td className="px-4 py-2">{task.taskCode}</td>
                 <td className="px-4 py-2">{task.taskName}</td>
