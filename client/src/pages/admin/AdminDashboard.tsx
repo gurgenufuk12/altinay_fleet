@@ -53,6 +53,7 @@ interface Robot {
     taskPriority: string;
   };
   robotName: string;
+  robotId: string;
 }
 interface Location {
   locationId: string;
@@ -95,11 +96,14 @@ const AdminDashboard = () => {
   };
   const fetchRobots = async () => {
     try {
-      const res = await axios.get("/robots/getRobots");
-      setRobots(res.data.data);
-    } catch (error) {
-      console.log(error);
-    }
+      const robotRef = collection(db, "robots");
+      onSnapshot(robotRef, (snapshot) => {
+        const robots: Robot[] = snapshot.docs.map((doc) => ({
+          ...(doc.data() as Robot),
+        }));
+        setRobots(robots);
+      });
+    } catch (error) {}
   };
   const fetchLocations = () => {
     try {
@@ -118,7 +122,7 @@ const AdminDashboard = () => {
   };
   React.useEffect(() => {
     fetchUsers();
-    // fetchRobots();
+    fetchRobots();
     fetchLocations();
   }, []);
 
@@ -305,6 +309,9 @@ const AdminDashboard = () => {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Robot Id
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Robot Name
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -324,6 +331,9 @@ const AdminDashboard = () => {
                     key={index}
                     className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
                   >
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                      {robot.robotId}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                       {robot.robotName}
                     </td>
