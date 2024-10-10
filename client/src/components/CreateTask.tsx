@@ -301,6 +301,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
                 locationDescription: task.Target.locationDescription,
               })),
               taskStartTime: new Date().toISOString(),
+              taskEndTime: "",
               savedTask: savedTask,
             });
             // const res = await axios.post("/robots/addTarget", {

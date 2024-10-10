@@ -94,11 +94,13 @@ interface SavedTask {
     targetExecuted: boolean;
     locationName: string;
   }[];
-  taskId: string;
-  taskCode: string;
-  taskName: string;
-  taskPercentage: string;
-  taskPriority: string;
+  Task: {
+    taskId: string;
+    taskCode: string;
+    taskName: string;
+    taskPercentage: string;
+    taskPriority: string;
+  };
 }
 interface Location {
   locationName: string;
@@ -656,7 +658,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
     }
     const selectedTaskName = event.target.value;
     const selectedTask = savedTasks.find(
-      (task) => task.taskName === selectedTaskName
+      (task) => task.Task.taskName === selectedTaskName
     );
     if (selectedTask) {
       const newTasks = selectedTask.Targets.map((target) => ({
@@ -679,7 +681,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
       setTasks(newTasks);
       setSavedTaskName("");
     }
-    settaskCode(selectedTask?.taskCode || "");
+    settaskCode(selectedTask?.Task.taskCode || "");
     setSelectedRobot(
       robots.find((robot) => robot.robotName === selectedTask?.robotName) ||
         null
@@ -693,7 +695,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
           <strong>Task Name:</strong> {selectedTaskName}
         </span>
         <span>
-          <strong>Task Code:</strong> {selectedTask?.taskCode}
+          <strong>Task Code:</strong> {selectedTask?.Task.taskCode}
         </span>
         <span>
           <strong>Robot Name:</strong> {selectedTask?.robotName}
@@ -903,8 +905,8 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
             >
               <option value="">Select Saved Task</option>
               {savedTasks.map((task) => (
-                <option key={task.taskName} value={task.taskName}>
-                  {task.taskName}
+                <option key={task.Task.taskName} value={task.Task.taskName}>
+                  {task.Task.taskName}
                 </option>
               ))}
             </select>

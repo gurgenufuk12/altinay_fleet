@@ -23,13 +23,15 @@ interface TaskInspectorProps {
       locationName: string;
       locationDescription: string;
     }[];
-    taskCode: string;
-    taskName: string;
-    taskPercentage: string;
-    taskPriority: string;
-    taskId: string;
-    taskEndTime: string;
+    Task: {
+      taskCode: string;
+      taskName: string;
+      taskPercentage: string;
+      taskPriority: string;
+      taskId: string;
+    };
     robotId: string;
+    taskEndTime: string;
   };
   onClose: () => void;
 }
@@ -92,15 +94,15 @@ const TaskInspector: React.FC<TaskInspectorProps> = ({ task, onClose }) => {
               </p>
               <p>
                 <span className="font-semibold">Task Code:</span>{" "}
-                {task.taskCode}
+                {task.Task.taskCode}
               </p>
               <p>
                 <span className="font-semibold">Task Name:</span>{" "}
-                {task.taskName}
+                {task.Task.taskName}
               </p>
               <p>
                 <span className="font-semibold">Task Priority:</span>{" "}
-                {task.taskPriority}
+                {task.Task.taskPriority}
               </p>
               <p>
                 <span className="font-semibold">Task Start Time:</span>{" "}
@@ -114,7 +116,7 @@ const TaskInspector: React.FC<TaskInspectorProps> = ({ task, onClose }) => {
               </p>
               <p>
                 <span className="font-semibold">Task Percentage:</span>{" "}
-                {task.taskPercentage}
+                {task.Task.taskPercentage}
               </p>
             </div>
           </div>

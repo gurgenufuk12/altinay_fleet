@@ -16,21 +16,24 @@ exports.addTasks = async (req, res, next) => {
       robotId,
       targets,
       taskStartTime,
+      taskEndTime,
       savedTask,
       taskId,
     } = req.body;
     const taskRef = db.doc(taskId.trim());
     await taskRef.set({
-      taskName: taskName,
-      taskCode: taskCode,
-      taskPriority: taskPriority,
-      taskPercentage: taskPercentage,
-      taskId: taskId,
+      Task: {
+        taskName: taskName,
+        taskCode: taskCode,
+        taskPriority: taskPriority,
+        taskPercentage: taskPercentage,
+        taskId: taskId,
+      },
       robotName: robotName,
       robotId: robotId,
       userName: userName,
       taskStartTime: taskStartTime,
-      taskEndTime: null,
+      taskEndTime: taskEndTime,
       savedTask: savedTask,
       Targets: targets.map((target) => ({
         Position: target.targetPosition,

@@ -29,13 +29,15 @@ interface Task {
     locationName: string;
     locationDescription: string;
   }[];
-  taskCode: string;
-  taskName: string;
-  taskPercentage: string;
-  taskPriority: string;
-  taskId: string;
-  taskEndTime: string;
+  Task: {
+    taskCode: string;
+    taskName: string;
+    taskPercentage: string;
+    taskPriority: string;
+    taskId: string;
+  };
   robotId: string;
+  taskEndTime: string;
 }
 
 const TaskTable: React.FC = () => {
@@ -79,7 +81,7 @@ const TaskTable: React.FC = () => {
   const filteredTasks = tasks
     .filter((task) => {
       if (!filter) return true;
-      return task.taskCode === filter;
+      return task.Task.taskCode === filter;
     })
     .filter((task) => {
       if (!searchTerm) return true;
@@ -87,10 +89,10 @@ const TaskTable: React.FC = () => {
       return (
         task.robotName?.toLowerCase().includes(search) ||
         task.userName?.toLowerCase().includes(search) ||
-        task.taskCode?.toLowerCase().includes(search) ||
-        task.taskName?.toLowerCase().includes(search) ||
-        task.taskPriority?.toLowerCase().includes(search) ||
-        task.taskPercentage?.toLowerCase().includes(search) ||
+        task.Task.taskCode?.toLowerCase().includes(search) ||
+        task.Task.taskName?.toLowerCase().includes(search) ||
+        task.Task.taskPriority?.toLowerCase().includes(search) ||
+        task.Task.taskPercentage?.toLowerCase().includes(search) ||
         task.taskStartTime?.toLowerCase().includes(search) ||
         (task.Targets &&
           task.Targets.some(
@@ -193,10 +195,10 @@ const TaskTable: React.FC = () => {
                 <td className="px-4 py-2">{task.robotName}</td>
                 <td className="px-4 py-2">{task.robotId}</td>
                 <td className="px-4 py-2">{task.userName}</td>
-                <td className="px-4 py-2">{task.taskCode}</td>
-                <td className="px-4 py-2">{task.taskName}</td>
-                <td className="px-4 py-2">{task.taskPercentage}</td>
-                <td className="px-4 py-2">{task.taskPriority}</td>
+                <td className="px-4 py-2">{task.Task.taskCode}</td>
+                <td className="px-4 py-2">{task.Task.taskName}</td>
+                <td className="px-4 py-2">{task.Task.taskPercentage}</td>
+                <td className="px-4 py-2">{task.Task.taskPriority}</td>
                 <td className="px-4 py-2">{formatDate(task.taskStartTime)}</td>
                 <td className="px-4 py-2">
                   {task.taskEndTime

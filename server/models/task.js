@@ -1,7 +1,13 @@
 class Task {
   constructor(
     Targets = [],
-    Task,
+    Task = {
+      taskCode: String,
+      taskName: String,
+      taskPercentage: String,
+      taskPriority: String,
+      taskId: String,
+    },
     robotName,
     robotId,
     userName,
