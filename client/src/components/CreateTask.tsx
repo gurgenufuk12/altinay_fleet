@@ -110,11 +110,13 @@ interface SavedTask {
     locationName: string;
     locationDescription: string;
   }[];
-  taskCode: string;
-  taskName: string;
-  taskPercentage: string;
-  taskPriority: string;
-  taskId: string;
+  Task: {
+    taskCode: string;
+    taskName: string;
+    taskPercentage: string;
+    taskPriority: string;
+    taskId: string;
+  };
 }
 interface CreateTaskProps {
   onClose: () => void;
@@ -349,9 +351,9 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
       },
     }));
     setTasks(newTasks);
-    setTaskName(task.taskName);
-    settaskCode(task.taskCode);
-    setTaskPriority(task.taskPriority);
+    setTaskName(task.Task.taskName);
+    settaskCode(task.Task.taskCode);
+    setTaskPriority(task.Task.taskPriority);
     setSelectedRobot(
       robots.find((robot) => robot.robotName === task.robotName) || null
     );
@@ -359,7 +361,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
 
   const handleDeleteTask = async (task: SavedTask | null) => {
     try {
-      await axios.put(`/tasks/deleteTask/${task?.taskId}`);
+      await axios.put(`/tasks/deleteTask/${task?.Task.taskId}`);
       toast.success("Task deleted successfully");
       fetchSavedTasks();
       setShowConfirmation(false);
@@ -369,9 +371,9 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
   };
   const handleUpdateTask = async (task: SavedTask) => {
     const isRobotChanged = selectedRobot?.robotName !== task.robotName;
-    const isTaskCodeChanged = taskCode !== task.taskCode;
-    const isTaskNameChanged = taskName !== task.taskName;
-    const isTaskPriorityChanged = taskPriority !== task.taskPriority;
+    const isTaskCodeChanged = taskCode !== task.Task.taskCode;
+    const isTaskNameChanged = taskName !== task.Task.taskName;
+    const isTaskPriorityChanged = taskPriority !== task.Task.taskPriority;
     const isTasksChanged = !isEqual(tasks, task.Targets);
     if (isRobotChanged) {
       setSelectedRobot(
@@ -379,13 +381,13 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
       );
     }
     if (isTaskCodeChanged) {
-      settaskCode(task.taskCode);
+      settaskCode(task.Task.taskCode);
     }
     if (isTaskNameChanged) {
-      setTaskName(task.taskName);
+      setTaskName(task.Task.taskName);
     }
     if (isTaskPriorityChanged) {
-      setTaskPriority(task.taskPriority);
+      setTaskPriority(task.Task.taskPriority);
     }
     if (isTasksChanged) {
       setTasks(
@@ -401,18 +403,21 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
     setSavedTask(true);
 
     try {
-      const res = await axios.put(`/tasks/updateSavedTask/${task.taskId}`, {
-        taskName: taskName,
-        taskCode: taskCode,
-        taskPriority: taskPriority,
-        targets: tasks.map((task) => ({
-          targetPosition: task.Target.Position,
-          targetOrientation: task.Target.Orientation,
-          targetExecuted: false,
-          locationName: task.Target.locationName,
-          locationDescription: task.Target.locationDescription,
-        })),
-      });
+      const res = await axios.put(
+        `/tasks/updateSavedTask/${task.Task.taskId}`,
+        {
+          taskName: taskName,
+          taskCode: taskCode,
+          taskPriority: taskPriority,
+          targets: tasks.map((task) => ({
+            targetPosition: task.Target.Position,
+            targetOrientation: task.Target.Orientation,
+            targetExecuted: false,
+            locationName: task.Target.locationName,
+            locationDescription: task.Target.locationDescription,
+          })),
+        }
+      );
       toast.success("Task updated successfully");
       setViewMode("defaultMode");
       setTasks([]);
@@ -569,17 +574,20 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
             </label>
             <div className="flex flex-col mt-4">
               {savedTasks.map((task) => (
-                <div key={task.taskName} className="flex items-center mb-4">
+                <div
+                  key={task.Task.taskName}
+                  className="flex items-center mb-4"
+                >
                   <button
                     className={`text-gray-800 mr-2 ${
                       selectedSavedTask &&
-                      selectedSavedTask.taskName === task.taskName
+                      selectedSavedTask.Task.taskName === task.Task.taskName
                         ? "font-bold"
                         : ""
                     }`}
                     onClick={() => handleSavedTaskSelection(task)}
                   >
-                    {task.taskName}
+                    {task.Task.taskName}
                   </button>
                   <div className="ml-auto flex items-center">
                     <button
@@ -649,7 +657,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
             </h1>
             <p className="text-black">
               Are you sure you want to delete task "
-              {selectedSavedTask?.taskName}"?
+              {selectedSavedTask?.Task.taskName}"?
             </p>
             <div className="mt-4 flex justify-end">
               <button
