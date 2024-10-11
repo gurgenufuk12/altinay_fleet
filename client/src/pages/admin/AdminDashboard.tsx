@@ -205,7 +205,7 @@ const AdminDashboard = () => {
         (location) => location.locationId !== locationId
       );
       setLocations(updatedLocations);
-      toast.success("Location deleted successfully");
+      toast.success(res.data.message);
     } catch (error: any) {
       toast.error("Error deleting location " + error.response.data.message);
     }

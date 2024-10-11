@@ -19,7 +19,7 @@ exports.addLocation = async (req, res, next) => {
     });
     res.status(200).json({
       success: true,
-      message: "Location added successfully",
+      message: `Location with ID ${locationId} added successfully`,
     });
   } catch (error) {
     console.error(error);
@@ -36,7 +36,7 @@ exports.deleteLocation = async (req, res, next) => {
     await locationRef.delete();
     res.status(200).json({
       success: true,
-      message: "Location deleted successfully",
+      message: `Location with ID ${locationId} deleted successfully`,
     });
   } catch (error) {
     console.error(error);

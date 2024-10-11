@@ -82,7 +82,7 @@ const LocationConfirm: React.FC<LocationConfirmProps> = ({
           },
           locationDescription: locationDescription,
         });
-        toast.success("Location added successfully");
+        toast.success(res.data.message);
         setLocationName("");
         handleClose();
       } catch (error: any) {
