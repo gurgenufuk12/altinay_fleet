@@ -7,7 +7,6 @@ const db = firebase.collection("robots");
 exports.addRobot = async (req, res, next) => {
   try {
     const { robotName, robotId } = req.body;
-    console.log(robotName, robotId);
     const robotRef = db.doc(robotId.trim());
     await robotRef.set({
       robotName: robotName,

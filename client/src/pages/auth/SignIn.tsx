@@ -17,14 +17,14 @@ const SignIn = () => {
   const { handleLogin, setIsLoggedIn } = useAuth();
 
   const [values, setValues] = useState({
-    username: "",
+    userEmail: "",
     password: "",
   });
 
-  const { username, password } = values;
+  const { userEmail, password } = values;
 
-  const handleChange = (username: any) => (event: any) => {
-    setValues({ ...values, [username]: event.target.value });
+  const handleChange = (userEmail: any) => (event: any) => {
+    setValues({ ...values, [userEmail]: event.target.value });
   };
 
   const handleSubmit = async (event: any) => {
@@ -33,7 +33,7 @@ const SignIn = () => {
     try {
       const userCredential = await signInWithEmailAndPassword(
         auth,
-        username,
+        userEmail,
         password
       );
 
@@ -47,6 +47,7 @@ const SignIn = () => {
           id: user.uid,
           username: userData.username,
           user_Role: userData.userRole,
+          user_Email: user.email || "",
         });
 
         sessionStorage.setItem(
@@ -77,15 +78,15 @@ const SignIn = () => {
             <h2 className="text-2xl font-semibold mb-6 text-white">Sign In</h2>
             <form>
               <div className="mb-4">
-                <label htmlFor="username" className="block text-white">
-                  Username
+                <label htmlFor="userEmail" className="block text-white">
+                  Email
                 </label>
                 <input
                   type="text"
-                  id="username"
-                  name="username"
-                  value={username}
-                  onChange={handleChange("username")}
+                  id="userEmail"
+                  name="userEmail"
+                  value={userEmail}
+                  onChange={handleChange("userEmail")}
                   className="mt-1 block w-full h-10 rounded-md border shadow-sm"
                 />
               </div>

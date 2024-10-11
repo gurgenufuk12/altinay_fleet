@@ -36,6 +36,7 @@ const SignUp = () => {
         username: user.email?.split("@")[0] || "",
         userRole: "user",
         userUid: user.uid,
+        userEmail: user.email || "",
       });
 
       setValues({ ...values, username: "", password: "" });
