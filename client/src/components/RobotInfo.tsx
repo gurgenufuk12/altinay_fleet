@@ -3,8 +3,6 @@ import axios from "axios";
 import Robot from "../assets/amr.png";
 import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase/firebaseConfig";
-import { toast } from "react-toastify";
-import { format } from "date-fns";
 
 interface Robot {
   Pose: {
@@ -41,6 +39,7 @@ interface Robot {
     targetExecuted: boolean;
   }[];
   Task: {
+    taskId: string;
     taskCode: string;
     taskName: string;
     taskPercentage: string;
@@ -106,6 +105,10 @@ const RobotInfo: React.FC<RobotInfoProps> = ({ selectedRobot }) => {
               <div className="flex justify-between">
                 <span className="font-medium">Task Name:</span>
                 <span>{activeRobot.Task.taskName}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-medium">Task Id:</span>
+                <span>{activeRobot.Task.taskId}</span>
               </div>
               <div className="flex justify-between">
                 <span className="font-medium">Task Percentage:</span>
