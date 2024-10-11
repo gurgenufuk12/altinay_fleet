@@ -710,7 +710,6 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
     const robotName = event.target.value;
     const selectedRobot = robots.find((robot) => robot.robotName === robotName);
     setSelectedRobot(selectedRobot || null);
-    toast.success("Robot selected successfully: " + robotName);
   };
   const handleTaskCode = (event: React.ChangeEvent<HTMLSelectElement>) => {
     settaskCode(event.target.value);
