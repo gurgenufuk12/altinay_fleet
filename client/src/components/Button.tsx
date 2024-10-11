@@ -17,7 +17,7 @@ const Button: React.FC<Props> = ({
   className,
   disabled,
   id,
-  type = "button",
+  type,
 }) => {
   return (
     <button
