@@ -867,14 +867,14 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
                   onClick={() => handleDeleteTask(index)}
                   title="Delete Task"
                 ></Button>
-                {/* {isUserAdmin && ( */}
-                <Button
-                  className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-2 rounded disabled:opacity-0  w-50 h-10"
-                  onClick={() => handleAddLocation(index)}
-                  disabled={disableButtons[index]}
-                  title="Add Location"
-                ></Button>
-                {/* )} */}
+                {isUserAdmin && (
+                  <Button
+                    className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-2 rounded disabled:opacity-0  w-50 h-10"
+                    onClick={() => handleAddLocation(index)}
+                    disabled={disableButtons[index]}
+                    title="Add Location"
+                  ></Button>
+                )}
               </div>
             </div>
           ))}
