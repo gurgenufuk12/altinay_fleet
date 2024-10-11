@@ -6,11 +6,13 @@ import { toast } from "react-toastify";
 import SideBar from "../../components/SideBar";
 import Button from "../../components/Button";
 import Close from "@mui/icons-material/Close";
+import { update } from "lodash";
 
 interface User {
   userUid: string;
   username: string;
   userRole: string;
+  userEmail: string;
 }
 interface Robot {
   Pose: {
@@ -82,6 +84,11 @@ const AdminDashboard = () => {
   }>({});
   const [showConfirmation, setShowConfirmation] = React.useState(false);
   const [selectedUser, setSelectedUser] = React.useState<User | null>(null);
+  const [showUpdateLocation, setShowUpdateLocation] = React.useState(false);
+  const [selectedLocation, setSelectedLocation] =
+    React.useState<Location | null>(null);
+  const [locationName, setLocationName] = React.useState("");
+  const [locationDescription, setLocationDescription] = React.useState("");
 
   const fetchUsers = async () => {
     try {
@@ -164,7 +171,32 @@ const AdminDashboard = () => {
       console.log(error);
     }
   };
+  const updateLocation = async (locationId: string | undefined) => {
+    const isTaskNameChanged = locationName !== selectedLocation?.locationName;
+    const isTaskDescriptionChanged =
+      locationDescription !== selectedLocation?.locationDescription;
+    if (!isTaskNameChanged && !isTaskDescriptionChanged) {
+      toast.error("No changes detected");
+      return;
+    }
 
+    try {
+      const res = await axios.put(`/locations/updateLocation/${locationId}`, {
+        locationName,
+        locationDescription,
+      });
+      toast.success(res.data.message);
+      const updatedLocations = locations.map((location) =>
+        location.locationId === selectedLocation?.locationId
+          ? { ...location, locationName, locationDescription }
+          : location
+      );
+      setLocations(updatedLocations);
+      setShowUpdateLocation(false);
+    } catch (error: any) {
+      toast.error("Error updating location " + error.response.data.message);
+    }
+  };
   const deleteLocation = async (locationId: string) => {
     try {
       const res = await axios.delete(`/locations/deleteLocation/${locationId}`);
@@ -268,7 +300,7 @@ const AdminDashboard = () => {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Target Position
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
@@ -291,8 +323,16 @@ const AdminDashboard = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <Button
+                        onClick={() => {
+                          setShowUpdateLocation(true);
+                          setSelectedLocation(location);
+                        }}
+                        className="bg-blue-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                        title="Update"
+                      />
+                      <Button
                         onClick={() => deleteLocation(location.locationId)}
-                        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-2"
                         title="Delete"
                       />
                     </td>
@@ -381,6 +421,57 @@ const AdminDashboard = () => {
               >
                 Delete
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {showUpdateLocation && (
+        <div className="absolute top-0 left-0 w-full h-full flex justify-center items-center bg-opacity-75">
+          <div className="w-[600px] h-[500px] bg-white rounded-lg p-8 flex flex-col shadow-lg">
+            <Button
+              onClick={() => {
+                setShowUpdateLocation(false);
+                setLocationName("");
+                setLocationDescription("");
+              }}
+              className="ml-auto"
+              children={<Close />}
+            />
+            <h1 className="text-3xl font-bold mb-6 text-gray-800">
+              Update Location
+            </h1>
+            <div className="flex flex-col">
+              <div>
+                <label htmlFor="locationName" className="text-gray-800">
+                  Location Name:
+                </label>{" "}
+                {selectedLocation?.locationName}
+              </div>
+              <input
+                type="text"
+                id="locationName"
+                value={locationName}
+                onChange={(event) => setLocationName(event.target.value)}
+                className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              />
+              <div>
+                <label htmlFor="locationName" className="text-gray-800">
+                  Location Description
+                </label>{" "}
+                {selectedLocation?.locationDescription}
+              </div>
+              <input
+                type="text"
+                id="locationDescription"
+                value={locationDescription}
+                onChange={(event) => setLocationDescription(event.target.value)}
+                className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              />
+              <Button
+                title="Update Location"
+                onClick={() => updateLocation(selectedLocation?.locationId)}
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 w-fit"
+              />
             </div>
           </div>
         </div>

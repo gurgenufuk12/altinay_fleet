@@ -71,3 +71,25 @@ exports.checkLocationExist = async (req, res) => {
     });
   }
 };
+exports.updateLocation = async (req, res, next) => {
+  const { locationId } = req.params;
+  const data = req.body;
+  const locationRef = db.doc(locationId);
+
+  try {
+    await locationRef.update({
+      locationName: data.locationName,
+      locationDescription: data.locationDescription,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: `Location with ID ${locationId} updated successfully`,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
