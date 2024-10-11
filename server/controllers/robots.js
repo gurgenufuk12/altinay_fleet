@@ -12,7 +12,7 @@ exports.addRobot = async (req, res, next) => {
       robotName: robotName,
       robotId: robotId,
       robotStatus: "Idle",
-      robotCharge: "80%",
+      robotCharge: "80",
       robotVelocity: {
         linearVelocity: "0.0",
         angularVelocity: "0.0",
