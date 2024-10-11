@@ -3,6 +3,7 @@ import randomStringGenerator from "../hooks/useRandomStringGenerator";
 import CloseIcon from "@mui/icons-material/Close";
 import axios from "axios";
 import Button from "./Button";
+import { toast } from "react-toastify";
 
 interface AddRobotProps {
   onClose: () => void;
@@ -36,6 +37,7 @@ const AddRobot: React.FC<AddRobotProps> = ({ onClose }) => {
         robotId: robotId,
         robotName: robotName,
       });
+      toast.success(res.data.message);
       onClose();
     } catch (error: any) {
       console.log(error);

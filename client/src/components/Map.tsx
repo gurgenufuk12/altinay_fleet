@@ -544,6 +544,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
                 taskStartTime: new Date().toISOString(),
                 savedTask: false,
               });
+              toast.success(res2.data.message);
             } catch (error: any) {
               toast.error(error.response.data.message);
             }

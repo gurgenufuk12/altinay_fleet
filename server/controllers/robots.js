@@ -43,7 +43,7 @@ exports.addRobot = async (req, res, next) => {
     });
     res.status(200).json({
       success: true,
-      message: "Robot added successfully",
+      message: `Robot with ID ${robotId} added successfully`,
     });
   } catch (error) {
     console.error(error.message);
@@ -98,7 +98,7 @@ exports.addTarget = async (req, res, next) => {
     });
     res.status(200).json({
       success: true,
-      message: "Target added successfully",
+      message: `Targets added successfully to robot with ID ${robotId}`,
     });
   } catch (error) {
     console.error(error.message);

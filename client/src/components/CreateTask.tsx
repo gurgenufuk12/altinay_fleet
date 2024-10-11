@@ -325,11 +325,10 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
             //     locationDescription: task.Target.locationDescription,
             //   })),
             // });
-            toast.success("Task is given to robot successfully");
+            toast.success(res2.data.message);
           } catch (error: any) {
             toast.error(error.response.data.message);
           }
-          toast.success("Task is added to list successfully!");
         }
         setTasks([]);
         onClose();
@@ -418,7 +417,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
           })),
         }
       );
-      toast.success("Task updated successfully");
+      toast.success(res.data.message);
       setViewMode("defaultMode");
       setTasks([]);
       setSelectedSavedTask(null);

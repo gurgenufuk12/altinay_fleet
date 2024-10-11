@@ -49,7 +49,7 @@ exports.addTasks = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      message: "Task added successfully",
+      message: `Task with ID ${taskId} added successfully`,
     });
   } catch (error) {
     console.error(error);
@@ -107,9 +107,10 @@ exports.updateSavedTask = async (req, res) => {
         locationDescription: target.locationDescription,
       })),
     });
-    res.status(200).json({ message: "Task updated successfully" });
+    res.status(200).json({
+      message: `Task with ID ${taskId} updated successfully`,
+    });
   } catch (error) {
-    console.error("Error updating saved task:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
