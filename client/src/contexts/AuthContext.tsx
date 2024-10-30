@@ -8,7 +8,6 @@ import {
   User,
 } from "firebase/auth";
 import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
-import CryptoJS from "crypto-js";
 
 interface UserProfile {
   userUid: string;
@@ -36,10 +35,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const db = getFirestore();
 
-  const hashData = (data: string): string => {
-    return CryptoJS.SHA256(data).toString();
-  };
-
   const fetchUserProfile = async (userUid: string) => {
     const userDoc = await getDoc(doc(db, "users", userUid));
     if (userDoc.exists()) {
@@ -47,7 +42,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setUserProfile(profileData);
       localStorage.setItem(
         "userProfile",
-        JSON.stringify(hashData(JSON.stringify(profileData)))
+        JSON.stringify(JSON.stringify(profileData))
       );
     } else {
       setUserProfile(null);
@@ -92,7 +87,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setUserProfile(newUserProfile);
       localStorage.setItem(
         "userProfile",
-        JSON.stringify(hashData(JSON.stringify(newUserProfile)))
+        JSON.stringify(JSON.stringify(newUserProfile))
       );
     } catch (error) {
       console.error("Registration failed:", (error as Error).message);
