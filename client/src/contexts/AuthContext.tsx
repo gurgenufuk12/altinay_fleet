@@ -40,10 +40,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     if (userDoc.exists()) {
       const profileData = userDoc.data() as UserProfile;
       setUserProfile(profileData);
-      localStorage.setItem(
-        "userProfile",
-        JSON.stringify(JSON.stringify(profileData))
-      );
+      localStorage.setItem("userProfile", JSON.stringify(profileData));
     } else {
       setUserProfile(null);
       localStorage.removeItem("userProfile");
@@ -85,10 +82,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       await setDoc(doc(db, "users", result.user.uid), newUserProfile);
       setUser(result.user);
       setUserProfile(newUserProfile);
-      localStorage.setItem(
-        "userProfile",
-        JSON.stringify(JSON.stringify(newUserProfile))
-      );
+      localStorage.setItem("userProfile", JSON.stringify(newUserProfile));
     } catch (error) {
       console.error("Registration failed:", (error as Error).message);
       throw error;
