@@ -1,38 +1,10 @@
 import React from "react";
+import { Task } from "../types/Task";
 import Button from "./Button";
 import CloseIcon from "@mui/icons-material/Close";
 
 interface TaskInspectorProps {
-  task: {
-    robotName: string;
-    userName: string;
-    taskStartTime: string;
-    Targets: {
-      Position: {
-        x: string;
-        y: string;
-        z: string;
-      };
-      Orientation: {
-        x: string;
-        y: string;
-        z: string;
-        w: string;
-      };
-      targetExecuted: boolean;
-      locationName: string;
-      locationDescription: string;
-    }[];
-    Task: {
-      taskCode: string;
-      taskName: string;
-      taskPercentage: string;
-      taskPriority: string;
-      taskId: string;
-    };
-    robotId: string;
-    taskEndTime: string;
-  };
+  task: Task;
   onClose: () => void;
 }
 

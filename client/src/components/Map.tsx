@@ -10,58 +10,12 @@ import useRandomStringGenerator from "../hooks/useRandomStringGenerator";
 import Button from "./Button";
 import LocationConfirm from "./LocationPopUp";
 import { Target } from "../types/Target";
-import { SavedTask } from "../types/SavedTask";
+import { Task } from "../types/Task";
 import { Location } from "../types/Location";
-import Robot from "../assets/amr.png";
+import { Robot } from "../types/Robot";
+import RobotPicture from "../assets/amr.png";
 import CanvasMap from "../assets/map.jpg";
-import { set } from "date-fns";
 
-interface Robot {
-  Pose: {
-    Position: {
-      x: string;
-      y: string;
-      z: string;
-    };
-    Orientation: {
-      x: string;
-      y: string;
-      z: string;
-      w: string;
-    };
-  };
-  robotCharge: string;
-  robotStatus: string;
-  robotVelocity: {
-    linearVelocity: string;
-    angularVelocity: string;
-  };
-  Targets: {
-    Position: {
-      x: string;
-      y: string;
-      z: string;
-    };
-    Orientation: {
-      x: string;
-      y: string;
-      z: string;
-      w: string;
-    };
-    targetExecuted: boolean;
-  }[];
-  Task: {
-    taskCode: string;
-    taskName: string;
-    taskPercentage: string;
-    taskPriority: string;
-    pathPoints: [string, string][];
-    taskId: string;
-  };
-  robotName: string;
-  robotId: string;
-  createdCostmap: [string, string][];
-}
 interface CanvasProps {
   width: number;
   height: number;
@@ -78,7 +32,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
   const [locations, setLocations] = React.useState<Location[]>([]);
   const [isUserAdmin, setIsUserAdmin] = React.useState<boolean>(false); // DO NOT COMMIT JUST FOR DEV AS TRUE
   const [disableButtons, setDisableButtons] = React.useState<boolean[]>([]);
-  const [savedTasks, setSavedTasks] = React.useState<SavedTask[]>([]);
+  const [savedTasks, setSavedTasks] = React.useState<Task[]>([]);
   const [savedTaskName, setSavedTaskName] = React.useState<string>("");
   const [showCostmap, setShowCostmap] = React.useState(true);
   const [taskMode, setTaskMode] = React.useState<"auto" | "manual">("auto");
@@ -160,10 +114,10 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
       const savedTasksRef = collection(db, "tasks");
 
       onSnapshot(savedTasksRef, (snapshot) => {
-        const savedTasks: SavedTask[] = snapshot.docs
+        const savedTasks: Task[] = snapshot.docs
           .filter((doc) => doc.data().savedTask === true)
           .map((doc) => ({
-            ...(doc.data() as SavedTask),
+            ...(doc.data() as Task),
           }));
 
         setSavedTasks(savedTasks);

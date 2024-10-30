@@ -1,11 +1,11 @@
 import { RobotPose } from "./RobotPose";
 import { Target } from "./Target";
-import { Task } from "./Task";
+import { TaskInfo } from "./TaskInfo";
 
 export interface Robot {
   Pose: RobotPose;
   Targets: Target[];
-  Task: Task;
+  Task: TaskInfo;
   robotCharge: string;
   robotStatus: string;
   robotName: string;
@@ -14,4 +14,5 @@ export interface Robot {
     linearVelocity: string;
     angularVelocity: string;
   };
+  createdCostmap: [string, string][];
 }

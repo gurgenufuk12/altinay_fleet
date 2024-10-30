@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { AuthContext } from "../contexts/AuthContext";
 import randomStringGenerator from "../hooks/useRandomStringGenerator";
 import { Target } from "../types/Target";
-import { SavedTask } from "../types/SavedTask";
+import { Task } from "../types/Task";
 import { Location } from "../types/Location";
 import { Robot } from "../types/Robot";
 import { collection, onSnapshot } from "firebase/firestore";
@@ -32,9 +32,9 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
   const [locationName, setLocationName] = React.useState<string>("");
   const [taskPriority, setTaskPriority] = React.useState<string>("1");
   const [savedTask, setSavedTask] = React.useState<boolean>(false);
-  const [savedTasks, setSavedTasks] = React.useState<SavedTask[]>([]);
+  const [savedTasks, setSavedTasks] = React.useState<Task[]>([]);
   const [selectedSavedTask, setSelectedSavedTask] =
-    React.useState<SavedTask | null>(null);
+    React.useState<Task | null>(null);
   const [showConfirmation, setShowConfirmation] = React.useState(false);
   const [viewMode, setViewMode] = React.useState<"editMode" | "defaultMode">(
     "defaultMode"
@@ -53,10 +53,10 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
 
       // Listen for real-time updates
       onSnapshot(savedTasksRef, (snapshot) => {
-        const savedTasks: SavedTask[] = snapshot.docs
+        const savedTasks: Task[] = snapshot.docs
           .filter((doc) => doc.data().savedTask === true) // Filter for saved tasks
           .map((doc) => ({
-            ...(doc.data() as SavedTask), // Spread the data and cast it to match the SavedTask interface
+            ...(doc.data() as Task), // Spread the data and cast it to match the SavedTask interface
           }));
 
         // Update the state with the fetched saved tasks
@@ -240,7 +240,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
     setTargets(newTargets);
   };
 
-  const handleSavedTaskSelection = (task: SavedTask) => {
+  const handleSavedTaskSelection = (task: Task) => {
     setSelectedSavedTask(task);
     const newTargets = task.Targets.map((target) => ({
       ...target,
@@ -256,7 +256,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
     );
   };
 
-  const handleDeleteTask = async (task: SavedTask | null) => {
+  const handleDeleteTask = async (task: Task | null) => {
     try {
       await axios.put(`/tasks/deleteTask/${task?.Task.taskId}`);
       toast.success("Task deleted successfully");
@@ -266,7 +266,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
       console.log(error);
     }
   };
-  const handleUpdateTask = async (task: SavedTask) => {
+  const handleUpdateTask = async (task: Task) => {
     const isRobotChanged = selectedRobot?.robotName !== task.robotName;
     const isTaskCodeChanged = taskCode !== task.Task.taskCode;
     const isTaskNameChanged = taskName !== task.Task.taskName;

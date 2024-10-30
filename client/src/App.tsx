@@ -12,7 +12,7 @@ import Dashboard from "./pages/Dashboard";
 import SignUp from "./pages/auth/SignUp";
 import SignIn from "./pages/auth/SignIn";
 import AdminDashboard from "./pages/admin/AdminDashboard";
-import TaskTable from "./pages/tasks/taskTable";
+import TaskTable from "./pages/tasks/TaskTable";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { toast } from "react-toastify";
+import { Task } from "../../types/Task";
 import Sidebar from "../../components/SideBar";
 import Button from "../../components/Button";
 import { collection, onSnapshot } from "firebase/firestore";
@@ -9,36 +8,6 @@ import TaskInspector from "../../components/TaskInspector";
 import Filter from "../../assets/filter.png";
 import SearchIcon from "@mui/icons-material/Search";
 
-interface Task {
-  robotName: string;
-  userName: string;
-  taskStartTime: string;
-  Targets: {
-    Position: {
-      x: string;
-      y: string;
-      z: string;
-    };
-    Orientation: {
-      x: string;
-      y: string;
-      z: string;
-      w: string;
-    };
-    targetExecuted: boolean;
-    locationName: string;
-    locationDescription: string;
-  }[];
-  Task: {
-    taskCode: string;
-    taskName: string;
-    taskPercentage: string;
-    taskPriority: string;
-    taskId: string;
-  };
-  robotId: string;
-  taskEndTime: string;
-}
 
 const TaskTable: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
