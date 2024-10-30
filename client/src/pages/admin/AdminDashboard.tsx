@@ -114,32 +114,6 @@ const AdminDashboard = () => {
       console.log(error);
     }
   };
-  const updateLocation = async (locationId: string | undefined) => {
-    const isTaskNameChanged = locationName !== selectedLocation?.locationName;
-    const isTaskDescriptionChanged =
-      locationDescription !== selectedLocation?.locationDescription;
-    if (!isTaskNameChanged && !isTaskDescriptionChanged) {
-      toast.error("No changes detected");
-      return;
-    }
-
-    try {
-      const res = await axios.put(`/locations/updateLocation/${locationId}`, {
-        locationName,
-        locationDescription,
-      });
-      toast.success(res.data.message);
-      const updatedLocations = locations.map((location) =>
-        location.locationId === selectedLocation?.locationId
-          ? { ...location, locationName, locationDescription }
-          : location
-      );
-      setLocations(updatedLocations);
-      setShowUpdateLocation(false);
-    } catch (error: any) {
-      toast.error("Error updating location " + error.response.data.message);
-    }
-  };
   const deleteLocation = async (locationId: string) => {
     try {
       const res = await axios.delete(`/locations/deleteLocation/${locationId}`);
