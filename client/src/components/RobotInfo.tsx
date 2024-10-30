@@ -1,53 +1,9 @@
 import React from "react";
 import axios from "axios";
-import Robot from "../assets/amr.png";
+import { Robot } from "../types/Robot";
 import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase/firebaseConfig";
-
-interface Robot {
-  Pose: {
-    Position: {
-      x: string;
-      y: string;
-      z: string;
-    };
-    Orientation: {
-      x: string;
-      y: string;
-      z: string;
-      w: string;
-    };
-  };
-  robotCharge: string;
-  robotStatus: string;
-  robotVelocity: {
-    linearVelocity: string;
-    angularVelocity: string;
-  };
-  Targets: {
-    Position: {
-      x: string;
-      y: string;
-      z: string;
-    };
-    Orientation: {
-      x: string;
-      y: string;
-      z: string;
-      w: string;
-    };
-    targetExecuted: boolean;
-  }[];
-  Task: {
-    taskId: string;
-    taskCode: string;
-    taskName: string;
-    taskPercentage: string;
-    taskPriority: string;
-  };
-  robotName: string;
-  robotId: string;
-}
+import RobotPicture from "../assets/amr.png";
 
 interface RobotInfoProps {
   selectedRobot: Robot | null;
@@ -81,7 +37,7 @@ const RobotInfo: React.FC<RobotInfoProps> = ({ selectedRobot }) => {
   return (
     <div className="flex flex-col items-center gap-4 p-4 bg-gray-100 rounded-lg">
       <h1 className="text-xl font-medium">Robot Information</h1>
-      <img src={Robot} alt="robot" className="w-36" />
+      <img src={RobotPicture} alt="robot" className="w-36" />
       {activeRobot && (
         <div className="flex flex-col gap-2">
           <div className="flex justify-between">
