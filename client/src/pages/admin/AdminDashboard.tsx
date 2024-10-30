@@ -71,7 +71,6 @@ const AdminDashboard = () => {
     fetchRobots();
     fetchLocations();
   }, []);
-
   const handleRoleChange = (
     event: React.ChangeEvent<HTMLSelectElement>,
     userUid: string
@@ -82,7 +81,6 @@ const AdminDashboard = () => {
     };
     setSelectedRoles(newSelectedRoles);
   };
-
   const saveUserRoleChanges = async (userUid: string) => {
     try {
       const res = await axios.put(`/api/changeUserRole/${userUid}`, {
