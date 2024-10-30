@@ -70,7 +70,7 @@ const LocationConfirm: React.FC<LocationConfirmProps> = ({
       );
       return;
     } else {
-      const randomNineDigitString = generateRandomString("location");
+      const randomNineDigitString = generateRandomString("L");
 
       try {
         const res = await axios.post("/locations/addLocation", {
