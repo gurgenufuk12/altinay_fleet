@@ -3,6 +3,10 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { AuthContext } from "../contexts/AuthContext";
 import randomStringGenerator from "../hooks/useRandomStringGenerator";
+import { Target } from "../types/Target";
+import { SavedTask } from "../types/SavedTask";
+import { Location } from "../types/Location";
+import { Robot } from "../types/Robot";
 import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase/firebaseConfig";
 import Button from "./Button";
@@ -11,113 +15,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import Arrow from "../assets/arrow.svg";
 import isEqual from "lodash/isEqual";
-interface Robot {
-  Pose: {
-    Position: {
-      x: string;
-      y: string;
-      z: string;
-    };
-    Orientation: {
-      x: string;
-      y: string;
-      z: string;
-      w: string;
-    };
-  };
-  robotCharge: string;
-  robotStatus: string;
-  robotVelocity: {
-    linearVelocity: string;
-    angularVelocity: string;
-  };
-  Targets: {
-    Position: {
-      x: string;
-      y: string;
-      z: string;
-    };
-    Orientation: {
-      x: string;
-      y: string;
-      z: string;
-      w: string;
-    };
-    targetExecuted: boolean;
-  }[];
-  Task: {
-    taskCode: string;
-    taskName: string;
-    taskPercentage: string;
-    taskPriority: string;
-    pathPoints: [string, string][];
-    taskId: string;
-  };
-  robotName: string;
-  robotId: string;
-}
-interface Task {
-  Target: {
-    Position: {
-      x: string;
-      y: string;
-      z: string;
-    };
-    Orientation: {
-      x: string;
-      y: string;
-      z: string;
-      w: string;
-    };
-    targetExecuted: boolean;
-    locationName?: string;
-    locationDescription?: string;
-  };
-}
-interface Location {
-  locationName: string;
-  locationDescription: string;
-  Target: {
-    Position: {
-      x: string;
-      y: string;
-      z: string;
-    };
-    Orientation: {
-      x: string;
-      y: string;
-      z: string;
-      w: string;
-    };
-  };
-}
-interface SavedTask {
-  robotName: string;
-  userName: string;
-  Targets: {
-    Position: {
-      x: string;
-      y: string;
-      z: string;
-    };
-    Orientation: {
-      x: string;
-      y: string;
-      z: string;
-      w: string;
-    };
-    targetExecuted: boolean;
-    locationName: string;
-    locationDescription: string;
-  }[];
-  Task: {
-    taskCode: string;
-    taskName: string;
-    taskPercentage: string;
-    taskPriority: string;
-    taskId: string;
-  };
-}
+
 interface CreateTaskProps {
   onClose: () => void;
 }
@@ -127,7 +25,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
   const user = authContext?.userProfile;
   const taskWindowRef = React.useRef<HTMLDivElement>(null);
   const [robots, setRobots] = React.useState<Robot[]>([]);
-  const [tasks, setTasks] = React.useState<Task[]>([]);
+  const [targets, setTargets] = React.useState<Target[]>([]);
   const [locations, setLocations] = React.useState<Location[]>([]);
   const [taskCode, settaskCode] = React.useState<string>("");
   const [taskName, setTaskName] = React.useState<string>("");
@@ -182,25 +80,24 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
       );
       if (selectedLocation) {
         const { Position, Orientation } = selectedLocation.Target;
-        const newTask = {
-          Target: {
-            Position: {
-              x: Position.x,
-              y: Position.y,
-              z: "0",
-            },
-            Orientation: {
-              x: Orientation.x,
-              y: Orientation.y,
-              z: Orientation.z,
-              w: Orientation.w,
-            },
-            targetExecuted: false,
-            locationName: selectedLocationName,
-            locationDescription: selectedLocation.locationDescription,
+        const newTarget = {
+          Position: {
+            x: Position.x,
+            y: Position.y,
+            z: "0",
           },
+          Orientation: {
+            x: Orientation.x,
+            y: Orientation.y,
+            z: Orientation.z,
+            w: Orientation.w,
+          },
+          targetExecuted: false,
+          locationId: selectedLocation.locationId,
+          locationName: selectedLocationName,
+          locationDescription: selectedLocation.locationDescription,
         };
-        setTasks([...tasks, newTask]);
+        setTargets([...targets, newTarget]);
         toast.success(
           `Location "${selectedLocationName}" added to the task list successfully`
         );
@@ -283,7 +180,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
       //   toast.error("Task code cannot be empty");
       //   break;
       default:
-        if (tasks.length > 0) {
+        if (targets.length > 0) {
           const randomNineDigitString = generateRandomString("task");
 
           try {
@@ -296,61 +193,61 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
               taskPercentage: "0",
               robotName: selectedRobot?.robotName,
               robotId: selectedRobot?.robotId,
-              targets: tasks.map((task, index) => ({
-                targetPosition: task.Target.Position,
-                targetOrientation: task.Target.Orientation,
+              targets: targets.map((target, index) => ({
+                targetPosition: target.Position,
+                targetOrientation: target.Orientation,
                 targetExecuted: false,
-                locationName: task.Target.locationName,
-                locationDescription: task.Target.locationDescription,
+                locationId: target.locationId,
+                locationName: target.locationName,
+                locationDescription: target.locationDescription,
               })),
               taskStartTime: new Date().toISOString(),
               taskEndTime: "",
               savedTask: savedTask,
             });
-            // const res = await axios.post("/robots/addTarget", {
-            //   taskName: taskName,
-            //   taskCode: taskCode,
-            //   taskPriority: taskPriority,
-            //   taskId: randomNineDigitString,
-            //   taskPercentage: "0",
-            //   robotId: selectedRobot?.robotId,
-            //   robotStatus: "Task In Progress", // DO NOT COMMIT LIKE THIS CONVERT TO Task In Progress
-            //   linearVelocity: "0",
-            //   angularVelocity: "0",
-            //   pathPoints: [],
-            //   targets: tasks.map((task, index) => ({
-            //     targetPosition: task.Target.Position,
-            //     targetOrientation: task.Target.Orientation,
-            //     targetExecuted: false,
-            //     locationName: task.Target.locationName,
-            //     locationDescription: task.Target.locationDescription,
-            //   })),
-            // });
+            const res = await axios.post("/robots/addTarget", {
+              taskName: taskName,
+              taskCode: taskCode,
+              taskPriority: taskPriority,
+              taskId: randomNineDigitString,
+              taskPercentage: "0",
+              robotId: selectedRobot?.robotId,
+              robotStatus: "Task In Progress", // DO NOT COMMIT LIKE THIS CONVERT TO Task In Progress
+              linearVelocity: "0",
+              angularVelocity: "0",
+              pathPoints: [],
+              targets: targets.map((target, index) => ({
+                targetPosition: target.Position,
+                targetOrientation: target.Orientation,
+                targetExecuted: false,
+                locationId: target.locationId,
+                locationName: target.locationName,
+                locationDescription: target.locationDescription,
+              })),
+            });
             toast.success(res2.data.message);
           } catch (error: any) {
             toast.error(error.response.data.message);
           }
         }
-        setTasks([]);
+        setTargets([]);
         onClose();
         break;
     }
   };
   const handleDeleteLocation = (index: number) => {
-    const newTasks = tasks.filter((_, i) => i !== index);
-    setTasks(newTasks);
+    const newTargets = targets.filter((_, i) => i !== index);
+    setTargets(newTargets);
   };
 
   const handleSavedTaskSelection = (task: SavedTask) => {
     setSelectedSavedTask(task);
-    const newTasks = task.Targets.map((target) => ({
-      Target: {
-        ...target,
-        locationName: target.locationName,
-        locationDescription: target.locationDescription,
-      },
+    const newTargets = task.Targets.map((target) => ({
+      ...target,
+      locationName: target.locationName,
+      locationDescription: target.locationDescription,
     }));
-    setTasks(newTasks);
+    setTargets(newTargets);
     setTaskName(task.Task.taskName);
     settaskCode(task.Task.taskCode);
     setTaskPriority(task.Task.taskPriority);
@@ -374,7 +271,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
     const isTaskCodeChanged = taskCode !== task.Task.taskCode;
     const isTaskNameChanged = taskName !== task.Task.taskName;
     const isTaskPriorityChanged = taskPriority !== task.Task.taskPriority;
-    const isTasksChanged = !isEqual(tasks, task.Targets);
+    const isTasksChanged = !isEqual(targets, task.Targets);
     if (isRobotChanged) {
       setSelectedRobot(
         robots.find((robot) => robot.robotName === task.robotName) || null
@@ -390,13 +287,11 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
       setTaskPriority(task.Task.taskPriority);
     }
     if (isTasksChanged) {
-      setTasks(
+      setTargets(
         task.Targets.map((target) => ({
-          Target: {
-            ...target,
-            locationName: target.locationName,
-            locationDescription: target.locationDescription,
-          },
+          ...target,
+          locationName: target.locationName,
+          locationDescription: target.locationDescription,
         }))
       );
     }
@@ -409,18 +304,18 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
           taskName: taskName,
           taskCode: taskCode,
           taskPriority: taskPriority,
-          targets: tasks.map((task) => ({
-            targetPosition: task.Target.Position,
-            targetOrientation: task.Target.Orientation,
+          targets: targets.map((target) => ({
+            targetPosition: target.Position,
+            targetOrientation: target.Orientation,
             targetExecuted: false,
-            locationName: task.Target.locationName,
-            locationDescription: task.Target.locationDescription,
+            locationName: target.locationName,
+            locationDescription: target.locationDescription,
           })),
         }
       );
       toast.success(res.data.message);
       setViewMode("defaultMode");
-      setTasks([]);
+      setTargets([]);
       setSelectedSavedTask(null);
     } catch (error) {
       console.log(error);
@@ -618,7 +513,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
         <div className="mt-8">
           <span className="text-black block">Task Summary:</span>
           <div className="flex flex-col pt-5">
-            {tasks.map((task, index) => (
+            {targets.map((target, index) => (
               <div
                 key={index}
                 className={` flex items-center mb-4 font-bold rounded-lg p-5 ${
@@ -627,8 +522,8 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
               >
                 <span className="text-gray-800">
                   {index + 1}. Destination:{" "}
-                  {task.Target.locationName || "No Location"}{" "}
-                  {task.Target.locationDescription}
+                  {target.locationName || "No Location"}{" "}
+                  {target.locationDescription}
                 </span>
                 <button
                   className="ml-auto text-red-600"
