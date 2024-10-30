@@ -1,7 +1,7 @@
 import React from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { useUserContext } from "../contexts/UserContext";
+import { AuthContext } from "../contexts/AuthContext";
 import randomStringGenerator from "../hooks/useRandomStringGenerator";
 import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase/firebaseConfig";
@@ -123,7 +123,8 @@ interface CreateTaskProps {
 }
 
 const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
-  const { user } = useUserContext();
+  const authContext = React.useContext(AuthContext);
+  const user = authContext?.userProfile;
   const taskWindowRef = React.useRef<HTMLDivElement>(null);
   const [robots, setRobots] = React.useState<Robot[]>([]);
   const [tasks, setTasks] = React.useState<Task[]>([]);

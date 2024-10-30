@@ -2,10 +2,10 @@ import React, { useEffect } from "react";
 import axios from "axios";
 import { useRef } from "react";
 import { toast } from "react-toastify";
+import { AuthContext } from "../contexts/AuthContext";
 import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase/firebaseConfig";
 import RobotInfo from "./RobotInfo";
-import { useUserContext } from "../contexts/UserContext";
 import useRandomStringGenerator from "../hooks/useRandomStringGenerator";
 import Button from "./Button";
 import LocationConfirm from "./LocationPopUp";
@@ -125,7 +125,7 @@ interface CanvasProps {
 }
 
 const Map: React.FC<CanvasProps> = ({ width, height }) => {
-  const { user } = useUserContext();
+  const authContext = React.useContext(AuthContext);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [robots, setRobots] = React.useState<Robot[]>([]);
   const [tasks, setTasks] = React.useState<Task[]>([]);
@@ -162,8 +162,9 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
     w: number;
   } | null>(null);
   const { generateRandomString } = useRandomStringGenerator();
+  const user = authContext?.userProfile;
   React.useEffect(() => {
-    if (user && user.user_Role === "admin") {
+    if (user && user.userRole === "admin") {
       setIsUserAdmin(true);
     }
   }, [user]);

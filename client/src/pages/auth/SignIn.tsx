@@ -1,11 +1,7 @@
 import React from "react";
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import { toast } from "react-toastify";
 import { AuthContext } from "../../contexts/AuthContext";
-import { useUserContext } from "../../contexts/UserContext";
-import { getFirestore, doc, getDoc } from "firebase/firestore"; // Firestore functions
 import Logo from "../../assets/altınay.png";
 import Button from "../../components/Button";
 

@@ -1,23 +1,21 @@
 import React, { useState, useEffect, useContext } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { useUserContext } from "../contexts/UserContext";
 import CreateTask from "./CreateTask";
 import AddRobot from "./AddRobot";
-import { useAuth } from "../contexts/AuthContext";
+import { AuthContext } from "../contexts/AuthContext";
 import Button from "./Button";
 import AddIcon from "@mui/icons-material/Add";
 
 const Sidebar: React.FC = () => {
+  const authContext = useContext(AuthContext);
+  const user = authContext?.userProfile;
   const [isUserAdmin, setIsUserAdmin] = useState<boolean>(false);
   const [showCreateTask, setShowCreateTask] = useState<boolean>(false);
   const [showAddRobot, setShowAddRobot] = useState<boolean>(false);
   const navigate = useNavigate();
-  const { handleLogout } = useAuth();
-  const { user, setUser } = useUserContext();
 
   useEffect(() => {
-    if (user && user.user_Role === "admin") {
+    if (user && user.userRole === "admin") {
       setIsUserAdmin(true);
     }
   }, [user]);
@@ -76,8 +74,7 @@ const Sidebar: React.FC = () => {
       <Button
         className="absolute bottom-0 w-full p-4 bg-red-500 text-white"
         onClick={() => {
-          setUser(null);
-          handleLogout();
+          authContext?.logout();
           navigate("/signin");
         }}
       >
