@@ -28,10 +28,6 @@ const AdminDashboard = () => {
   const [showUpdateLocation, setShowUpdateLocation] = React.useState(false);
   const [selectedLocation, setSelectedLocation] =
     React.useState<Location | null>(null);
-  const [locationName, setLocationName] = React.useState("");
-  const [locationDescription, setLocationDescription] = React.useState("");
-  console.log("selectedLocation", selectedLocation?.locationName);
-  console.log("locationName", locationName);
 
   const fetchUsers = async () => {
     try {
