@@ -8,6 +8,7 @@ import {
   User,
 } from "firebase/auth";
 import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
+import CryptoJS from "crypto-js";
 
 interface UserProfile {
   userUid: string;
@@ -35,20 +36,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const db = getFirestore();
 
+  const hashData = (data: string): string => {
+    return CryptoJS.SHA256(data).toString();
+  };
+
   const fetchUserProfile = async (userUid: string) => {
     const userDoc = await getDoc(doc(db, "users", userUid));
     if (userDoc.exists()) {
       const profileData = userDoc.data() as UserProfile;
       setUserProfile(profileData);
-      localStorage.setItem("userProfile", JSON.stringify(profileData)); // Save profile to localStorage
+      localStorage.setItem(
+        "userProfile",
+        JSON.stringify(hashData(JSON.stringify(profileData)))
+      );
     } else {
       setUserProfile(null);
-      localStorage.removeItem("userProfile"); // Clear profile from localStorage if not found
+      localStorage.removeItem("userProfile");
     }
   };
 
   useEffect(() => {
-    // Check if userProfile exists in localStorage on component mount
     const storedProfile = localStorage.getItem("userProfile");
     if (storedProfile) {
       setUserProfile(JSON.parse(storedProfile));
@@ -61,7 +68,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       } else {
         setUser(null);
         setUserProfile(null);
-        localStorage.removeItem("userProfile"); // Clear localStorage on sign-out
+        localStorage.removeItem("userProfile");
       }
     });
     return () => unsubscribe();
@@ -83,7 +90,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       await setDoc(doc(db, "users", result.user.uid), newUserProfile);
       setUser(result.user);
       setUserProfile(newUserProfile);
-      localStorage.setItem("userProfile", JSON.stringify(newUserProfile)); // Save new profile to localStorage
+      localStorage.setItem(
+        "userProfile",
+        JSON.stringify(hashData(JSON.stringify(newUserProfile)))
+      );
     } catch (error) {
       console.error("Registration failed:", (error as Error).message);
       throw error;
@@ -106,7 +116,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       await signOut(auth);
       setUser(null);
       setUserProfile(null);
-      localStorage.removeItem("userProfile"); // Clear localStorage on logout
+      localStorage.removeItem("userProfile");
     } catch (error) {
       console.error("Logout failed:", (error as Error).message);
     }
