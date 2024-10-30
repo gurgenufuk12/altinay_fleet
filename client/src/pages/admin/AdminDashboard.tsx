@@ -1,79 +1,20 @@
 import React from "react";
 import axios from "axios";
+import { Robot } from "../../types/Robot";
+import { Location } from "../../types/Location";
 import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../../firebase/firebaseConfig";
 import { toast } from "react-toastify";
 import SideBar from "../../components/SideBar";
+import UpdateLocation from "../../components/UpdateLocation";
 import Button from "../../components/Button";
 import Close from "@mui/icons-material/Close";
-import { update } from "lodash";
 
 interface User {
   userUid: string;
   username: string;
   userRole: string;
   userEmail: string;
-}
-interface Robot {
-  Pose: {
-    Position: {
-      x: string;
-      y: string;
-      z: string;
-    };
-    Orientation: {
-      x: string;
-      y: string;
-      z: string;
-      w: string;
-    };
-  };
-  robotCharge: string;
-  robotStatus: string;
-  robotVelocity: {
-    linearVelocity: string;
-    angularVelocity: string;
-  };
-  Targets: {
-    Position: {
-      x: string;
-      y: string;
-      z: string;
-    };
-    Orientation: {
-      x: string;
-      y: string;
-      z: string;
-      w: string;
-    };
-    targetExecuted: boolean;
-  }[];
-  Task: {
-    taskCode: string;
-    taskName: string;
-    taskPercentage: string;
-    taskPriority: string;
-  };
-  robotName: string;
-  robotId: string;
-}
-interface Location {
-  locationId: string;
-  locationName: string;
-  locationDescription: string;
-  Target: {
-    Position: {
-      x: string;
-      y: string;
-      z: string;
-    };
-    Orientation: {
-      x: string;
-      y: string;
-      z: string;
-      w: string;
-    };
-  };
 }
 const AdminDashboard = () => {
   const [users, setUsers] = React.useState<User[]>([]);
@@ -89,6 +30,8 @@ const AdminDashboard = () => {
     React.useState<Location | null>(null);
   const [locationName, setLocationName] = React.useState("");
   const [locationDescription, setLocationDescription] = React.useState("");
+  console.log("selectedLocation", selectedLocation?.locationName);
+  console.log("locationName", locationName);
 
   const fetchUsers = async () => {
     try {
@@ -212,7 +155,7 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 relative">
       <SideBar />
       <h1 className="text-3xl font-bold mb-4 ml-14 text-gray-800">
         Admin Dashboard
@@ -426,55 +369,10 @@ const AdminDashboard = () => {
         </div>
       )}
       {showUpdateLocation && (
-        <div className="absolute top-0 left-0 w-full h-full flex justify-center items-center bg-opacity-75">
-          <div className="w-[600px] h-[500px] bg-white rounded-lg p-8 flex flex-col shadow-lg">
-            <Button
-              onClick={() => {
-                setShowUpdateLocation(false);
-                setLocationName("");
-                setLocationDescription("");
-              }}
-              className="ml-auto"
-              children={<Close />}
-            />
-            <h1 className="text-3xl font-bold mb-6 text-gray-800">
-              Update Location
-            </h1>
-            <div className="flex flex-col">
-              <div>
-                <label htmlFor="locationName" className="text-gray-800">
-                  Location Name:
-                </label>{" "}
-                {selectedLocation?.locationName}
-              </div>
-              <input
-                type="text"
-                id="locationName"
-                value={locationName}
-                onChange={(event) => setLocationName(event.target.value)}
-                className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              />
-              <div>
-                <label htmlFor="locationName" className="text-gray-800">
-                  Location Description
-                </label>{" "}
-                {selectedLocation?.locationDescription}
-              </div>
-              <input
-                type="text"
-                id="locationDescription"
-                value={locationDescription}
-                onChange={(event) => setLocationDescription(event.target.value)}
-                className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              />
-              <Button
-                title="Update Location"
-                onClick={() => updateLocation(selectedLocation?.locationId)}
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 w-fit"
-              />
-            </div>
-          </div>
-        </div>
+        <UpdateLocation
+          locaiton={selectedLocation}
+          onClose={() => setShowUpdateLocation(false)}
+        />
       )}
     </div>
   );
