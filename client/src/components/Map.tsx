@@ -9,8 +9,12 @@ import RobotInfo from "./RobotInfo";
 import useRandomStringGenerator from "../hooks/useRandomStringGenerator";
 import Button from "./Button";
 import LocationConfirm from "./LocationPopUp";
+import { Target } from "../types/Target";
+import { SavedTask } from "../types/SavedTask";
+import { Location } from "../types/Location";
 import Robot from "../assets/amr.png";
 import CanvasMap from "../assets/map.jpg";
+import { set } from "date-fns";
 
 interface Robot {
   Pose: {
@@ -58,67 +62,6 @@ interface Robot {
   robotId: string;
   createdCostmap: [string, string][];
 }
-interface Task {
-  Target: {
-    Position: {
-      x: string;
-      y: string;
-      z: string;
-    };
-    Orientation: {
-      x: string;
-      y: string;
-      z: string;
-      w: string;
-    };
-    targetExecuted: boolean;
-    locationName: string;
-  };
-}
-interface SavedTask {
-  robotName: string;
-  userName: string;
-  taskStartTime: string;
-  Targets: {
-    Position: {
-      x: string;
-      y: string;
-      z: string;
-    };
-    Orientation: {
-      x: string;
-      y: string;
-      z: string;
-      w: string;
-    };
-    targetExecuted: boolean;
-    locationName: string;
-  }[];
-  Task: {
-    taskId: string;
-    taskCode: string;
-    taskName: string;
-    taskPercentage: string;
-    taskPriority: string;
-  };
-}
-interface Location {
-  locationName: string;
-  locationDescription: string;
-  Target: {
-    Position: {
-      x: string;
-      y: string;
-      z: string;
-    };
-    Orientation: {
-      x: string;
-      y: string;
-      z: string;
-      w: string;
-    };
-  };
-}
 interface CanvasProps {
   width: number;
   height: number;
@@ -128,7 +71,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
   const authContext = React.useContext(AuthContext);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [robots, setRobots] = React.useState<Robot[]>([]);
-  const [tasks, setTasks] = React.useState<Task[]>([]);
+  const [targets, setTargets] = React.useState<Target[]>([]);
   const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(null);
   const [taskCode, settaskCode] = React.useState<string>("");
   const [locationName, setLocationName] = React.useState<string>("");
@@ -169,19 +112,19 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
     }
   }, [user]);
   React.useEffect(() => {
-    const newDisableButtons = tasks.map((task) =>
+    const newDisableButtons = targets.map((task) =>
       locations.some(
         (location) =>
-          task.Target.Position.x === location.Target.Position.x &&
-          task.Target.Position.y === location.Target.Position.y &&
-          task.Target.Orientation.x === location.Target.Orientation.x &&
-          task.Target.Orientation.y === location.Target.Orientation.y &&
-          task.Target.Orientation.z === location.Target.Orientation.z &&
-          task.Target.Orientation.w === location.Target.Orientation.w
+          task.Position.x === location.Target.Position.x &&
+          task.Position.y === location.Target.Position.y &&
+          task.Orientation.x === location.Target.Orientation.x &&
+          task.Orientation.y === location.Target.Orientation.y &&
+          task.Orientation.z === location.Target.Orientation.z &&
+          task.Orientation.w === location.Target.Orientation.w
       )
     );
     setDisableButtons(newDisableButtons);
-  }, [tasks, locations]);
+  }, [targets, locations]);
   const handleAddLocation = (index: number) => {
     setSelectedTaskIndex(index);
   };
@@ -458,33 +401,30 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
         z: taskOrientation.z,
         w: taskOrientation.w,
       });
-      setTasks([
-        ...tasks,
+      setTargets([
+        ...targets,
         {
-          Target: {
-            Position: {
-              x: robotXStart.toString(),
-              y: robotYStart.toString(),
-              z: "0",
-            },
-            Orientation: {
-              x: taskOrientation.x.toString(),
-              y: taskOrientation.y.toString(),
-              z: taskOrientation.z.toString(),
-              w: taskOrientation.w.toString(),
-            },
-            targetExecuted: false,
-            locationName: "",
+          Position: {
+            x: robotXStart.toString(),
+            y: robotYStart.toString(),
+            z: "0",
           },
+          Orientation: {
+            x: taskOrientation.x.toString(),
+            y: taskOrientation.y.toString(),
+            z: taskOrientation.z.toString(),
+            w: taskOrientation.w.toString(),
+          },
+          targetExecuted: false,
+          locationId: "",
+          locationName: "",
+          locationDescription: "",
         },
       ]);
     }
 
     setArrowStart(null);
     setArrowEnd(null);
-  };
-  const showTasks = () => {
-    console.log(tasks);
   };
 
   const giveTaskToRobot = async () => {
@@ -506,7 +446,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
         //   toast.error("Task code cannot be empty");
         //   break;
         default:
-          if (tasks.length > 0 && selectedRobot !== null) {
+          if (targets.length > 0 && selectedRobot !== null) {
             try {
               // INFO : This is the old way of giving task to robot
               // const res = await axios.post("/robots/addTarget", {
@@ -536,11 +476,11 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
                 taskPercentage: "0",
                 robotName: selectedRobot?.robotName,
                 robotId: selectedRobot?.robotId,
-                targets: tasks.map((task, index) => ({
-                  targetPosition: task.Target.Position,
-                  targetOrientation: task.Target.Orientation,
+                targets: targets.map((target, index) => ({
+                  targetPosition: target.Position,
+                  targetOrientation: target.Orientation,
                   targetExecuted: false,
-                  locationName: task.Target.locationName,
+                  locationName: target.locationName,
                 })),
                 taskStartTime: new Date().toISOString(),
                 savedTask: false,
@@ -550,7 +490,8 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
               toast.error(error.response.data.message);
             }
           }
-          setTasks([]);
+
+          setTargets([]);
           break;
       }
     } else {
@@ -558,7 +499,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
         toast.error("Task code cannot be empty");
         return;
       }
-      if (tasks.length === 0) {
+      if (targets.length === 0) {
         toast.error("Please give a task to the robot");
         return;
       } else {
@@ -571,15 +512,15 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
             taskPercentage: "0",
             robotName: " ",
             robotId: " ",
-            targets: tasks.map((task, index) => ({
-              targetPosition: task.Target.Position,
-              targetOrientation: task.Target.Orientation,
+            targets: targets.map((target, index) => ({
+              targetPosition: target.Position,
+              targetOrientation: target.Orientation,
               targetExecuted: false,
             })),
             taskStartTime: new Date().toISOString(),
           });
           toast.success("Task is given robot will chosen automatically!");
-          setTasks([]);
+          setTargets([]);
         } catch (error: any) {
           toast.error(error.response.data.message);
         }
@@ -587,13 +528,13 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
     }
   };
   const clearTaskList = () => {
-    setTasks([]);
+    setTargets([]);
     toast.success("Task list is cleared");
   };
   const handleDeleteTask = (index: number) => {
-    const updatedTasks = [...tasks];
+    const updatedTasks = [...targets];
     updatedTasks.splice(index, 1);
-    setTasks(updatedTasks);
+    setTargets(updatedTasks);
   };
 
   React.useEffect(() => {
@@ -663,24 +604,24 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
       (task) => task.Task.taskName === selectedTaskName
     );
     if (selectedTask) {
-      const newTasks = selectedTask.Targets.map((target) => ({
-        Target: {
-          Position: {
-            x: target.Position.x,
-            y: target.Position.y,
-            z: target.Position.z,
-          },
-          Orientation: {
-            x: target.Orientation.x,
-            y: target.Orientation.y,
-            z: target.Orientation.z,
-            w: target.Orientation.w,
-          },
-          targetExecuted: false,
-          locationName: target.locationName,
+      const newTargets = selectedTask.Targets.map((target) => ({
+        Position: {
+          x: target.Position.x,
+          y: target.Position.y,
+          z: target.Position.z,
         },
+        Orientation: {
+          x: target.Orientation.x,
+          y: target.Orientation.y,
+          z: target.Orientation.z,
+          w: target.Orientation.w,
+        },
+        targetExecuted: false,
+        locationId: target.locationId,
+        locationName: target.locationName,
+        locationDescription: target.locationDescription,
       }));
-      setTasks(newTasks);
+      setTargets(newTargets);
       setSavedTaskName("");
     }
     settaskCode(selectedTask?.Task.taskCode || "");
@@ -727,24 +668,24 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
       );
       if (selectedLocation) {
         const { Position, Orientation } = selectedLocation.Target;
-        const newTask = {
-          Target: {
-            Position: {
-              x: Position.x,
-              y: Position.y,
-              z: "0",
-            },
-            Orientation: {
-              x: Orientation.x,
-              y: Orientation.y,
-              z: Orientation.z,
-              w: Orientation.w,
-            },
-            targetExecuted: false,
-            locationName: selectedLocationName,
+        const newTarget = {
+          Position: {
+            x: Position.x,
+            y: Position.y,
+            z: "0",
           },
+          Orientation: {
+            x: Orientation.x,
+            y: Orientation.y,
+            z: Orientation.z,
+            w: Orientation.w,
+          },
+          targetExecuted: false,
+          locationName: selectedLocationName,
+          locationId: selectedLocation.locationId,
+          locationDescription: selectedLocation.locationDescription,
         };
-        setTasks([...tasks, newTask]);
+        setTargets([...targets, newTarget]);
         setLocationName("");
       }
     }
@@ -755,8 +696,8 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
       {selectedTaskIndex !== null && (
         <LocationConfirm
           handleClose={() => setSelectedTaskIndex(null)}
-          taskPosition={tasks[selectedTaskIndex].Target.Position}
-          taskOrientation={tasks[selectedTaskIndex].Target.Orientation}
+          taskPosition={targets[selectedTaskIndex].Position}
+          taskOrientation={targets[selectedTaskIndex].Orientation}
         />
       )}
       <div className="mr-10">
@@ -837,17 +778,17 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
       <div className="gap-10 flex flex-row">
         <div className="flex flex-col gap-3 pl-5 mt-6">
           Task List:
-          {tasks.map((task, index) => (
+          {targets.map((target, index) => (
             <div key={index}>
-              {task.Target.locationName ? (
+              {target.locationName ? (
                 <div className="flex flex-col">
                   <span>
-                    <strong>Location Name:</strong> {task.Target.locationName}
+                    <strong>Location Name:</strong> {target.locationName}
                   </span>
                   <span>
                     <strong>Position:</strong> x :{" "}
-                    {parseFloat(task.Target.Position.x).toFixed(2)}, y :{" "}
-                    {parseFloat(task.Target.Position.y).toFixed(2)}
+                    {parseFloat(target.Position.x).toFixed(2)}, y :{" "}
+                    {parseFloat(target.Position.y).toFixed(2)}
                   </span>
                 </div>
               ) : (
@@ -857,8 +798,8 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
                   </span>
                   <span>
                     <strong>Position:</strong> x :{" "}
-                    {parseFloat(task.Target.Position.x).toFixed(2)}, y :{" "}
-                    {parseFloat(task.Target.Position.y).toFixed(2)}
+                    {parseFloat(target.Position.x).toFixed(2)}, y :{" "}
+                    {parseFloat(target.Position.y).toFixed(2)}
                   </span>
                 </div>
               )}
@@ -866,7 +807,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
                 <Button
                   className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-2 rounded w-50 h-10"
                   onClick={() => handleDeleteTask(index)}
-                  title="Delete Task"
+                  title="Delete Target"
                 ></Button>
                 {isUserAdmin && (
                   <Button
