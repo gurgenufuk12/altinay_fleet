@@ -1,72 +1,41 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { toast } from "react-toastify";
-import { useAuth } from "../../contexts/AuthContext";
+import { AuthContext } from "../../contexts/AuthContext";
 import { useUserContext } from "../../contexts/UserContext";
 import { getFirestore, doc, getDoc } from "firebase/firestore"; // Firestore functions
 import Logo from "../../assets/altınay.png";
 import Button from "../../components/Button";
 
 const SignIn = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const authContext = useContext(AuthContext);
   const navigate = useNavigate();
-  const { setUser } = useUserContext();
-  const auth = getAuth();
-  const db = getFirestore();
-  const { handleLogin, setIsLoggedIn } = useAuth();
 
   const [values, setValues] = useState({
     userEmail: "",
     password: "",
   });
 
-  const { userEmail, password } = values;
-
-  const handleChange = (userEmail: any) => (event: any) => {
-    setValues({ ...values, [userEmail]: event.target.value });
-  };
-
-  const handleSubmit = async (event: any) => {
-    event.preventDefault();
-
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
     try {
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        userEmail,
-        password
-      );
-
-      const user = userCredential.user;
-
-      const userDoc = await getDoc(doc(db, "users", user.uid));
-
-      if (userDoc.exists()) {
-        const userData = userDoc.data();
-        setUser({
-          id: user.uid,
-          username: userData.username,
-          user_Role: userData.userRole,
-          user_Email: user.email || "",
-        });
-
-        sessionStorage.setItem(
-          "userData",
-          JSON.stringify({ token: await user.getIdToken(), uid: user.uid })
-        );
-
-        handleLogin();
-        setIsLoggedIn(true);
-
+      setLoading(true);
+      if (authContext) {
+        await authContext.login(email, password);
         navigate("/");
-      } else {
-        throw new Error("User data not found.");
       }
-    } catch (error: any) {
-      toast.error(error.message);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
-
   return (
     <>
       <div className="flex flex-row h-screen p-20 bg-companyRed">
@@ -85,8 +54,8 @@ const SignIn = () => {
                   type="text"
                   id="userEmail"
                   name="userEmail"
-                  value={userEmail}
-                  onChange={handleChange("userEmail")}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="mt-1 block w-full h-10 rounded-md border shadow-sm"
                 />
               </div>
@@ -99,14 +68,14 @@ const SignIn = () => {
                   id="password"
                   name="password"
                   value={password}
-                  onChange={handleChange("password")}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="mt-1 block w-full h-10 rounded-md border shadow-sm"
                 />
               </div>
               <div className="mb-4 flex justify-end">
                 <Button
                   type="submit"
-                  onClick={(event) => handleSubmit(event)}
+                  onClick={(event) => handleLogin(event)}
                   className=" bg-black text-white py-2 px-4 rounded-md"
                 >
                   Sign In

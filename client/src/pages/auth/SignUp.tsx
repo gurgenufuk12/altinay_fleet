@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useContext, useState } from "react";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-import { useState } from "react";
+import { AuthContext } from "../../contexts/AuthContext";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { getFirestore, doc, setDoc } from "firebase/firestore"; // Firestore functions
@@ -8,46 +8,26 @@ import Button from "../../components/Button";
 import Logo from "../../assets/altınay.png";
 
 const SignUp = () => {
-  const auth = getAuth();
-  const db = getFirestore();
-  const [values, setValues] = useState({
-    username: "",
-    password: "",
-  });
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState();
+  const [loading, setLoading] = useState(false);
+  const authContext = useContext(AuthContext);
   const navigate = useNavigate();
-  const { username, password } = values;
 
-  const handleChange = (username: any) => (event: any) => {
-    setValues({ ...values, [username]: event.target.value });
-  };
-
-  const handleSubmit = async (event: any) => {
-    event.preventDefault();
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
     try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        username,
-        password
-      );
-
-      const user = userCredential.user;
-
-      await setDoc(doc(db, "users", user.uid), {
-        username: user.email?.split("@")[0] || "",
-        userRole: "user",
-        userUid: user.uid,
-        userEmail: user.email || "",
-      });
-
-      setValues({ ...values, username: "", password: "" });
-      toast.success("Sign up successfully, redirecting to sign in page...");
-      navigate("/signin");
-    } catch (error: any) {
-      console.log(error.message);
-      toast.error(error.message);
+      setLoading(true);
+      if (authContext) {
+        await authContext.register(email, password);
+        navigate("/");
+      }
+    } catch (err: any) {
+      setError(err.message);
+      setLoading(false);
     }
   };
-
   return (
     <>
       <div className="flex flex-row h-screen p-20 bg-companyRed">
@@ -66,8 +46,8 @@ const SignUp = () => {
                   type="text"
                   id="username"
                   name="username"
-                  value={username}
-                  onChange={handleChange("username")}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="mt-1 block w-full h-10 rounded-md border shadow-sm"
                 />
               </div>
@@ -80,19 +60,20 @@ const SignUp = () => {
                   id="password"
                   name="password"
                   value={password}
-                  onChange={handleChange("password")}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="mt-1 block w-full h-10 rounded-md border shadow-sm"
                 />
               </div>
               <div className="mb-4 flex justify-end">
                 <Button
                   type="submit"
-                  onClick={(event) => handleSubmit(event)}
+                  onClick={(event) => handleRegister(event)}
                   className=" bg-black text-white py-2 px-4 rounded-md"
                 >
                   Sign Up
                 </Button>
               </div>
+              {error && <p className="text-red-600 text-center">{error}</p>}
             </form>
             <div className="text-sm text-center text-white flex flex-col gap-2 items-center">
               Already have an account?
