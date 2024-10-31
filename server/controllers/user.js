@@ -7,7 +7,6 @@ const db = firebase.collection("users");
 exports.changeUserRole = async (req, res, next) => {
   const { userUid } = req.params;
   const { newRole } = req.body;
-  console.log("🚀 ~ exports.changeUserRole= ~ newRole:", newRole);
   try {
     const userRef = db.doc(userUid.trim());
     await userRef.update({
