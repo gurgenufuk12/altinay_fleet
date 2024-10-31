@@ -66,7 +66,7 @@ exports.deleteTask = async (req, res) => {
     const tasksSnapshot = await admin
       .firestore()
       .collection("tasks")
-      .where("taskId", "==", taskId)
+      .where("Task.taskId", "==", taskId)
       .get();
 
     if (tasksSnapshot.empty) {
