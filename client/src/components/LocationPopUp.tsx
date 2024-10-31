@@ -26,8 +26,6 @@ const LocationConfirm: React.FC<LocationConfirmProps> = ({
       const res = await axios.get(
         `/locations/checkLocationExist/${locationName}`
       );
-      console.log("res data", res.data);
-
       return res;
     } catch (error: any) {
       toast.error(error.response.data.message);
