@@ -383,8 +383,6 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
 
   const giveTaskToRobot = async () => {
     if (taskMode === "manual") {
-      console.log("fasdfdasfdsafadsf");
-
       switch (true) {
         // INFO: CHANGE LATER DO NOT FORGET
         // case selectedRobot === null && tasks.length === 0:
