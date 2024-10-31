@@ -3,6 +3,8 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { AuthContext } from "../contexts/AuthContext";
 import randomStringGenerator from "../hooks/useRandomStringGenerator";
+import { addTask, removeSaveFlag, updateSavedTask } from "../services/tasksApi";
+import { addTargetToRobot } from "../services/robotsApi";
 import { Target } from "../types/Target";
 import { Task } from "../types/Task";
 import { Location } from "../types/Location";
@@ -183,51 +185,37 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
       default:
         if (targets.length > 0) {
           const randomNineDigitString = generateRandomString("task");
+          console.log(targets);
 
           try {
             setLoading(true);
-            const res2 = await axios.post("/tasks/addTasks", {
-              taskId: randomNineDigitString,
-              userName: user?.username,
-              taskName: taskName,
-              taskCode: taskCode,
-              taskPriority: taskPriority,
-              taskPercentage: "0",
-              robotName: selectedRobot?.robotName,
-              robotId: selectedRobot?.robotId,
-              targets: targets.map((target, index) => ({
-                targetPosition: target.Position,
-                targetOrientation: target.Orientation,
-                targetExecuted: false,
-                locationId: target.locationId,
-                locationName: target.locationName,
-                locationDescription: target.locationDescription,
-              })),
-              taskStartTime: new Date().toISOString(),
-              taskEndTime: "",
-              savedTask: savedTask,
-            });
-            const res = await axios.post("/robots/addTarget", {
-              taskName: taskName,
-              taskCode: taskCode,
-              taskPriority: taskPriority,
-              taskId: randomNineDigitString,
-              taskPercentage: "0",
-              robotId: selectedRobot?.robotId,
-              robotStatus: "Task In Progress", // DO NOT COMMIT LIKE THIS CONVERT TO Task In Progress
-              linearVelocity: "0",
-              angularVelocity: "0",
-              pathPoints: [],
-              targets: targets.map((target, index) => ({
-                targetPosition: target.Position,
-                targetOrientation: target.Orientation,
-                targetExecuted: false,
-                locationId: target.locationId,
-                locationName: target.locationName,
-                locationDescription: target.locationDescription,
-              })),
-            });
-            toast.success(res2.data.message);
+            await addTask(
+              randomNineDigitString,
+              user?.username,
+              taskName,
+              taskCode,
+              taskPriority,
+              "0",
+              selectedRobot?.robotName,
+              selectedRobot?.robotId,
+              targets,
+              new Date().toISOString(),
+              "0",
+              savedTask
+            );
+            await addTargetToRobot(
+              randomNineDigitString,
+              taskName,
+              taskCode,
+              selectedRobot?.robotId,
+              targets,
+              taskPriority,
+              "0",
+              "0",
+              [],
+              "Task In Progress"
+            );
+            toast.success("Task added successfully");
           } catch (error: any) {
             toast.error(error.response.data.message);
           } finally {
@@ -263,7 +251,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
   const handleDeleteTask = async (task: Task | null) => {
     try {
       setLoading(true);
-      await axios.put(`/tasks/deleteTask/${task?.Task.taskId}`);
+      await removeSaveFlag(task?.Task.taskId);
       toast.success("Task deleted successfully");
       setShowConfirmation(false);
     } catch (error) {
@@ -305,22 +293,15 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
 
     try {
       setLoading(true);
-      const res = await axios.put(
-        `/tasks/updateSavedTask/${task.Task.taskId}`,
-        {
-          taskName: taskName,
-          taskCode: taskCode,
-          taskPriority: taskPriority,
-          targets: targets.map((target) => ({
-            targetPosition: target.Position,
-            targetOrientation: target.Orientation,
-            targetExecuted: false,
-            locationName: target.locationName,
-            locationDescription: target.locationDescription,
-          })),
-        }
+      const res = await updateSavedTask(
+        task.Task.taskId,
+        taskName,
+        taskCode,
+        taskPriority,
+        targets
       );
-      toast.success(res.data.message);
+      toast.success(res.message);
+
       setViewMode("defaultMode");
       setTargets([]);
       setSelectedSavedTask(null);
@@ -545,7 +526,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
                 }`}
               >
                 <span className="text-gray-800">
-                  {index + 1}. Destination:{" "}
+                  {index + 1}. Destination:
                   {target.locationName || "No Location"}{" "}
                   {target.locationDescription}
                 </span>

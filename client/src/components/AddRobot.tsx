@@ -1,5 +1,6 @@
 import React from "react";
 import randomStringGenerator from "../hooks/useRandomStringGenerator";
+import { addRobot } from "../services/robotsApi";
 import CloseIcon from "@mui/icons-material/Close";
 import axios from "axios";
 import Button from "./Button";
@@ -33,14 +34,10 @@ const AddRobot: React.FC<AddRobotProps> = ({ onClose }) => {
   const handleClick = async () => {
     const robotId = generateRandomString("robot");
     try {
-      const res = await axios.post("/robots/addRobot", {
-        robotId: robotId,
-        robotName: robotName,
-      });
-      toast.success(res.data.message);
+      await addRobot(robotName, robotId);
       onClose();
-    } catch (error: any) {
-      console.log(error);
+    } catch (error) {
+      toast.error("An error occurred while adding robot");
     }
   };
   return (
