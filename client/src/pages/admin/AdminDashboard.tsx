@@ -2,6 +2,7 @@ import React from "react";
 import axios from "axios";
 import { Robot } from "../../types/Robot";
 import { Location } from "../../types/Location";
+import { User } from "../../types/User";
 import { deleteLocation } from "../../services/locationsApi";
 import { changeUserRole, deleteUser } from "../../services/authApi";
 import { collection, onSnapshot } from "firebase/firestore";
@@ -12,12 +13,6 @@ import UpdateLocation from "../../components/UpdateLocation";
 import Button from "../../components/Button";
 import Close from "@mui/icons-material/Close";
 
-interface User {
-  userUid: string;
-  username: string;
-  userRole: string;
-  userEmail: string;
-}
 const AdminDashboard = () => {
   const [users, setUsers] = React.useState<User[]>([]);
   const [robots, setRobots] = React.useState<Robot[]>([]);
@@ -40,7 +35,11 @@ const AdminDashboard = () => {
         }));
         setUsers(users);
       });
-    } catch (error) {}
+    } catch (error: any) {
+      toast.error(
+        "Error fetching users: " + error.response.data.message || error.message
+      );
+    }
   };
   const fetchRobots = async () => {
     try {
@@ -51,7 +50,11 @@ const AdminDashboard = () => {
         }));
         setRobots(robots);
       });
-    } catch (error) {}
+    } catch (error: any) {
+      toast.error(
+        "Error fetching robots: " + error.response.data.message || error.message
+      );
+    }
   };
   const fetchLocations = () => {
     try {
@@ -64,8 +67,11 @@ const AdminDashboard = () => {
 
         setLocations(locations);
       });
-    } catch (error) {
-      console.log("Error fetching locations: ", error);
+    } catch (error: any) {
+      toast.error(
+        "Error fetching locations: " + error.response.data.message ||
+          error.message
+      );
     }
   };
   React.useEffect(() => {
@@ -94,8 +100,8 @@ const AdminDashboard = () => {
       );
       setUsers(updatedUsers);
       toast.success(res.message);
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      toast.error("Error updating user role: " + error.response.data.message);
     } finally {
       setLoading(false);
     }
@@ -108,8 +114,8 @@ const AdminDashboard = () => {
       setUsers(updatedUsers);
       setShowConfirmation(false);
       toast.success(res.message);
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      toast.error("Error deleting user: " + error.response.data.message);
     } finally {
       setLoading(false);
     }
