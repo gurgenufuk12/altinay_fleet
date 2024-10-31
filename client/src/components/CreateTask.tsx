@@ -15,6 +15,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import Arrow from "../assets/arrow.svg";
 import isEqual from "lodash/isEqual";
+import { set } from "lodash";
 
 interface CreateTaskProps {
   onClose: () => void;
@@ -33,8 +34,10 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
   const [taskPriority, setTaskPriority] = React.useState<string>("1");
   const [savedTask, setSavedTask] = React.useState<boolean>(false);
   const [savedTasks, setSavedTasks] = React.useState<Task[]>([]);
-  const [selectedSavedTask, setSelectedSavedTask] =
-    React.useState<Task | null>(null);
+  const [selectedSavedTask, setSelectedSavedTask] = React.useState<Task | null>(
+    null
+  );
+  const [loading, setLoading] = React.useState(false);
   const [showConfirmation, setShowConfirmation] = React.useState(false);
   const [viewMode, setViewMode] = React.useState<"editMode" | "defaultMode">(
     "defaultMode"
@@ -158,8 +161,6 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
 
   const handleClick = async () => {
     if (viewMode === "editMode") {
-      console.log(selectedSavedTask);
-
       if (selectedSavedTask) {
         handleUpdateTask(selectedSavedTask);
       }
@@ -184,6 +185,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
           const randomNineDigitString = generateRandomString("task");
 
           try {
+            setLoading(true);
             const res2 = await axios.post("/tasks/addTasks", {
               taskId: randomNineDigitString,
               userName: user?.username,
@@ -228,6 +230,8 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
             toast.success(res2.data.message);
           } catch (error: any) {
             toast.error(error.response.data.message);
+          } finally {
+            setLoading(false);
           }
         }
         setTargets([]);
@@ -258,12 +262,14 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
 
   const handleDeleteTask = async (task: Task | null) => {
     try {
+      setLoading(true);
       await axios.put(`/tasks/deleteTask/${task?.Task.taskId}`);
       toast.success("Task deleted successfully");
-      fetchSavedTasks();
       setShowConfirmation(false);
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
   const handleUpdateTask = async (task: Task) => {
@@ -298,6 +304,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
     setSavedTask(true);
 
     try {
+      setLoading(true);
       const res = await axios.put(
         `/tasks/updateSavedTask/${task.Task.taskId}`,
         {
@@ -319,14 +326,31 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
       setSelectedSavedTask(null);
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const conditionalButtonRender = () => {
+    switch (viewMode) {
+      case "editMode":
+        switch (loading) {
+          case true:
+            return "Updating...";
+          default:
+            return "Update Task";
+        }
+      default:
+        switch (loading) {
+          case true:
+            return "Submitting...";
+          default:
+            return "Submit Task";
+        }
     }
   };
   return (
     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-75">
-      <div
-        ref={taskWindowRef}
-        className="w-2/3 h-4/5 bg-white rounded-lg p-8 relative flex flex-col shadow-lg overflow-auto"
-      >
+      <div className="w-2/3 h-4/5 bg-white rounded-lg p-8 relative flex flex-col shadow-lg overflow-auto">
         <button onClick={onClose} className="absolute top-4 right-4">
           <CloseIcon className="text-black" />
         </button>
@@ -541,7 +565,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
           }`}
           onClick={handleClick}
         >
-          {viewMode === "editMode" ? "Update" : "Submit"}
+          {conditionalButtonRender()}
         </button>
       </div>
       {showConfirmation && (
@@ -565,7 +589,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
                 className="px-4 py-2 bg-red-600 text-white rounded-lg"
                 onClick={() => handleDeleteTask(selectedSavedTask)}
               >
-                Delete
+                {loading ? "Deleting..." : "Delete"}
               </button>
             </div>
           </div>
