@@ -7,6 +7,7 @@ const db = firebase.collection("users");
 exports.changeUserRole = async (req, res, next) => {
   const { userUid } = req.params;
   const { newRole } = req.body;
+  console.log("🚀 ~ exports.changeUserRole= ~ newRole:", newRole);
   try {
     const userRef = db.doc(userUid.trim());
     await userRef.update({
@@ -14,7 +15,7 @@ exports.changeUserRole = async (req, res, next) => {
     });
     res.status(200).json({
       success: true,
-      message: "User role updated successfully",
+      message: `User role updated for UserId: ${userUid} `,
     });
   } catch (error) {
     console.error(error);
@@ -31,5 +32,7 @@ exports.deleteUser = async (req, res, next) => {
       success: true,
       message: "User deleted successfully",
     });
-  } catch (error) {}
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
 };

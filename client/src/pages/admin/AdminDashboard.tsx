@@ -3,6 +3,7 @@ import axios from "axios";
 import { Robot } from "../../types/Robot";
 import { Location } from "../../types/Location";
 import { deleteLocation } from "../../services/locationsApi";
+import { changeUserRole, deleteUser } from "../../services/authApi";
 import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../../firebase/firebaseConfig";
 import { toast } from "react-toastify";
@@ -29,7 +30,7 @@ const AdminDashboard = () => {
   const [showUpdateLocation, setShowUpdateLocation] = React.useState(false);
   const [selectedLocation, setSelectedLocation] =
     React.useState<Location | null>(null);
-
+  const [loading, setLoading] = React.useState(false);
   const fetchUsers = async () => {
     try {
       const usersRef = collection(db, "users");
@@ -84,29 +85,33 @@ const AdminDashboard = () => {
   };
   const saveUserRoleChanges = async (userUid: string) => {
     try {
-      const res = await axios.put(`/api/changeUserRole/${userUid}`, {
-        newRole: selectedRoles[userUid],
-      });
+      setLoading(true);
+      const res = await changeUserRole(userUid, selectedRoles[userUid]);
       const updatedUsers = users.map((user) =>
         user.userUid === userUid
           ? { ...user, userRole: selectedRoles[userUid] }
           : user
       );
       setUsers(updatedUsers);
-      toast.success("User role updated successfully");
+      toast.success(res.message);
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
-  const deleteUser = async (userUid: string | undefined) => {
+  const handleDeleteUser = async (userUid: string | undefined) => {
     try {
-      const res = await axios.delete(`/api/deleteUser/${userUid}`);
+      setLoading(true);
+      const res = await deleteUser(userUid);
       const updatedUsers = users.filter((user) => user.userUid !== userUid);
       setUsers(updatedUsers);
       setShowConfirmation(false);
-      toast.success("User deleted successfully");
+      toast.success(res.message);
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
   const handleDeleteLocation = async (locationId: string) => {
@@ -331,9 +336,9 @@ const AdminDashboard = () => {
               </button>
               <button
                 className="px-4 py-2 bg-red-600 text-white rounded-lg"
-                onClick={() => deleteUser(selectedUser?.userUid)}
+                onClick={() => handleDeleteUser(selectedUser?.userUid)}
               >
-                Delete
+                {loading ? "Deleting..." : "Delete"}
               </button>
             </div>
           </div>
