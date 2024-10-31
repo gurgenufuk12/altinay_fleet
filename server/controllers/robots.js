@@ -89,9 +89,10 @@ exports.addTarget = async (req, res, next) => {
         pathPoints: pathPoints,
       },
       Targets: targets.map((target) => ({
-        Position: target.targetPosition,
-        Orientation: target.targetOrientation,
+        Position: target.Position,
+        Orientation: target.Orientation,
         targetExecuted: target.targetExecuted,
+        locationId: target.locationId,
         locationName: target.locationName,
         locationDescription: target.locationDescription,
       })),
@@ -107,24 +108,6 @@ exports.addTarget = async (req, res, next) => {
       message: error.message,
     });
   }
-};
-exports.getRobotInfo = async (req, res, next) => {
-  try {
-    const { robotId } = req.params;
-    const robotRef = db.doc(robotId.trim());
-    const robot = await robotRef.get();
-    if (!robot.exists) {
-      return res.status(404).json({
-        success: false,
-        message: "Robot not found",
-      });
-    }
-    const robotData = robot.data();
-    res.status(200).json({
-      success: true,
-      data: robotData,
-    });
-  } catch (error) {}
 };
 // exports.getCurrentRobotVelocity = async (req, res, next) => {
 //   try {
