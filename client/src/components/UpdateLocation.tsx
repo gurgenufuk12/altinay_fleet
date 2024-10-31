@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { Location } from "../types/Location";
+import { updateLocation } from "../services/locationsApi";
 import Button from "./Button";
 import { toast } from "react-toastify";
 import { Close } from "@mui/icons-material";
@@ -18,7 +19,7 @@ const UpdateLocation: React.FC<UpdateLocationProps> = ({
   const [locationDescription, setLocationDescription] = useState(
     locaiton?.locationDescription
   );
-  const updateLocation = async (locationId: string | undefined) => {
+  const handleUpdateLocation = async (locationId: string | undefined) => {
     const isTaskNameChanged = locationName !== locaiton?.locationName;
     const isTaskDescriptionChanged =
       locationDescription !== locaiton?.locationDescription;
@@ -28,11 +29,12 @@ const UpdateLocation: React.FC<UpdateLocationProps> = ({
     }
 
     try {
-      const res = await axios.put(`/locations/updateLocation/${locationId}`, {
+      const res = await updateLocation(
+        locationId,
         locationName,
-        locationDescription,
-      });
-      toast.success(res.data.message);
+        locationDescription
+      );
+      toast.success(res.message);
       onClose();
     } catch (error: any) {
       toast.error("Error updating location " + error.response.data.message);
@@ -45,7 +47,7 @@ const UpdateLocation: React.FC<UpdateLocationProps> = ({
           className="flex flex-col"
           onSubmit={(e) => {
             e.preventDefault();
-            updateLocation(locaiton?.locationId);
+            handleUpdateLocation(locaiton?.locationId);
           }}
         >
           <button className="flex self-end mb-5 bg-gray-300 rounded-full p-2 w-[40px] ">

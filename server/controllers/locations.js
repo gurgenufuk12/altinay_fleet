@@ -8,7 +8,10 @@ exports.addLocation = async (req, res, next) => {
   try {
     const { locationName, Target, locationDescription, locationId } = req.body;
     if (!locationId || locationId.trim() === "") {
-      throw new Error("locationId is required and cannot be empty");
+      return res.status(400).json({
+        success: false,
+        message: "Location ID is required",
+      });
     }
     const locationRef = db.doc(locationId.trim());
     await locationRef.set({

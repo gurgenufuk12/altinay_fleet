@@ -2,6 +2,7 @@ import React from "react";
 import axios from "axios";
 import { Robot } from "../../types/Robot";
 import { Location } from "../../types/Location";
+import { deleteLocation } from "../../services/locationsApi";
 import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../../firebase/firebaseConfig";
 import { toast } from "react-toastify";
@@ -108,15 +109,15 @@ const AdminDashboard = () => {
       console.log(error);
     }
   };
-  const deleteLocation = async (locationId: string) => {
+  const handleDeleteLocation = async (locationId: string) => {
     try {
-      const res = await axios.delete(`/locations/deleteLocation/${locationId}`);
+      const res = await deleteLocation(locationId);
 
       const updatedLocations = locations.filter(
         (location) => location.locationId !== locationId
       );
       setLocations(updatedLocations);
-      toast.success(res.data.message);
+      toast.success(res.message);
     } catch (error: any) {
       toast.error("Error deleting location " + error.response.data.message);
     }
@@ -238,11 +239,13 @@ const AdminDashboard = () => {
                           setShowUpdateLocation(true);
                           setSelectedLocation(location);
                         }}
-                        className="bg-blue-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                         title="Update"
                       />
                       <Button
-                        onClick={() => deleteLocation(location.locationId)}
+                        onClick={() =>
+                          handleDeleteLocation(location.locationId)
+                        }
                         className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-2"
                         title="Delete"
                       />
