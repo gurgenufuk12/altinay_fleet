@@ -36,16 +36,41 @@ exports.addTasks = async (req, res, next) => {
       taskEndTime: taskEndTime,
       savedTask: savedTask,
       Targets: targets.map((target) => ({
-        Position: target.targetPosition,
-        Orientation: target.targetOrientation,
+        Position: target.Position,
+        Orientation: target.Orientation,
         targetExecuted: target.targetExecuted,
+        locationId: target.locationId,
         locationName: target.locationName,
         locationDescription: target.locationDescription,
       })),
     });
-
-    // Broadcast the new task
-    // req.broadcast({ type: "new_task", data: task });
+    // INFO: Broadcast new task to MASTER_CLIENT
+    // req.broadcast({
+    //   type: "new_task",
+    //   data: {
+    //     Task: {
+    //       taskName: taskName,
+    //       taskCode: taskCode,
+    //       taskPriority: taskPriority,
+    //       taskPercentage: taskPercentage,
+    //       taskId: taskId,
+    //     },
+    //     robotName: robotName,
+    //     robotId: robotId,
+    //     userName: userName,
+    //     taskStartTime: taskStartTime,
+    //     taskEndTime: taskEndTime,
+    //     savedTask: savedTask,
+    //     Targets: targets.map((target) => ({
+    //       Position: target.Position,
+    //       Orientation: target.Orientation,
+    //       targetExecuted: target.targetExecuted,
+    //       locationId: target.locationId,
+    //       locationName: target.locationName,
+    //       locationDescription: target.locationDescription,
+    //     })),
+    //   },
+    // });
 
     res.status(200).json({
       success: true,
@@ -92,17 +117,21 @@ exports.deleteTask = async (req, res) => {
 exports.updateSavedTask = async (req, res) => {
   const { taskId } = req.params;
   const { taskName, taskCode, taskPriority, targets } = req.body;
-  console.log(req.body);
   try {
     const taskRef = db.doc(taskId.trim());
     await taskRef.update({
-      taskName: taskName,
-      taskCode: taskCode,
-      taskPriority: taskPriority,
+      Task: {
+        taskName: taskName,
+        taskCode: taskCode,
+        taskPriority: taskPriority,
+        taskId: taskId,
+        taskPercentage: "0",
+      },
       Targets: targets.map((target) => ({
-        Position: target.targetPosition,
-        Orientation: target.targetOrientation,
+        Position: target.Position,
+        Orientation: target.Orientation,
         targetExecuted: target.targetExecuted,
+        locationId: target.locationId,
         locationName: target.locationName,
         locationDescription: target.locationDescription,
       })),

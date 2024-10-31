@@ -7,6 +7,7 @@ import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase/firebaseConfig";
 import RobotInfo from "./RobotInfo";
 import useRandomStringGenerator from "../hooks/useRandomStringGenerator";
+import { addTask } from "../services/tasksApi";
 import Button from "./Button";
 import LocationConfirm from "./LocationPopUp";
 import { Target } from "../types/Target";
@@ -382,6 +383,8 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
   };
 
   const giveTaskToRobot = async () => {
+    const randomNineDigitString = generateRandomString("task");
+
     if (taskMode === "manual") {
       switch (true) {
         // INFO: CHANGE LATER DO NOT FORGET
@@ -417,29 +420,24 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
               //   })),
               // });
               // toast.success("Task is given to robot successfully");
-              const randomNineDigitString = generateRandomString("task");
 
-              const res2 = await axios.post("/tasks/addTasks", {
-                taskId: randomNineDigitString,
-                userName: user?.username,
-                taskName: "MAP",
-                taskCode: taskCode,
-                taskPriority: "1",
-                taskPercentage: "0",
-                robotName: selectedRobot?.robotName,
-                robotId: selectedRobot?.robotId,
-                targets: targets.map((target, index) => ({
-                  targetPosition: target.Position,
-                  targetOrientation: target.Orientation,
-                  targetExecuted: false,
-                  locationName: target.locationName,
-                })),
-                taskStartTime: new Date().toISOString(),
-                savedTask: false,
-              });
-              toast.success(res2.data.message);
+              const res2 = await addTask(
+                randomNineDigitString,
+                user?.username,
+                "Map Task",
+                taskCode,
+                "1",
+                "0",
+                selectedRobot.robotName,
+                selectedRobot.robotId,
+                targets,
+                new Date().toISOString(),
+                "",
+                false
+              );
+              toast.success(res2.message);
             } catch (error: any) {
-              toast.error(error.response.data.message);
+              toast.error(error.message);
             }
           }
 
@@ -456,21 +454,20 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
         return;
       } else {
         try {
-          const res2 = await axios.post("/tasks/addTasks", {
-            userName: user?.username,
-            taskName: "",
-            taskCode: taskCode,
-            taskPriority: "1",
-            taskPercentage: "0",
-            robotName: " ",
-            robotId: " ",
-            targets: targets.map((target, index) => ({
-              targetPosition: target.Position,
-              targetOrientation: target.Orientation,
-              targetExecuted: false,
-            })),
-            taskStartTime: new Date().toISOString(),
-          });
+          const res2 = await addTask(
+            randomNineDigitString,
+            user?.username,
+            "Map Task",
+            taskCode,
+            "1",
+            "0",
+            "",
+            "",
+            targets,
+            new Date().toISOString(),
+            "",
+            false
+          );
           toast.success("Task is given robot will chosen automatically!");
           setTargets([]);
         } catch (error: any) {
