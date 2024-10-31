@@ -7,6 +7,11 @@ const db = firebase.collection("users");
 exports.changeUserRole = async (req, res, next) => {
   const { userUid } = req.params;
   const { newRole } = req.body;
+  if (!userUid || !newRole) {
+    return res.status(400).json({
+      message: "Bad request",
+    });
+  }
   try {
     const userRef = db.doc(userUid.trim());
     await userRef.update({
