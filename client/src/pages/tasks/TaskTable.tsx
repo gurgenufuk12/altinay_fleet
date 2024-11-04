@@ -7,6 +7,7 @@ import { db } from "../../firebase/firebaseConfig";
 import TaskInspector from "../../components/TaskInspector";
 import Filter from "../../assets/filter.png";
 import SearchIcon from "@mui/icons-material/Search";
+import DynamicTable from "../../components/DynamicTable";
 
 const TaskTable: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -22,59 +23,18 @@ const TaskTable: React.FC = () => {
   }, []);
 
   const retrieveTasks = () => {
-    try {
-      const tasksRef = collection(db, "tasks");
-
-      onSnapshot(tasksRef, (snapshot) => {
-        const tasks: Task[] = snapshot.docs.map((doc) => ({
-          ...(doc.data() as Task),
-        }));
-        setTasks(tasks);
-      });
-    } catch (error) {
-      console.log("Error fetching saved tasks: ", error);
-    }
+    const tasksRef = collection(db, "tasks");
+    onSnapshot(tasksRef, (snapshot) => {
+      const tasks: Task[] = snapshot.docs.map((doc) => ({
+        ...(doc.data() as Task),
+      }));
+      setTasks(tasks);
+    });
   };
 
   const applyFilter = (taskCode: string) => {
     setFilter(taskCode === "All" ? "" : taskCode);
     setIsDropdownOpen(false);
-  };
-
-  const clearFilter = () => {
-    setFilter("");
-  };
-
-  const filteredTasks = tasks
-    .filter((task) => {
-      if (!filter) return true;
-      return task.Task.taskCode === filter;
-    })
-    .filter((task) => {
-      if (!searchTerm) return true;
-      const search = searchTerm.toLowerCase();
-      return (
-        task.robotName?.toLowerCase().includes(search) ||
-        task.userName?.toLowerCase().includes(search) ||
-        task.Task.taskCode?.toLowerCase().includes(search) ||
-        task.Task.taskName?.toLowerCase().includes(search) ||
-        task.Task.taskPriority?.toLowerCase().includes(search) ||
-        task.Task.taskPercentage?.toLowerCase().includes(search) ||
-        task.taskStartTime?.toLowerCase().includes(search) ||
-        (task.Targets &&
-          task.Targets.some(
-            (target) =>
-              target.locationName?.toLowerCase().includes(search) ||
-              (target.locationDescription &&
-                target.locationDescription?.toLowerCase().includes(search)) ||
-              target.targetExecuted.toString().toLowerCase().includes(search)
-          ))
-      );
-    })
-    .reverse();
-  const handleTaskClick = (task: Task) => {
-    setSelectedTask(task);
-    setIsTaskInspectorOpen(true);
   };
 
   const formatDate = (date: string) => {
@@ -87,13 +47,29 @@ const TaskTable: React.FC = () => {
     });
   };
 
+  const filteredTasks = tasks
+    .filter((task) => !filter || task.Task.taskCode === filter)
+    .filter((task) => {
+      const search = searchTerm.toLowerCase();
+      return (
+        task.robotName?.toLowerCase().includes(search) ||
+        task.userName?.toLowerCase().includes(search) ||
+        task.Task.taskCode?.toLowerCase().includes(search)
+      );
+    })
+    .reverse();
+
+  const handleTaskClick = (task: Task) => {
+    setSelectedTask(task);
+    setIsTaskInspectorOpen(true);
+  };
+
   return (
     <div className="flex">
       <Sidebar />
       <div className="flex-1 p-4 bg-gray-100 min-h-screen ml-60">
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-2xl font-bold">Task Management</h1>
-
           <div className="relative flex gap-10">
             <input
               type="text"
@@ -128,78 +104,65 @@ const TaskTable: React.FC = () => {
           </div>
         </div>
 
-        <table className="min-w-full bg-white rounded-lg shadow overflow-hidden">
-          <thead className="bg-gray-800 text-white">
-            <tr>
-              {[
-                "Robot Name",
-                "Robot Id",
-                "Given By",
-                "Task Code",
-                "Task Name",
-                "Task Percentage",
-                "Task Priority",
-                "Task Start Time",
-                "Task Finish Time",
-                "Task Details",
-              ].map((header) => (
-                <th
-                  key={header}
-                  className="px-4 py-2 text-left text-sm font-medium tracking-wider"
-                >
-                  {header}
-                </th>
-              ))}
+        <DynamicTable
+          data={filteredTasks}
+          headers={[
+            "Robot Name",
+            "Robot Id",
+            "Given By",
+            "Task Code",
+            "Task Name",
+            "Task Percentage",
+            "Task Priority",
+            "Task Start Time",
+            "Task Finish Time",
+            "Task Details",
+          ]}
+          renderRow={(task, index) => (
+            <tr
+              key={index}
+              className="border-b border-gray-200 hover:bg-gray-100 cursor-pointer"
+              onClick={() => handleTaskClick(task)}
+            >
+              <td className="px-4 py-2">{task.robotName}</td>
+              <td className="px-4 py-2">{task.robotId}</td>
+              <td className="px-4 py-2">{task.userName}</td>
+              <td className="px-4 py-2">{task.Task.taskCode}</td>
+              <td className="px-4 py-2">{task.Task.taskName}</td>
+              <td className="px-4 py-2">{task.Task.taskPercentage}</td>
+              <td className="px-4 py-2">{task.Task.taskPriority}</td>
+              <td className="px-4 py-2">{formatDate(task.taskStartTime)}</td>
+              <td className="px-4 py-2">
+                {task.taskEndTime === "unknown"
+                  ? "Mission In Progress"
+                  : formatDate(task.taskEndTime)}
+              </td>
+              <td className="px-4 py-2">
+                {task.Targets.map((target, idx) => (
+                  <div key={idx} className="mb-2">
+                    <p className="text-sm">
+                      <span className="font-semibold">Location {idx + 1}:</span>{" "}
+                      {target.locationName}
+                    </p>
+                    <p className="text-sm">
+                      Target Executed:{" "}
+                      <span
+                        className={
+                          target.targetExecuted
+                            ? "text-green-500"
+                            : "text-red-500"
+                        }
+                      >
+                        {target.targetExecuted ? "Yes" : "No"}
+                      </span>
+                    </p>
+                  </div>
+                ))}
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {filteredTasks.map((task, index) => (
-              <tr
-                key={index}
-                className="border-b border-gray-200 hover:bg-gray-100 cursor-pointer"
-                onClick={() => handleTaskClick(task)}
-              >
-                <td className="px-4 py-2">{task.robotName}</td>
-                <td className="px-4 py-2">{task.robotId}</td>
-                <td className="px-4 py-2">{task.userName}</td>
-                <td className="px-4 py-2">{task.Task.taskCode}</td>
-                <td className="px-4 py-2">{task.Task.taskName}</td>
-                <td className="px-4 py-2">{task.Task.taskPercentage}</td>
-                <td className="px-4 py-2">{task.Task.taskPriority}</td>
-                <td className="px-4 py-2">{formatDate(task.taskStartTime)}</td>
-                <td className="px-4 py-2">
-                  {task.taskEndTime == "unknown"
-                    ? "Mission In Progress"
-                    : formatDate(task.taskEndTime)}
-                </td>
-                <td className="px-4 py-2">
-                  {task.Targets.map((target, idx) => (
-                    <div key={idx} className="mb-2">
-                      <p className="text-sm">
-                        <span className="font-semibold">
-                          Location {idx + 1}:
-                        </span>{" "}
-                        {target.locationName}
-                      </p>
-                      <p className="text-sm">
-                        Target Executed:{" "}
-                        <span
-                          className={
-                            target.targetExecuted
-                              ? "text-green-500"
-                              : "text-red-500"
-                          }
-                        >
-                          {target.targetExecuted ? "Yes" : "No"}
-                        </span>
-                      </p>
-                    </div>
-                  ))}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+          )}
+        />
+
         {selectedTask && isTaskInspectorOpen && (
           <TaskInspector
             task={selectedTask}
