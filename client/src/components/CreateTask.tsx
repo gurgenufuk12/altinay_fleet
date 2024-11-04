@@ -46,6 +46,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
   );
 
   const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(null);
+  const [error, setError] = React.useState<string | null>(null);
   const { generateRandomString } = randomStringGenerator();
   const handleRobotChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const robotName = event.target.value;
@@ -56,19 +57,17 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
     try {
       const savedTasksRef = collection(db, "tasks");
 
-      // Listen for real-time updates
       onSnapshot(savedTasksRef, (snapshot) => {
         const savedTasks: Task[] = snapshot.docs
-          .filter((doc) => doc.data().savedTask === true) // Filter for saved tasks
+          .filter((doc) => doc.data().savedTask === true)
           .map((doc) => ({
-            ...(doc.data() as Task), // Spread the data and cast it to match the SavedTask interface
+            ...(doc.data() as Task),
           }));
 
-        // Update the state with the fetched saved tasks
         setSavedTasks(savedTasks);
       });
     } catch (error) {
-      console.log("Error fetching saved tasks: ", error);
+      toast.error("Error fetching saved tasks");
     }
   };
 
@@ -120,8 +119,8 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
 
         setRobots(robots);
       });
-    } catch (error) {
-      console.log("Error fetching robots: ", error);
+    } catch (error: any) {
+      toast.error(`Error fetching robots: ${error.response.data.message}`);
     }
   };
   const fetchLocations = () => {
@@ -135,8 +134,8 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
 
         setLocations(locations);
       });
-    } catch (error) {
-      console.log("Error fetching locations: ", error);
+    } catch (error: any) {
+      toast.error(`Error fetching locations: ${error.response.data.message}`);
     }
   };
   React.useEffect(() => {
@@ -170,18 +169,18 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
     }
     switch (true) {
       // INFO: CHANGE LATER DO NOT FORGET
-      // case selectedRobot === null && tasks.length === 0:
-      //   toast.error("Please select a robot and target position");
-      //   break;
-      // case selectedRobot !== null && tasks.length === 0:
-      //   toast.error("Please give a task to the robot");
-      //   break;
-      // case selectedRobot === null && tasks.length !== 0:
-      //   toast.error("Please select a robot to give a task");
-      //   break;
-      // case taskCode.trim() === "":
-      //   toast.error("Task code cannot be empty");
-      //   break;
+      case selectedRobot === null && targets.length === 0:
+        setError("Please select a robot and target position");
+        break;
+      case selectedRobot !== null && targets.length === 0:
+        setError("Please give a task to the robot");
+        break;
+      case selectedRobot === null && targets.length !== 0:
+        setError("Please select a robot to give a task");
+        break;
+      case taskCode.trim() === "":
+        setError("Task code cannot be empty");
+        break;
       default:
         if (targets.length > 0) {
           const randomNineDigitString = generateRandomString("task");
@@ -200,7 +199,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
               selectedRobot?.robotId,
               targets,
               new Date().toISOString(),
-              "0",
+              "unknown",
               savedTask
             );
             await addTargetToRobot(
@@ -540,6 +539,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
             ))}
           </div>
         </div>
+        <span className="font-semibold text-red-600">{error}</span>
         <button
           className={` flex items-center mb-4 font-bold  p-5 py-2 px-4  text-white rounded-lg self-center mt-8 ${
             viewMode === "editMode" ? " bg-orange-400" : "bg-blue-500"

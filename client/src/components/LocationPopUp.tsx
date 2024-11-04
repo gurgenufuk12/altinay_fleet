@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { addLocation, checkLocationExist } from "../services/locationsApi";
 import randomStringGenerator from "../hooks/useRandomStringGenerator";
 import CloseIcon from "@mui/icons-material/Close";
@@ -19,6 +18,7 @@ const LocationConfirm: React.FC<LocationConfirmProps> = ({
 }) => {
   const [locationName, setLocationName] = useState("");
   const [locationDescription, setLocationDescription] = useState("");
+  const [error, setError] = useState("");
   const popUpWindowRef = React.useRef<HTMLDivElement>(null);
   const { generateRandomString } = randomStringGenerator();
 
@@ -27,38 +27,22 @@ const LocationConfirm: React.FC<LocationConfirmProps> = ({
       const res = await checkLocationExist(locationName);
       return res;
     } catch (error: any) {
-      toast.error(error.response.data.message);
+      setError(error.response.data.message);
     }
   };
   const handleAddLocation = async () => {
     if (locationName.trim() === "") {
-      toast.error("Location name cannot be empty");
+      setError("Location name cannot be empty");
       return;
     }
     if (locationDescription.trim() === "") {
-      toast.error("Location description cannot be empty");
+      setError("Location description cannot be empty");
       return;
     }
     const data = await handleCheckLocationExist();
 
     if (data?.locationExists) {
-      toast.error(
-        <div className="flex flex-col">
-          <span>
-            <strong>Location with the name already exists!</strong>
-          </span>
-          <span>
-            Location Name: <strong>{data.locationData.locationName}</strong>
-          </span>
-          <span>
-            Location Description:{" "}
-            <strong>{data.locationData.locationDescription}</strong>
-          </span>
-          <span>
-            Location Id: <strong>{data.locationData.locationId}</strong>
-          </span>
-        </div>
-      );
+      setError(`Location ${data.locationData.locationName} already exists`);
       return;
     } else {
       const randomNineDigitString = generateRandomString("L");
@@ -121,6 +105,9 @@ const LocationConfirm: React.FC<LocationConfirmProps> = ({
           value={locationDescription}
           onChange={(e) => setLocationDescription(e.target.value)}
         />
+        <span className="font-semibold text-red-600 ">
+          {error ? error : ""}
+        </span>
         <div className="flex justify-end">
           <Button
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg mr-2"

@@ -4,6 +4,7 @@ import { Robot } from "../types/Robot";
 import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase/firebaseConfig";
 import RobotPicture from "../assets/amr.png";
+import { toast } from "react-toastify";
 
 interface RobotInfoProps {
   selectedRobot: Robot | null;
@@ -26,8 +27,9 @@ const RobotInfo: React.FC<RobotInfoProps> = ({ selectedRobot }) => {
 
         setActiveRobot(robot[0]);
       });
-    } catch (error) {
-      console.log("Error fetching saved tasks: ", error);
+    } catch (error: any) {
+      toast.error(`
+      Error fetching robot information: ${error.message}`);
     }
   };
 

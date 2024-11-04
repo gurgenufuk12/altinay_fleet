@@ -31,7 +31,7 @@ const Map: React.FC<CanvasProps> = ({ width, height }) => {
   const [taskCode, settaskCode] = React.useState<string>("");
   const [locationName, setLocationName] = React.useState<string>("");
   const [locations, setLocations] = React.useState<Location[]>([]);
-  const [isUserAdmin, setIsUserAdmin] = React.useState<boolean>(false); // DO NOT COMMIT JUST FOR DEV AS TRUE
+  const [isUserAdmin, setIsUserAdmin] = React.useState<boolean>(false);
   const [disableButtons, setDisableButtons] = React.useState<boolean[]>([]);
   const [savedTasks, setSavedTasks] = React.useState<Task[]>([]);
   const [savedTaskName, setSavedTaskName] = React.useState<string>("");

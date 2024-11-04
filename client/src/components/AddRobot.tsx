@@ -13,6 +13,7 @@ interface AddRobotProps {
 const AddRobot: React.FC<AddRobotProps> = ({ onClose }) => {
   const addRobotWindowRef = React.useRef<HTMLDivElement>(null);
   const [robotName, setRobotName] = React.useState<string>("");
+  const [error, setError] = React.useState<string>("");
   const { generateRandomString } = randomStringGenerator();
 
   React.useEffect(() => {
@@ -32,12 +33,12 @@ const AddRobot: React.FC<AddRobotProps> = ({ onClose }) => {
   }, [onClose]);
 
   const handleClick = async () => {
-    const robotId = generateRandomString("robot");
+    const robotId = generateRandomString("R");
     try {
       await addRobot(robotName, robotId);
       onClose();
-    } catch (error) {
-      toast.error("An error occurred while adding robot");
+    } catch (error: any) {
+      setError(error.response.data.message);
     }
   };
   return (
