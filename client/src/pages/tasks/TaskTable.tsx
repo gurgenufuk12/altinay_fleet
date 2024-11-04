@@ -8,7 +8,6 @@ import TaskInspector from "../../components/TaskInspector";
 import Filter from "../../assets/filter.png";
 import SearchIcon from "@mui/icons-material/Search";
 
-
 const TaskTable: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [filter, setFilter] = useState<string>("");
@@ -30,7 +29,6 @@ const TaskTable: React.FC = () => {
         const tasks: Task[] = snapshot.docs.map((doc) => ({
           ...(doc.data() as Task),
         }));
-
         setTasks(tasks);
       });
     } catch (error) {
@@ -170,9 +168,9 @@ const TaskTable: React.FC = () => {
                 <td className="px-4 py-2">{task.Task.taskPriority}</td>
                 <td className="px-4 py-2">{formatDate(task.taskStartTime)}</td>
                 <td className="px-4 py-2">
-                  {task.taskEndTime
-                    ? formatDate(task.taskEndTime)
-                    : "Not Finished"}
+                  {task.taskEndTime == "unknown"
+                    ? "Mission In Progress"
+                    : formatDate(task.taskEndTime)}
                 </td>
                 <td className="px-4 py-2">
                   {task.Targets.map((target, idx) => (
