@@ -33,7 +33,8 @@ const AddRobot: React.FC<AddRobotProps> = ({ onClose }) => {
   }, [onClose]);
 
   const handleClick = async () => {
-    const robotId = generateRandomString("R");
+    const robotId = generateRandomString("robot");
+
     try {
       await addRobot(robotName, robotId);
       onClose();
