@@ -1,80 +1,11 @@
-const firebase = require("../db");
-const Task = require("../models/task");
-const admin = require("firebase-admin");
-const auth = admin.auth();
-const db = firebase.collection("tasks");
+const taskService = require("../services/taskService");
 
 exports.addTasks = async (req, res, next) => {
   try {
-    const {
-      userName,
-      taskName,
-      taskCode,
-      taskPriority,
-      taskPercentage,
-      robotName,
-      robotId,
-      targets,
-      taskStartTime,
-      taskEndTime,
-      savedTask,
-      taskId,
-    } = req.body;
-    const taskRef = db.doc(taskId.trim());
-    await taskRef.set({
-      Task: {
-        taskName: taskName,
-        taskCode: taskCode,
-        taskPriority: taskPriority,
-        taskPercentage: taskPercentage,
-        taskId: taskId,
-      },
-      robotName: robotName,
-      robotId: robotId,
-      userName: userName,
-      taskStartTime: taskStartTime,
-      taskEndTime: taskEndTime,
-      savedTask: savedTask,
-      Targets: targets.map((target) => ({
-        Position: target.Position,
-        Orientation: target.Orientation,
-        targetExecuted: target.targetExecuted,
-        locationId: target.locationId,
-        locationName: target.locationName,
-        locationDescription: target.locationDescription,
-      })),
-    });
-    // INFO: Broadcast new task to MASTER_CLIENT
-    // req.broadcast({
-    //   type: "new_task",
-    //   data: {
-    //     Task: {
-    //       taskName: taskName,
-    //       taskCode: taskCode,
-    //       taskPriority: taskPriority,
-    //       taskPercentage: taskPercentage,
-    //       taskId: taskId,
-    //     },
-    //     robotName: robotName,
-    //     robotId: robotId,
-    //     userName: userName,
-    //     taskStartTime: taskStartTime,
-    //     taskEndTime: taskEndTime,
-    //     savedTask: savedTask,
-    //     Targets: targets.map((target) => ({
-    //       Position: target.Position,
-    //       Orientation: target.Orientation,
-    //       targetExecuted: target.targetExecuted,
-    //       locationId: target.locationId,
-    //       locationName: target.locationName,
-    //       locationDescription: target.locationDescription,
-    //     })),
-    //   },
-    // });
-
+    await taskService.addTask(req.body);
     res.status(200).json({
       success: true,
-      message: `Task with ID ${taskId} added successfully`,
+      message: `Task with ID ${req.body.taskId} added successfully`,
     });
   } catch (error) {
     console.error(error);
@@ -84,58 +15,22 @@ exports.addTasks = async (req, res, next) => {
     });
   }
 };
+
 exports.deleteTask = async (req, res) => {
   const { taskId } = req.params;
-  console.log(taskId);
   try {
-    const tasksSnapshot = await admin
-      .firestore()
-      .collection("tasks")
-      .where("Task.taskId", "==", taskId)
-      .get();
-
-    if (tasksSnapshot.empty) {
-      return res.status(404).json({ message: "Task not found" });
-    }
-
-    const updatePromises = tasksSnapshot.docs.map((doc) => {
-      return doc.ref.update({ savedTask: false });
-    });
-
-    await Promise.all(updatePromises);
-
-    const updatedTasks = tasksSnapshot.docs.map((doc) => {
-      return { id: doc.id, ...doc.data() };
-    });
-
-    res.status(200).json({ deletedTasks: updatedTasks });
+    const deletedTasks = await taskService.deleteTask(taskId);
+    res.status(200).json({ deletedTasks });
   } catch (error) {
     console.error("Error deleting task:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ message: error.message });
   }
 };
+
 exports.updateSavedTask = async (req, res) => {
   const { taskId } = req.params;
-  const { taskName, taskCode, taskPriority, targets } = req.body;
   try {
-    const taskRef = db.doc(taskId.trim());
-    await taskRef.update({
-      Task: {
-        taskName: taskName,
-        taskCode: taskCode,
-        taskPriority: taskPriority,
-        taskId: taskId,
-        taskPercentage: "0",
-      },
-      Targets: targets.map((target) => ({
-        Position: target.Position,
-        Orientation: target.Orientation,
-        targetExecuted: target.targetExecuted,
-        locationId: target.locationId,
-        locationName: target.locationName,
-        locationDescription: target.locationDescription,
-      })),
-    });
+    await taskService.updateSavedTask(taskId, req.body);
     res.status(200).json({
       message: `Task with ID ${taskId} updated successfully`,
     });
