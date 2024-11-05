@@ -3,20 +3,13 @@ const User = require("../models/user");
 const admin = require("firebase-admin");
 const auth = admin.auth();
 const db = firebase.collection("users");
+const authService = require("../services/authService");
 
 exports.changeUserRole = async (req, res, next) => {
   const { userUid } = req.params;
   const { newRole } = req.body;
-  if (!userUid || !newRole) {
-    return res.status(400).json({
-      message: "Bad request",
-    });
-  }
   try {
-    const userRef = db.doc(userUid.trim());
-    await userRef.update({
-      userRole: newRole,
-    });
+    await authService.changeUserRole(userUid, newRole);
     res.status(200).json({
       success: true,
       message: `User role updated for UserId: ${userUid} `,
@@ -29,9 +22,7 @@ exports.changeUserRole = async (req, res, next) => {
 exports.deleteUser = async (req, res, next) => {
   const { userUid } = req.params;
   try {
-    const userRef = db.doc(userUid.trim());
-    await userRef.delete();
-    await auth.deleteUser(userUid);
+    await authService.deleteUser(userUid);
     res.status(200).json({
       success: true,
       message: "User deleted successfully",
