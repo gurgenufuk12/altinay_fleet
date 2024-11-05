@@ -1,25 +1,23 @@
-const firebase = require("../db");
-const Location = require("../models/location");
-const admin = require("firebase-admin");
-const auth = admin.auth();
-const db = firebase.collection("locations");
+const locationService = require("../services/locationService");
 
 exports.addLocation = async (req, res, next) => {
   try {
     const { locationName, Target, locationDescription, locationId } = req.body;
+
     if (!locationId || locationId.trim() === "") {
       return res.status(400).json({
         success: false,
         message: "Location ID is required",
       });
     }
-    const locationRef = db.doc(locationId.trim());
-    await locationRef.set({
-      locationId: locationId,
-      locationName: locationName,
-      locationDescription: locationDescription,
-      Target: Target,
+
+    await locationService.addLocation({
+      locationId,
+      locationName,
+      Target,
+      locationDescription,
     });
+
     res.status(200).json({
       success: true,
       message: `Location with ID ${locationId} added successfully`,
@@ -32,11 +30,12 @@ exports.addLocation = async (req, res, next) => {
     });
   }
 };
+
 exports.deleteLocation = async (req, res, next) => {
   const { locationId } = req.params;
   try {
-    const locationRef = db.doc(locationId.trim());
-    await locationRef.delete();
+    await locationService.deleteLocation(locationId);
+
     res.status(200).json({
       success: true,
       message: `Location with ID ${locationId} deleted successfully`,
@@ -49,18 +48,13 @@ exports.deleteLocation = async (req, res, next) => {
     });
   }
 };
+
 exports.checkLocationExist = async (req, res) => {
   const { locationName } = req.params;
   try {
-    const locations = await db.get();
-    let locationExists = false;
-    let locationData;
-    locations.forEach((doc) => {
-      if (doc.data().locationName === locationName) {
-        locationExists = true;
-        locationData = doc.data();
-      }
-    });
+    const { locationExists, locationData } =
+      await locationService.checkLocationExist(locationName);
+
     res.status(200).json({
       success: true,
       locationExists: locationExists,
@@ -74,16 +68,13 @@ exports.checkLocationExist = async (req, res) => {
     });
   }
 };
+
 exports.updateLocation = async (req, res, next) => {
   const { locationId } = req.params;
   const data = req.body;
-  const locationRef = db.doc(locationId);
 
   try {
-    await locationRef.update({
-      locationName: data.locationName,
-      locationDescription: data.locationDescription,
-    });
+    await locationService.updateLocation(locationId, data);
 
     res.status(200).json({
       success: true,
