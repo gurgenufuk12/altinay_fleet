@@ -8,6 +8,7 @@ import TaskInspector from "../../components/TaskInspector";
 import Filter from "../../assets/filter.png";
 import SearchIcon from "@mui/icons-material/Search";
 import DynamicTable from "../../components/DynamicTable";
+import ExcelExport from "../../components/ExcelExport";
 
 const TaskTable: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -117,6 +118,9 @@ const TaskTable: React.FC = () => {
             "Task Start Time",
             "Task Finish Time",
             "Task Details",
+            (
+              <ExcelExport data={filteredTasks} fileName="Task_History" />
+            ) as any,
           ]}
           renderRow={(task, index) => (
             <tr
