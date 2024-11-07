@@ -1,18 +1,46 @@
-import axios from "axios";
+import axios, { AxiosRequestConfig } from "axios";
 import { Target } from "../types/Target";
-const API_BASE_URL = "http://localhost:8000/robots";
 
-export const addRobot = async (robotName: string, robotId: string) => {
+const DUMMY_BASE_URL = "http://localhost:8000";
+
+function assertParamExists(
+  functionName: string,
+  paramName: string,
+  paramValue: any
+) {
+  if (paramValue == null) {
+    throw new Error(`${functionName} requires parameter '${paramName}'`);
+  }
+}
+
+export const addRobot = async (
+  robotName: string,
+  robotId: string,
+  options: AxiosRequestConfig = {}
+): Promise<any> => {
+  assertParamExists("addRobot", "robotName", robotName);
+  assertParamExists("addRobot", "robotId", robotId);
+
+  const localVarPath = `/robots/addRobot`;
+  const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+  const localVarRequestOptions = {
+    method: "POST",
+    ...options,
+    headers: { ...options.headers },
+  };
+
   try {
-    const response = await axios.post(`${API_BASE_URL}/addRobot`, {
-      robotName,
-      robotId,
-    });
+    const response = await axios.post(
+      localVarUrlObj.toString(),
+      { robotName, robotId },
+      localVarRequestOptions
+    );
     return response.data;
   } catch (error) {
     return error;
   }
 };
+
 export const addTargetToRobot = async (
   taskId: string,
   taskName: string,
@@ -23,21 +51,38 @@ export const addTargetToRobot = async (
   linearVelocity: string,
   angularVelocity: string,
   pathPoints: [],
-  robotStatus: string
-) => {
+  robotStatus: string,
+  options: AxiosRequestConfig = {}
+): Promise<any> => {
+  assertParamExists("addTargetToRobot", "taskId", taskId);
+  assertParamExists("addTargetToRobot", "taskName", taskName);
+  assertParamExists("addTargetToRobot", "taskCode", taskCode);
+
+  const localVarPath = `/robots/addTarget`;
+  const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+  const localVarRequestOptions = {
+    method: "POST",
+    ...options,
+    headers: { ...options.headers },
+  };
+
   try {
-    const response = await axios.post(`${API_BASE_URL}/addTarget`, {
-      taskId,
-      taskName,
-      taskCode,
-      robotId,
-      targets,
-      taskPriority,
-      linearVelocity,
-      angularVelocity,
-      pathPoints,
-      robotStatus,
-    });
+    const response = await axios.post(
+      localVarUrlObj.toString(),
+      {
+        taskId,
+        taskName,
+        taskCode,
+        robotId,
+        targets,
+        taskPriority,
+        linearVelocity,
+        angularVelocity,
+        pathPoints,
+        robotStatus,
+      },
+      localVarRequestOptions
+    );
     return response.data;
   } catch (error) {
     return error;
