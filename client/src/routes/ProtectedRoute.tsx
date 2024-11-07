@@ -1,5 +1,6 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
+import { AuthContext } from "../contexts/AuthContext";
 
 export const ProtectedRoute = ({
   component: Component,
@@ -8,14 +9,15 @@ export const ProtectedRoute = ({
   component: React.ComponentType<any>;
   adminOnly?: boolean;
 }) => {
-  const userProfile = localStorage.getItem("userProfile");
+  const authContext = React.useContext(AuthContext);
+  const user = authContext?.userProfile;
+  const isLoggedIn = localStorage.getItem("isLoggedIn");
 
-  if (!userProfile) {
+  if (!isLoggedIn) {
     return <Navigate to="/signin" />;
   }
-  if (userProfile && adminOnly) {
-    const parsedProfile = JSON.parse(userProfile);
-    if (parsedProfile.userRole !== "admin") {
+  if (isLoggedIn && adminOnly) {
+    if (user?.userRole !== "admin") {
       return <Navigate to="/" />;
     }
   }

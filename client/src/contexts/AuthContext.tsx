@@ -38,29 +38,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const fetchUserProfile = async (userUid: string) => {
     const userDoc = await getDoc(doc(db, "users", userUid));
     if (userDoc.exists()) {
-      const profileData = userDoc.data() as UserProfile;
-      setUserProfile(profileData);
-      localStorage.setItem("userProfile", JSON.stringify(profileData));
+      setUserProfile(userDoc.data() as UserProfile);
     } else {
       setUserProfile(null);
-      localStorage.removeItem("userProfile");
     }
   };
 
   useEffect(() => {
-    const storedProfile = localStorage.getItem("userProfile");
-    if (storedProfile) {
-      setUserProfile(JSON.parse(storedProfile));
-    }
+    const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
 
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
+      if (user && isLoggedIn) {
         setUser(user);
+
         await fetchUserProfile(user.uid);
       } else {
         setUser(null);
         setUserProfile(null);
-        localStorage.removeItem("userProfile");
+        localStorage.removeItem("isLoggedIn");
       }
     });
     return () => unsubscribe();
@@ -82,7 +77,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       await setDoc(doc(db, "users", result.user.uid), newUserProfile);
       setUser(result.user);
       setUserProfile(newUserProfile);
-      localStorage.setItem("userProfile", JSON.stringify(newUserProfile));
+      localStorage.setItem("isLoggedIn", "true");
     } catch (error) {
       console.error("Registration failed:", (error as Error).message);
       throw error;
@@ -94,6 +89,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       const result = await signInWithEmailAndPassword(auth, email, password);
       await fetchUserProfile(result.user.uid);
       setUser(result.user);
+      localStorage.setItem("isLoggedIn", "true");
     } catch (error) {
       console.error("Login failed:", (error as Error).message);
       throw error;
@@ -105,7 +101,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       await signOut(auth);
       setUser(null);
       setUserProfile(null);
-      localStorage.removeItem("userProfile");
+      localStorage.removeItem("isLoggedIn");
     } catch (error) {
       console.error("Logout failed:", (error as Error).message);
     }
