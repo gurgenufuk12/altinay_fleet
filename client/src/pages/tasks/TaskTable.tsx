@@ -111,6 +111,7 @@ const TaskTable: React.FC = () => {
             "Robot Name",
             "Robot Id",
             "Given By",
+            "Task Id",
             "Task Code",
             "Task Name",
             "Task Percentage",
@@ -131,6 +132,7 @@ const TaskTable: React.FC = () => {
               <td className="px-4 py-2">{task.robotName}</td>
               <td className="px-4 py-2">{task.robotId}</td>
               <td className="px-4 py-2">{task.userName}</td>
+              <td className="px-4 py-2">{task.Task.taskId}</td>
               <td className="px-4 py-2">{task.Task.taskCode}</td>
               <td className="px-4 py-2">{task.Task.taskName}</td>
               <td className="px-4 py-2">{task.Task.taskPercentage}</td>
