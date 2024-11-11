@@ -3,6 +3,40 @@ const taskService = require("../services/taskService");
 exports.addTasks = async (req, res, next) => {
   try {
     await taskService.addTask(req.body);
+    const taskData = req.body;
+    const broadcastData = {
+      type: "new_task",
+      data: {
+        Task: {
+          taskName: taskData.taskName,
+          taskCode: taskData.taskCode,
+          taskPriority: taskData.taskPriority,
+          taskPercentage: "0",
+          taskId: taskData.taskId,
+        },
+        robotName: taskData.robotName,
+        robotId: taskData.robotId,
+        userName: taskData.userName,
+        taskStartTime: taskData.taskStartTime,
+        taskEndTime: taskData.taskEndTime,
+        savedTask: taskData.savedTask,
+        Targets: taskData.targets.map((target) => ({
+          Position: target.Position,
+          Orientation: target.Orientation,
+          targetExecuted: target.targetExecuted,
+          locationId: target.locationId,
+          locationName: target.locationName,
+          locationDescription: target.locationDescription,
+        })),
+      },
+    };
+
+    console.log(
+      "Broadcasting the following data:",
+      JSON.stringify(broadcastData, null, 2)
+    );
+
+    req.broadcast(broadcastData);
     res.status(200).json({
       success: true,
       message: `Task with ID ${req.body.taskId} added successfully`,
