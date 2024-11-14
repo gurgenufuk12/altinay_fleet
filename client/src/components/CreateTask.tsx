@@ -49,10 +49,11 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
   const [viewMode, setViewMode] = React.useState<"editMode" | "defaultMode">(
     "defaultMode"
   );
-
+  const lastTarget = targets[targets.length - 1];
   const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(null);
   const [error, setError] = React.useState<string | null>(null);
   const { generateRandomString } = randomStringGenerator();
+
   const handleRobotChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const robotName = event.target.value;
     const selectedRobot = robots.find((robot) => robot.robotName === robotName);
@@ -79,10 +80,17 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
   const handleTaskCode = (event: React.ChangeEvent<HTMLSelectElement>) => {
     settaskCode(event.target.value);
   };
+
   const handleLocationSelection = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
     const selectedLocationName = event.target.value;
+    if (targets.length > 0) {
+      if (selectedLocationName === lastTarget.locationName) {
+        toast.error("Location already added to the task list");
+        return;
+      }
+    }
     if (selectedLocationName) {
       const selectedLocation = locations.find(
         (location) => location.locationName === selectedLocationName
@@ -107,9 +115,6 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
           locationDescription: selectedLocation.locationDescription,
         };
         setTargets([...targets, newTarget]);
-        toast.success(
-          `Location "${selectedLocationName}" added to the task list successfully`
-        );
       }
     }
   };
@@ -197,7 +202,6 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
       default:
         if (targets.length > 0) {
           const randomNineDigitString = generateRandomString("task");
-          console.log(targets);
 
           try {
             setLoading(true);
