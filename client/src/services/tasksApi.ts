@@ -127,3 +127,30 @@ export const updateSavedTask = async (
     return error;
   }
 };
+export const checkSaveTaskExists = async (
+  taskName: string | undefined,
+  options: AxiosRequestConfig = {}
+): Promise<any> => {
+  assertParamExists("checkSaveTaskExists", "taskName", taskName);
+  const localVarPath = `/tasks/checkSaveTaskExists/${encodeURIComponent(
+    String(taskName)
+  )}`;
+  const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+  let baseOptions = options;
+
+  const localVarRequestOptions = {
+    method: "GET",
+    ...baseOptions,
+    headers: { ...options.headers },
+  };
+
+  try {
+    const response = await axios.get(
+      localVarUrlObj.toString(),
+      localVarRequestOptions
+    );
+    return response.data;
+  } catch (error) {
+    return error;
+  }
+};

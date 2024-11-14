@@ -83,9 +83,18 @@ async function updateSavedTask(taskId, taskData) {
     })),
   });
 }
-
+async function checkSaveTaskExists(taskName) {
+  const savedTasks = await db.where("savedTask", "==", true).get();
+  for (const task of savedTasks.docs) {
+    if (task.data().Task.taskName === taskName) {
+      return true;
+    }
+  }
+  return false;
+}
 module.exports = {
   addTask,
   deleteTask,
   updateSavedTask,
+  checkSaveTaskExists,
 };

@@ -3,7 +3,12 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { AuthContext } from "../contexts/AuthContext";
 import randomStringGenerator from "../hooks/useRandomStringGenerator";
-import { addTask, removeSaveFlag, updateSavedTask } from "../services/tasksApi";
+import {
+  addTask,
+  removeSaveFlag,
+  updateSavedTask,
+  checkSaveTaskExists,
+} from "../services/tasksApi";
 import { addTargetToRobot } from "../services/robotsApi";
 import { Target } from "../types/Target";
 import { Task } from "../types/Task";
@@ -161,12 +166,20 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
   }, [onClose]);
 
   const handleClick = async () => {
+    if (savedTask) {
+      const res = await checkSaveTaskExists(taskName);
+      if (res.taskExists && !selectedSavedTask) {
+        setError(res.message);
+        return;
+      }
+    }
     if (viewMode === "editMode") {
       if (selectedSavedTask) {
         handleUpdateTask(selectedSavedTask);
       }
       return;
     }
+
     switch (true) {
       // INFO: CHANGE LATER DO NOT FORGET
       case selectedRobot === null && targets.length === 0:
@@ -472,11 +485,8 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose }) => {
               Choose from saved tasks:
             </label>
             <div className="flex flex-col mt-4">
-              {savedTasks.map((task) => (
-                <div
-                  key={task.Task.taskName}
-                  className="flex items-center mb-4"
-                >
+              {savedTasks.map((task, idx) => (
+                <div key={idx} className="flex items-center mb-4">
                   <button
                     className={`text-gray-800 mr-2 ${
                       selectedSavedTask &&
