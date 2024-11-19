@@ -92,10 +92,22 @@ async function checkSaveTaskExists(taskName) {
   }
   return false;
 }
-async function updateSavedTaskTargetsByLocationId(task) {
-  const taskRef = db.doc(task.Task.taskId.trim());
-  await taskRef.update({
-    Targets: task.Targets,
+async function updateSavedTaskTargetsByLocationId(locationId) {
+  const tasks = await db.get();
+  const savedTasks = [];
+  tasks.forEach((doc) => {
+    if (doc.data().savedTask === true) {
+      savedTasks.push(doc.data());
+    }
+  });
+  savedTasks.forEach(async (task) => {
+    task.Targets = task.Targets.filter(
+      (target) => target.locationId !== locationId
+    );
+    const taskRef = db.doc(task.Task.taskId.trim());
+    await taskRef.update({
+      Targets: task.Targets,
+    });
   });
 }
 module.exports = {
