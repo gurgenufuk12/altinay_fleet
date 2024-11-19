@@ -202,6 +202,7 @@ const AdminDashboard = () => {
           <DynamicTable
             data={locations}
             headers={[
+              "Location Id",
               "Location Name",
               "Location Description",
               "Target Position",
@@ -212,6 +213,9 @@ const AdminDashboard = () => {
                 key={location.locationId}
                 className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
               >
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                  {location.locationId}
+                </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                   {location.locationName}
                 </td>
