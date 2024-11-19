@@ -82,9 +82,9 @@ const TaskInspector: React.FC<TaskInspectorProps> = ({ task, onClose }) => {
               </p>
               <p>
                 <span className="font-semibold">Task End Time:</span>{" "}
-                {task.taskEndTime
-                  ? formatDate(task.taskEndTime)
-                  : "Not Finished"}
+                {task.taskEndTime === "unknown"
+                  ? "Mission In Progress"
+                  : formatDate(task.taskEndTime)}
               </p>
               <p>
                 <span className="font-semibold">Task Percentage:</span>{" "}
