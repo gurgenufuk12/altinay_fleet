@@ -92,9 +92,16 @@ async function checkSaveTaskExists(taskName) {
   }
   return false;
 }
+async function updateSavedTaskTargetsByLocationId(task) {
+  const taskRef = db.doc(task.Task.taskId.trim());
+  await taskRef.update({
+    Targets: task.Targets,
+  });
+}
 module.exports = {
   addTask,
   deleteTask,
   updateSavedTask,
   checkSaveTaskExists,
+  updateSavedTaskTargetsByLocationId,
 };
