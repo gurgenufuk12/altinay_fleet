@@ -20,11 +20,13 @@ const wss = new WebSocket.Server({ server });
 
 wss.on("connection", (ws) => {
   console.log("Client connected");
+  ws.on("message", (message) => {
+    console.log("Message from client:", message);
+  });
   ws.on("close", () => console.log("Client disconnected"));
 });
 
 const broadcast = (data) => {
-  console.log("Broadcasting data:", data);
   wss.clients.forEach((client) => {
     if (client.readyState === WebSocket.OPEN) {
       client.send(JSON.stringify(data));
@@ -47,6 +49,6 @@ app.use("/robots", robotsRoutes);
 app.use("/tasks", tasksRoutes);
 app.use("/locations", locationsRoutes);
 
-app.listen(config.port, () => {
+server.listen(config.port, () => {
   console.log("Server is running on http://localhost:" + config.port);
 });
