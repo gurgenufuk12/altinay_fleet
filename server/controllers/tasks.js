@@ -76,12 +76,10 @@ exports.checkSaveTaskExists = async (req, res) => {
   const { taskName } = req.params;
   try {
     const taskExists = await taskService.checkSaveTaskExists(taskName);
-    res
-      .status(200)
-      .json({
-        taskExists,
-        message: "Saved task with given name already exists!",
-      });
+    res.status(200).json({
+      taskExists,
+      message: "Saved task with given name already exists!",
+    });
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });
   }
